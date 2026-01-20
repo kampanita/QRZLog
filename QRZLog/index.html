@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Logbook Pro Mobile</title>
+    <style>
+        :root {
+            --primary: #4361ee; --primary-hover: #3a56d4;
+            --success: #2ec4b6; --danger: #e71d36;
+            --warning: #ff9f1c; --bg: #f8f9fa;
+            --text: #2b2d42; --card-bg: #ffffff;
+        }
+
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: var(--text); margin: 0; padding: 10px; }
+        
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        header { text-align: center; padding: 20px 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .logo { width: 40px; fill: var(--primary); }
+        h1 { font-size: 1.5rem; margin: 0; color: var(--primary); }
+
+        /* Formulario Adaptable */
+        .log-form { 
+            background: var(--card-bg); padding: 20px; border-radius: 15px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;
+        }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .full-width { grid-column: span 2; }
+        
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; opacity: 0.8; }
+        input, select { 
+            width: 100%; padding: 12px; border: 2px solid #edf2f4; 
+            border-radius: 8px; font-size: 1rem; outline: none;
+        }
+        input:focus { border-color: var(--primary); }
+
+        .btn-main { 
+            width: 100%; padding: 15px; border: none; border-radius: 8px; 
+            font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s;
+            background: var(--primary); color: white; margin-top: 10px;
+        }
+        .btn-update { background: var(--warning); color: var(--text); }
+
+        /* Botones de acción */
+        .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+        .btn-small { flex: 1; padding: 10px; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: white; }
+        .bg-sec { background: #8d99ae; }
+        .bg-danger { background: var(--danger); }
+
+        /* Tabla Responsive (Tarjetas en móvil) */
+        .log-container { display: grid; gap: 10px; }
+        .log-card { 
+            background: var(--card-bg); padding: 15px; border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 5px solid var(--primary);
+            display: grid; grid-template-columns: 1fr auto;
+        }
+        .log-info b { font-size: 1.2rem; color: var(--primary); }
+        .log-meta { font-size: 0.85rem; margin-top: 5px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .badge { background: #edf2f4; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+        .card-btns { display: flex; flex-direction: column; gap: 5px; }
+        
+        @media (min-width: 600px) {
+            .grid { grid-template-columns: repeat(4, 1fr); }
+            .full-width { grid-column: span 4; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <svg class="logo" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+        <h1>Logbook Profesional</h1>
+    </header>
+
+    <div class="log-form">
+        <input type="hidden" id="editId">
+        <div class="grid">
+            <div class="form-item">
+                <label>Indicativo</label>
+                <input type="text" id="callsign" placeholder="EA4ABC">
+            </div>
+            <div class="form-item">
+                <label>RST</label>
+                <input type="text" id="rst" value="59">
+            </div>
+            <div class="form-item">
+                <label>Banda</label>
+                <select id="band">
+                    <option value="40m">40m</option><option value="20m">20m</option>
+                    <option value="15m">15m</option><option value="10m">10m</option>
+                    <option value="2m">2m</option><option value="70cm">70cm</option>
+                </select>
+            </div>
+            <div class="form-item">
+                <label>Modo</label>
+                <select id="mode">
+                    <option value="SSB">SSB</option><option value="FT8">FT8</option>
+                    <option value="CW">CW</option><option value="FM">FM</option>
+                </select>
+            </div>
+            <div class="form-item full-width">
+                <label>Comentario</label>
+                <input type="text" id="comment" placeholder="Opcional...">
+            </div>
+        </div>
+        <button id="saveBtn" class="btn-main" onclick="handleSubmit()">REGISTRAR QSO</button>
+    </div>
+
+    <div class="actions">
+        <button class="btn-small bg-sec" onclick="exportJSON()">Backup JSON</button>
+        <button class="btn-small bg-sec" onclick="exportADIF()">Export ADIF</button>
+        <button class="btn-small bg-danger" onclick="clearLogs()">Borrar Todo</button>
+    </div>
+
+    <div id="logList" class="log-container">
+        </div>
+</div>
+
+<script>
+    let logs = JSON.parse(localStorage.getItem('hamLogs')) || [];
+    let isEditing = false;
+
+    function handleSubmit() {
+        const id = document.getElementById('editId').value;
+        const data = {
+            id: id ? parseInt(id) : Date.now(),
+            timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
+            callsign: document.getElementById('callsign').value.toUpperCase(),
+            rst: document.getElementById('rst').value,
+            band: document.getElementById('band').value,
+            mode: document.getElementById('mode').value,
+            comment: document.getElementById('comment').value
+        };
+
+        if(!data.callsign) return alert("¡Sin indicativo no hay contacto!");
+
+        if(isEditing) {
+            logs = logs.map(l => l.id === data.id ? data : l);
+            isEditing = false;
+            document.getElementById('saveBtn').innerText = "REGISTRAR QSO";
+            document.getElementById('saveBtn').classList.remove('btn-update');
+        } else {
+            logs.unshift(data); // Añadir al principio
+        }
+
+        resetForm();
+        saveAndRender();
+    }
+
+    function editLog(id) {
+        const log = logs.find(l => l.id === id);
+        if(!log) return;
+
+        document.getElementById('editId').value = log.id;
+        document.getElementById('callsign').value = log.callsign;
+        document.getElementById('rst').value = log.rst;
+        document.getElementById('band').value = log.band;
+        document.getElementById('mode').value = log.mode;
+        document.getElementById('comment').value = log.comment;
+
+        isEditing = true;
+        document.getElementById('saveBtn').innerText = "ACTUALIZAR REGISTRO";
+        document.getElementById('saveBtn').classList.add('btn-update');
+        window.scrollTo(0,0);
+    }
+
+    function deleteLog(id) {
+        if(confirm("¿Eliminar este QSO?")) {
+            logs = logs.filter(l => l.id !== id);
+            saveAndRender();
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('editId').value = '';
+        document.getElementById('callsign').value = '';
+        document.getElementById('comment').value = '';
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('hamLogs', JSON.stringify(logs));
+        const list = document.getElementById('logList');
+        list.innerHTML = logs.map(log => `
+            <div class="log-card">
+                <div class="log-info">
+                    <b>${log.callsign}</b>
+                    <div class="log-meta">
+                        <span>${log.timestamp}</span>
+                        <span class="badge">${log.band}</span>
+                        <span class="badge">${log.mode}</span>
+                        <span>${log.rst}</span>
+                    </div>
+                    <div style="font-size: 0.8rem; margin-top:5px; color:#666">${log.comment}</div>
+                </div>
+                <div class="card-btns">
+                    <button class="btn-small bg-sec" onclick="editLog(${log.id})">Edit</button>
+                    <button class="btn-small bg-danger" onclick="deleteLog(${log.id})">X</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Funciones de exportación (simplificadas para el ejemplo)
+    function exportJSON() {
+        const blob = new Blob([JSON.stringify(logs, null, 2)], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'logbook.json'; a.click();
+    }
+
+    function exportADIF() {
+        let adif = "ADIF Export\n<EOH>\n" + logs.map(l => `<CALL:${l.callsign.length}>${l.callsign}<BAND:${l.band.length}>${l.band}<MODE:${l.mode.length}>${l.mode}<EOR>`).join('\n');
+        const blob = new Blob([adif], {type: 'text/plain'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'log.adi'; a.click();
+    }
+
+    function clearLogs() { if(confirm("¿Borrar todo?")) { logs = []; saveAndRender(); } }
+
+    saveAndRender();
+</script>
+
+</body>
+</html>
