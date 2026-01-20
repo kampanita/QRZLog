@@ -3,225 +3,335 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radio Logbook Pro Mobile</title>
+    <title>RadioLog Pro v2.0 - IT Systems</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #4361ee; --primary-hover: #3a56d4;
-            --success: #2ec4b6; --danger: #e71d36;
-            --warning: #ff9f1c; --bg: #f8f9fa;
-            --text: #2b2d42; --card-bg: #ffffff;
+            --sidebar-width: 260px;
+            --primary: #2563eb; --primary-dark: #1e40af;
+            --accent: #10b981; --danger: #ef4444;
+            --bg: #f3f4f6; --sidebar-bg: #1f2937;
+            --text-main: #111827; --text-muted: #6b7280;
         }
 
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: var(--text); margin: 0; padding: 10px; }
-        
-        .container { max-width: 800px; margin: 0 auto; }
-        
-        header { text-align: center; padding: 20px 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .logo { width: 40px; fill: var(--primary); }
-        h1 { font-size: 1.5rem; margin: 0; color: var(--primary); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
-        /* Formulario Adaptable */
-        .log-form { 
-            background: var(--card-bg); padding: 20px; border-radius: 15px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;
+        /* Sidebar - Menú Lateral */
+        .sidebar {
+            width: var(--sidebar-width); background: var(--sidebar-bg); color: white;
+            display: flex; flex-direction: column; transition: all 0.3s; z-index: 1000;
         }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .full-width { grid-column: span 2; }
-        
-        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; opacity: 0.8; }
-        input, select { 
-            width: 100%; padding: 12px; border: 2px solid #edf2f4; 
-            border-radius: 8px; font-size: 1rem; outline: none;
+        .sidebar-header { padding: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #374151; }
+        .sidebar-header svg { width: 32px; fill: var(--accent); }
+        .nav-menu { flex: 1; padding: 20px 0; }
+        .nav-item { 
+            padding: 12px 24px; display: flex; align-items: center; gap: 12px; 
+            cursor: pointer; transition: 0.2s; color: #9ca3af; text-decoration: none;
         }
-        input:focus { border-color: var(--primary); }
+        .nav-item:hover, .nav-item.active { background: #374151; color: white; border-left: 4px solid var(--accent); }
 
-        .btn-main { 
-            width: 100%; padding: 15px; border: none; border-radius: 8px; 
-            font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s;
-            background: var(--primary); color: white; margin-top: 10px;
+        /* Área Principal */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; position: relative; }
+        header { 
+            background: white; padding: 15px 30px; display: flex; justify-content: space-between; 
+            align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
         }
-        .btn-update { background: var(--warning); color: var(--text); }
 
-        /* Botones de acción */
-        .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-        .btn-small { flex: 1; padding: 10px; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: white; }
-        .bg-sec { background: #8d99ae; }
-        .bg-danger { background: var(--danger); }
+        .content-padding { padding: 25px; max-width: 1100px; margin: 0 auto; width: 100%; }
 
-        /* Tabla Responsive (Tarjetas en móvil) */
-        .log-container { display: grid; gap: 10px; }
-        .log-card { 
-            background: var(--card-bg); padding: 15px; border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 5px solid var(--primary);
-            display: grid; grid-template-columns: 1fr auto;
+        /* Formulario Profesional */
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+        input, select, textarea { 
+            padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.95rem; outline: none; transition: 0.2s;
         }
-        .log-info b { font-size: 1.2rem; color: var(--primary); }
-        .log-meta { font-size: 0.85rem; margin-top: 5px; display: flex; gap: 10px; flex-wrap: wrap; }
-        .badge { background: #edf2f4; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
-        .card-btns { display: flex; flex-direction: column; gap: 5px; }
-        
-        @media (min-width: 600px) {
-            .grid { grid-template-columns: repeat(4, 1fr); }
-            .full-width { grid-column: span 4; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+
+        /* Filtros */
+        .filters { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-input { flex: 1; min-width: 200px; }
+
+        /* Tabla y Lista */
+        .qso-list { display: flex; flex-direction: column; gap: 12px; }
+        .qso-item { 
+            background: white; padding: 16px; border-radius: 8px; border: 1px solid #e5e7eb;
+            display: grid; grid-template-columns: 1fr auto; cursor: pointer; transition: 0.2s;
         }
+        .qso-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .qso-main { display: flex; align-items: center; gap: 15px; }
+        .qso-call { font-size: 1.2rem; font-weight: 800; color: var(--primary); min-width: 100px; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; background: #eff6ff; color: var(--primary); }
+
+        /* Utilidades */
+        .btn { 
+            padding: 10px 20px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; 
+            display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; 
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-ghost { background: transparent; color: var(--text-muted); }
+        .btn-ghost:hover { background: #f3f4f6; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; flex-direction: row; overflow-x: auto; }
+            .sidebar-header, .nav-item span { display: none; }
+            .nav-menu { display: flex; padding: 0; }
+            .nav-item { padding: 15px; }
+            .main-content { height: calc(100vh - 60px); }
+        }
+
+        #importAdif, #importJson { display: none; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <svg class="logo" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
-        <h1>Logbook Profesional</h1>
-    </header>
-
-    <div class="log-form">
-        <input type="hidden" id="editId">
-        <div class="grid">
-            <div class="form-item">
-                <label>Indicativo</label>
-                <input type="text" id="callsign" placeholder="EA4ABC">
-            </div>
-            <div class="form-item">
-                <label>RST</label>
-                <input type="text" id="rst" value="59">
-            </div>
-            <div class="form-item">
-                <label>Banda</label>
-                <select id="band">
-                    <option value="40m">40m</option><option value="20m">20m</option>
-                    <option value="15m">15m</option><option value="10m">10m</option>
-                    <option value="2m">2m</option><option value="70cm">70cm</option>
-                </select>
-            </div>
-            <div class="form-item">
-                <label>Modo</label>
-                <select id="mode">
-                    <option value="SSB">SSB</option><option value="FT8">FT8</option>
-                    <option value="CW">CW</option><option value="FM">FM</option>
-                </select>
-            </div>
-            <div class="form-item full-width">
-                <label>Comentario</label>
-                <input type="text" id="comment" placeholder="Opcional...">
-            </div>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+            <span style="font-weight: 800; font-size: 1.2rem;">RLPro <small>v2</small></span>
         </div>
-        <button id="saveBtn" class="btn-main" onclick="handleSubmit()">REGISTRAR QSO</button>
-    </div>
-
-    <div class="actions">
-        <button class="btn-small bg-sec" onclick="exportJSON()">Backup JSON</button>
-        <button class="btn-small bg-sec" onclick="exportADIF()">Export ADIF</button>
-        <button class="btn-small bg-danger" onclick="clearLogs()">Borrar Todo</button>
-    </div>
-
-    <div id="logList" class="log-container">
+        <div class="nav-menu">
+            <a href="#" class="nav-item active"><i class="fa-solid fa-radio"></i> <span>Logbook</span></a>
+            <a href="#" class="nav-item" onclick="document.getElementById('importAdif').click()"><i class="fa-solid fa-file-import"></i> <span>Importar ADIF</span></a>
+            <a href="#" class="nav-item" onclick="document.getElementById('importJson').click()"><i class="fa-solid fa-file-code"></i> <span>Importar JSON</span></a>
+            <a href="#" class="nav-item" onclick="exportADIF()"><i class="fa-solid fa-file-export"></i> <span>Exportar ADIF</span></a>
+            <a href="#" class="nav-item" onclick="clearLogs()" style="color: var(--danger);"><i class="fa-solid fa-trash"></i> <span>Borrar Todo</span></a>
         </div>
-</div>
+        <div style="padding: 20px; font-size: 0.7rem; color: #6b7280; text-align: center;">
+            IT Systems Pro &copy; 2024
+        </div>
+    </nav>
 
-<script>
-    let logs = JSON.parse(localStorage.getItem('hamLogs')) || [];
-    let isEditing = false;
+    <input type="file" id="importAdif" accept=".adi,.adif" onchange="handleAdif(event)">
+    <input type="file" id="importJson" accept=".json" onchange="handleJson(event)">
 
-    function handleSubmit() {
-        const id = document.getElementById('editId').value;
-        const data = {
-            id: id ? parseInt(id) : Date.now(),
-            timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
-            callsign: document.getElementById('callsign').value.toUpperCase(),
-            rst: document.getElementById('rst').value,
-            band: document.getElementById('band').value,
-            mode: document.getElementById('mode').value,
-            comment: document.getElementById('comment').value
-        };
+    <main class="main-content">
+        <header>
+            <h2 id="viewTitle">Estación de Control</h2>
+            <div id="statusBadge" class="badge" style="background: #ecfdf5; color: #065f46;">Sistema Online</div>
+        </header>
 
-        if(!data.callsign) return alert("¡Sin indicativo no hay contacto!");
-
-        if(isEditing) {
-            logs = logs.map(l => l.id === data.id ? data : l);
-            isEditing = false;
-            document.getElementById('saveBtn').innerText = "REGISTRAR QSO";
-            document.getElementById('saveBtn').classList.remove('btn-update');
-        } else {
-            logs.unshift(data); // Añadir al principio
-        }
-
-        resetForm();
-        saveAndRender();
-    }
-
-    function editLog(id) {
-        const log = logs.find(l => l.id === id);
-        if(!log) return;
-
-        document.getElementById('editId').value = log.id;
-        document.getElementById('callsign').value = log.callsign;
-        document.getElementById('rst').value = log.rst;
-        document.getElementById('band').value = log.band;
-        document.getElementById('mode').value = log.mode;
-        document.getElementById('comment').value = log.comment;
-
-        isEditing = true;
-        document.getElementById('saveBtn').innerText = "ACTUALIZAR REGISTRO";
-        document.getElementById('saveBtn').classList.add('btn-update');
-        window.scrollTo(0,0);
-    }
-
-    function deleteLog(id) {
-        if(confirm("¿Eliminar este QSO?")) {
-            logs = logs.filter(l => l.id !== id);
-            saveAndRender();
-        }
-    }
-
-    function resetForm() {
-        document.getElementById('editId').value = '';
-        document.getElementById('callsign').value = '';
-        document.getElementById('comment').value = '';
-    }
-
-    function saveAndRender() {
-        localStorage.setItem('hamLogs', JSON.stringify(logs));
-        const list = document.getElementById('logList');
-        list.innerHTML = logs.map(log => `
-            <div class="log-card">
-                <div class="log-info">
-                    <b>${log.callsign}</b>
-                    <div class="log-meta">
-                        <span>${log.timestamp}</span>
-                        <span class="badge">${log.band}</span>
-                        <span class="badge">${log.mode}</span>
-                        <span>${log.rst}</span>
+        <div class="content-padding">
+            <div class="card">
+                <input type="hidden" id="qsoId">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Indicativo</label>
+                        <input type="text" id="callsign" placeholder="EA4ABC" style="font-weight: bold; text-transform: uppercase;">
                     </div>
-                    <div style="font-size: 0.8rem; margin-top:5px; color:#666">${log.comment}</div>
+                    <div class="input-group">
+                        <label>RST</label>
+                        <input type="text" id="rst" value="59">
+                    </div>
+                    <div class="input-group">
+                        <label>Banda</label>
+                        <select id="band">
+                            <option value="2m" selected>2m</option>
+                            <option value="70cm">70cm</option>
+                            <option value="40m">40m</option>
+                            <option value="20m">20m</option>
+                            <option value="10m">10m</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Modo</label>
+                        <select id="mode">
+                            <option value="FM" selected>FM</option>
+                            <option value="SSB">SSB</option>
+                            <option value="FT8">FT8</option>
+                            <option value="CW">CW</option>
+                            <option value="DMR">DMR</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="card-btns">
-                    <button class="btn-small bg-sec" onclick="editLog(${log.id})">Edit</button>
-                    <button class="btn-small bg-danger" onclick="deleteLog(${log.id})">X</button>
+                <div class="input-group" style="margin-top: 15px;">
+                    <label>Comentarios</label>
+                    <textarea id="comment" rows="2" placeholder="Notas del contacto..."></textarea>
+                </div>
+                <div style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button id="saveBtn" class="btn btn-primary" onclick="saveQSO()">
+                        <i class="fa-solid fa-plus"></i> REGISTRAR QSO
+                    </button>
+                    <button id="cancelBtn" class="btn btn-ghost" onclick="resetForm()" style="display:none;">Cancelar Edición</button>
                 </div>
             </div>
-        `).join('');
-    }
 
-    // Funciones de exportación (simplificadas para el ejemplo)
-    function exportJSON() {
-        const blob = new Blob([JSON.stringify(logs, null, 2)], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = 'logbook.json'; a.click();
-    }
+            <div class="filters">
+                <input type="text" id="searchCall" class="filter-input" placeholder="Filtrar por indicativo..." oninput="renderLogs()">
+                <input type="date" id="searchDate" class="filter-input" onchange="renderLogs()">
+                <button class="btn btn-ghost" onclick="resetFilters()"><i class="fa-solid fa-filter-circle-xmark"></i></button>
+            </div>
 
-    function exportADIF() {
-        let adif = "ADIF Export\n<EOH>\n" + logs.map(l => `<CALL:${l.callsign.length}>${l.callsign}<BAND:${l.band.length}>${l.band}<MODE:${l.mode.length}>${l.mode}<EOR>`).join('\n');
-        const blob = new Blob([adif], {type: 'text/plain'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob); a.download = 'log.adi'; a.click();
-    }
+            <div id="qsoList" class="qso-list">
+                </div>
+        </div>
+    </main>
 
-    function clearLogs() { if(confirm("¿Borrar todo?")) { logs = []; saveAndRender(); } }
+    <script>
+        let logs = JSON.parse(localStorage.getItem('hamLogs_v2')) || [];
+        let editMode = false;
 
-    saveAndRender();
-</script>
+        function saveQSO() {
+            const id = document.getElementById('qsoId').value;
+            const qso = {
+                id: id ? parseInt(id) : Date.now(),
+                callsign: document.getElementById('callsign').value.toUpperCase().trim(),
+                rst: document.getElementById('rst').value,
+                band: document.getElementById('band').value,
+                mode: document.getElementById('mode').value,
+                comment: document.getElementById('comment').value,
+                date: id ? logs.find(l => l.id == id).date : new Date().toISOString()
+            };
 
+            if (!qso.callsign) return alert("Error de sistema: Indicativo requerido.");
+
+            if (editMode) {
+                logs = logs.map(l => l.id === qso.id ? qso : l);
+            } else {
+                logs.unshift(qso);
+            }
+
+            localStorage.setItem('hamLogs_v2', JSON.stringify(logs));
+            resetForm();
+            renderLogs();
+        }
+
+        function editQSO(id) {
+            const qso = logs.find(l => l.id === id);
+            document.getElementById('qsoId').value = qso.id;
+            document.getElementById('callsign').value = qso.callsign;
+            document.getElementById('rst').value = qso.rst;
+            document.getElementById('band').value = qso.band;
+            document.getElementById('mode').value = qso.mode;
+            document.getElementById('comment').value = qso.comment;
+
+            editMode = true;
+            document.getElementById('saveBtn').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> ACTUALIZAR';
+            document.getElementById('cancelBtn').style.display = 'inline-flex';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            document.getElementById('qsoId').value = '';
+            document.getElementById('callsign').value = '';
+            document.getElementById('comment').value = '';
+            document.getElementById('rst').value = '59';
+            document.getElementById('band').value = '2m';
+            document.getElementById('mode').value = 'FM';
+            editMode = false;
+            document.getElementById('saveBtn').innerHTML = '<i class="fa-solid fa-plus"></i> REGISTRAR QSO';
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
+
+        function renderLogs() {
+            const filterCall = document.getElementById('searchCall').value.toUpperCase();
+            const filterDate = document.getElementById('searchDate').value;
+            const container = document.getElementById('qsoList');
+            
+            const filtered = logs.filter(l => {
+                const matchCall = l.callsign.includes(filterCall);
+                const matchDate = filterDate ? l.date.startsWith(filterDate) : true;
+                return matchCall && matchDate;
+            });
+
+            container.innerHTML = filtered.map(l => `
+                <div class="qso-item" onclick="editQSO(${l.id})">
+                    <div class="qso-main">
+                        <div class="qso-call">${l.callsign}</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.9rem;">${new Date(l.date).toLocaleString()}</div>
+                            <div style="color: var(--text-muted); font-size: 0.8rem;">${l.comment.substring(0, 40)}${l.comment.length > 40 ? '...' : ''}</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="badge">${l.band}</span>
+                        <span class="badge" style="background:#fef3c7; color:#92400e;">${l.mode}</span>
+                        <button class="btn btn-ghost" onclick="event.stopPropagation(); deleteQSO(${l.id})" style="color: var(--danger)">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteQSO(id) {
+            if(confirm("¿Eliminar registro?")) {
+                logs = logs.filter(l => l.id !== id);
+                localStorage.setItem('hamLogs_v2', JSON.stringify(logs));
+                renderLogs();
+            }
+        }
+
+        function resetFilters() {
+            document.getElementById('searchCall').value = '';
+            document.getElementById('searchDate').value = '';
+            renderLogs();
+        }
+
+        // --- IMPORTACIÓN / EXPORTACIÓN ---
+
+        function handleJson(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    logs = [...data, ...logs];
+                    localStorage.setItem('hamLogs_v2', JSON.stringify(logs));
+                    renderLogs();
+                    alert("Importación JSON completada.");
+                } catch(err) { alert("Archivo JSON inválido."); }
+            };
+            reader.readAsText(file);
+        }
+
+        function handleAdif(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const text = ev.target.result;
+                const records = text.split(/<eor>|<EOR>/i);
+                const newLogs = records.map(rec => {
+                    const getField = (f) => {
+                        const match = rec.match(new RegExp(`<${f}:\\d+>(.*?)(?=<|$)`, 'i'));
+                        return match ? match[1].trim() : '';
+                    };
+                    const call = getField('CALL');
+                    if(!call) return null;
+                    return {
+                        id: Date.now() + Math.random(),
+                        callsign: call,
+                        rst: getField('RST_SENT') || '59',
+                        band: getField('BAND') || '2m',
+                        mode: getField('MODE') || 'FM',
+                        comment: getField('COMMENT') || 'Importado ADIF',
+                        date: new Date().toISOString()
+                    };
+                }).filter(x => x);
+                logs = [...newLogs, ...logs];
+                localStorage.setItem('hamLogs_v2', JSON.stringify(logs));
+                renderLogs();
+            };
+            reader.readAsText(file);
+        }
+
+        function exportADIF() {
+            let adif = "ADIF Export RLPro\n<EOH>\n" + logs.map(l => 
+                `<CALL:${l.callsign.length}>${l.callsign}<BAND:${l.band.length}>${l.band}<MODE:${l.mode.length}>${l.mode}<RST_SENT:${l.rst.length}>${l.rst}<COMMENT:${l.comment.length}>${l.comment}<EOR>`
+            ).join('\n');
+            const blob = new Blob([adif], {type: 'text/plain'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob); a.download = 'export.adi'; a.click();
+        }
+
+        function clearLogs() { if(confirm("¿Borrar todo?")) { logs = []; localStorage.setItem('hamLogs_v2', '[]'); renderLogs(); } }
+
+        renderLogs();
+    </script>
 </body>
 </html>
