@@ -3,263 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RadioLog Pro v4 | Enterprise Edition</title>
+    <title>RadioLog Pro v5 | Ultimate Edition</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --sidebar-bg: #212529;
-            --accent-color: #0d6efd;
-            --main-bg: #f8f9fa;
-        }
+        :root { --primary: #3f51b5; --bg: #f0f2f5; }
+        body { background-color: var(--bg); font-family: 'Segoe UI', system-ui, sans-serif; display: flex; height: 100vh; overflow: hidden; }
 
-        body {
-            background-color: var(--main-bg);
-            font-family: 'Inter', -apple-system, sans-serif;
-            overflow: hidden;
-        }
+        /* Sidebar mejorado */
+        .sidebar { width: 280px; background: #212529; color: white; display: flex; flex-direction: column; z-index: 1000; transition: 0.3s; }
+        .logo-area { padding: 40px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .logo-icon { font-size: 3.5rem; color: #0d6efd; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(13,110,253,0.3)); }
+        
+        .nav-link { color: rgba(255,255,255,0.7) !important; padding: 15px 25px; border-left: 4px solid transparent; display: flex; align-items: center; gap: 12px; }
+        .nav-link.active { color: white !important; background: rgba(255,255,255,0.05); border-left-color: #0d6efd; }
+        
+        /* Contenido */
+        main { flex: 1; overflow-y: auto; padding: 30px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-        /* Sidebar con estilo profesional */
-        .sidebar {
-            width: 280px;
-            background-color: var(--sidebar-bg);
-            height: 100vh;
-            position: fixed;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-
-        .logo-container {
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .logo-svg {
-            width: 80px;
-            height: 80px;
-            fill: var(--accent-color);
-            filter: drop-shadow(0 0 10px rgba(13, 110, 253, 0.5));
-            margin-bottom: 15px;
-        }
-
-        .nav-link {
-            color: rgba(255,255,255,0.7) !important;
-            padding: 12px 25px;
-            border-radius: 0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-left: 4px solid transparent;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            color: white !important;
-            background: rgba(255,255,255,0.05);
-            border-left-color: var(--accent-color);
-        }
-
-        /* Área de contenido */
-        .content {
-            margin-left: 280px;
-            height: 100vh;
-            overflow-y: auto;
-            padding: 40px;
-        }
-
-        .card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
-        }
-
-        .btn-icon {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .log-table-container {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-        }
-
-        /* Badges de banda coloridos */
-        .badge-band {
-            background-color: #e9ecef;
-            color: #495057;
-            font-weight: 600;
-        }
-
-        /* Estilo para el Plan de Bandas */
-        .tx-status { font-weight: bold; }
-        .tx-allowed { color: #198754; }
-        .tx-forbidden { color: #dc3545; }
+        /* Cards de Log */
+        .qso-card { border: none; border-radius: 12px; transition: 0.2s; border-left: 6px solid var(--primary); margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .qso-card:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        .callsign-text { font-size: 1.4rem; font-weight: 800; color: var(--primary); letter-spacing: 1px; }
+        
+        .edit-mode { background-color: #fff3cd !important; border-left-color: #ffc107 !important; }
 
         @media (max-width: 768px) {
-            .sidebar { width: 80px; }
+            .sidebar { width: 70px; }
             .sidebar span, .sidebar h4 { display: none; }
-            .content { margin-left: 80px; padding: 15px; }
-            .logo-svg { width: 40px; height: 40px; }
+            main { padding: 15px; }
         }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <div class="logo-container">
-        <svg class="logo-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm4-6h-8v-2h8v2z"/>
-            <path d="M12 7l-2 2h4l-2-2zM12 17l2-2h-4l2 2z"/>
-        </svg>
-        <h4 class="mb-0">RadioPro <small class="d-block text-muted fs-6">v4.0 Enterprise</small></h4>
+<aside class="sidebar">
+    <div class="logo-area">
+        <i class="fas fa-satellite-dish logo-icon"></i>
+        <h4 class="fw-bold">RadioPro <small class="d-block fs-6 opacity-50">v5.0 Stable</small></h4>
     </div>
-    
     <nav class="nav flex-column mt-3">
-        <a class="nav-link active" href="#" onclick="showTab('logbook', this)">
-            <i class="fas fa-book"></i> <span>Libro de Guardia</span>
-        </a>
-        <a class="nav-link" href="#" onclick="showTab('plan', this)">
-            <i class="fas fa-broadcast-tower"></i> <span>Plan de Bandas</span>
-        </a>
+        <a class="nav-link active" href="#" onclick="switchTab('logbook', this)"><i class="fas fa-list-ul"></i> <span>Libro de Guardia</span></a>
+        <a class="nav-link" href="#" onclick="switchTab('plan', this)"><i class="fas fa-map"></i> <span>Plan de Bandas</span></a>
     </nav>
-
-    <div class="mt-auto p-4 border-top border-secondary">
-        <button class="btn btn-outline-light btn-sm w-100 mb-2 btn-icon" onclick="exportJSON()">
-            <i class="fas fa-file-download"></i> <span>Exportar JSON</span>
-        </button>
-        <button class="btn btn-outline-info btn-sm w-100 btn-icon" onclick="document.getElementById('importInput').click()">
-            <i class="fas fa-file-upload"></i> <span>Importar JSON</span>
-        </button>
-        <input type="file" id="importInput" hidden onchange="importJSON(event)">
+    <div class="mt-auto p-3">
+        <button class="btn btn-outline-light btn-sm w-100 mb-2" onclick="exportJSON()"><i class="fas fa-download me-2"></i>Exportar</button>
+        <button class="btn btn-outline-info btn-sm w-100" onclick="document.getElementById('importFile').click()"><i class="fas fa-upload me-2"></i>Importar</button>
+        <input type="file" id="importFile" hidden onchange="importJSON(event)">
     </div>
-</div>
+</aside>
 
-<div class="content">
-    
-    <div id="logbook-tab" class="tab-content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold">Gestión de Contactos</h2>
-            <span class="text-muted"><i class="fas fa-map-marker-alt"></i> Basauri, Vizcaya</span>
-        </div>
-
-        <div class="card mb-4">
-            <div class="card-body p-4">
-                <form id="qsoForm" onsubmit="event.preventDefault(); handleSubmit();">
-                    <input type="hidden" id="editId">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <label class="form-label">Indicativo</label>
-                            <input type="text" id="callsign" class="form-control form-control-lg" placeholder="EA4ABC" required>
+<main>
+    <div id="logbook" class="tab-content active">
+        <div class="container-fluid">
+            <h2 class="mb-4 fw-bold">Registro de Actividad</h2>
+            
+            <div class="card shadow-sm mb-5" id="formContainer">
+                <div class="card-body p-4">
+                    <form id="qsoForm" onsubmit="event.preventDefault(); saveQSO();">
+                        <input type="hidden" id="editId">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Indicativo</label>
+                                <input type="text" id="callsign" class="form-control form-control-lg text-uppercase" placeholder="EA4ABC" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">RST</label>
+                                <input type="text" id="rst" class="form-control form-control-lg" value="59">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Banda</label>
+                                <select id="band" class="form-select form-select-lg">
+                                    <option value="40m">40m (HF)</option>
+                                    <option value="20m">20m (HF)</option>
+                                    <option value="2m" selected>2m (VHF)</option>
+                                    <option value="70cm">70cm (UHF)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Modo</label>
+                                <select id="mode" class="form-select form-select-lg">
+                                    <option value="FM">FM</option><option value="SSB">SSB</option>
+                                    <option value="CW">CW</option><option value="FT8">FT8</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" id="saveBtn" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-save me-2"></i>Guardar
+                                </button>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Comentario</label>
+                                <textarea id="comment" class="form-control" rows="1" placeholder="Detalles del contacto..."></textarea>
+                            </div>
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label">RST</label>
-                            <input type="text" id="rst" class="form-control form-control-lg" value="59">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Banda</label>
-                            <select id="band" class="form-select form-select-lg">
-                                <option value="40m">40m</option>
-                                <option value="20m">20m</option>
-                                <option value="2m" selected>2m (VHF)</option>
-                                <option value="70cm">70cm (UHF)</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Modo</label>
-                            <select id="mode" class="form-select form-select-lg">
-                                <option value="FM">FM</option>
-                                <option value="SSB">SSB</option>
-                                <option value="CW">CW</option>
-                                <option value="FT8">FT8</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" id="saveBtn" class="btn btn-primary btn-lg w-100 btn-icon">
-                                <i class="fas fa-plus-circle"></i> <span id="btnText">Registrar</span>
-                            </button>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Comentarios</label>
-                            <input type="text" id="comment" class="form-control" placeholder="Nombre, ubicación, condiciones...">
-                        </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
-        </div>
 
-        <div class="log-table-container">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Fecha (UTC)</th>
-                        <th>Indicativo</th>
-                        <th>Banda</th>
-                        <th>Modo</th>
-                        <th>RST</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="logList">
-                    </tbody>
-            </table>
+            <div id="logCardsContainer"></div>
+
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center" id="pagination"></ul>
+            </nav>
         </div>
     </div>
 
-    <div id="plan-tab" class="tab-content d-none">
-        <h2 class="fw-bold mb-4">Plan de Bandas e Información Técnica</h2>
-        <div class="card">
-            <div class="card-body p-0">
-                <table class="table table-striped mb-0">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Frecuencia (MHz)</th>
-                            <th>Uso / Banda</th>
-                            <th>TX</th>
-                            <th>Modo</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>65.0 - 108.0</td><td>FM Comercial</td><td class="tx-status tx-forbidden">NO</td><td>WFM</td></tr>
-                        <tr><td>108.0 - 136.0</td><td>Banda Aérea</td><td class="tx-status tx-forbidden">NO</td><td>AM</td></tr>
-                        <tr><td>144.0 - 146.0</td><td>Radioaficionados (2m)</td><td class="tx-status tx-allowed">SÍ</td><td>FM/SSB/CW</td></tr>
-                        <tr><td>136.0 - 174.0</td><td>VHF Extendida</td><td class="tx-status tx-forbidden">RX (VFO)</td><td>FM</td></tr>
-                        <tr><td>200.0 - 260.0</td><td>Banda 220</td><td class="tx-status tx-allowed">SÍ (H8)</td><td>FM</td></tr>
-                        <tr><td>430.0 - 440.0</td><td>Radioaficionados (70cm)</td><td class="tx-status tx-allowed">SÍ</td><td>FM/SSB/CW</td></tr>
-                        <tr><td>446.0 - 446.2</td><td>PMR446 (Uso libre)</td><td class="tx-status tx-forbidden">RX*</td><td>NFM</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="card-footer text-muted">
-                * Nota: El Tidradio H8 permite TX en rangos no permitidos si está abierto de bandas. Usa con responsabilidad técnica.
+    <div id="plan" class="tab-content">
+        <div class="container-fluid">
+            <h2 class="mb-4 fw-bold">Plan de Bandas Tidradio H8</h2>
+            <div class="card shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr><th>Rango (MHz)</th><th>Banda / Uso</th><th>TX</th><th>Modo</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>65 - 108</td><td>FM Comercial</td><td class="text-danger fw-bold">NO</td><td>WFM (RX)</td></tr>
+                            <tr><td>108 - 136</td><td>Airband</td><td class="text-danger fw-bold">NO</td><td>AM (RX)</td></tr>
+                            <tr><td>144 - 146</td><td>Radioaficionados (2m)</td><td class="text-success fw-bold">SÍ</td><td>FM/SSB/CW</td></tr>
+                            <tr><td>200 - 260</td><td>Banda 220</td><td class="text-success fw-bold">SÍ (H8)</td><td>FM</td></tr>
+                            <tr><td>430 - 440</td><td>Radioaficionados (70cm)</td><td class="text-success fw-bold">SÍ</td><td>FM/SSB/CW</td></tr>
+                            <tr><td>446.0 - 446.2</td><td>PMR (Uso libre)</td><td class="text-warning fw-bold">SÍ*</td><td>NFM</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-
-</div>
+</main>
 
 <script>
     let logs = JSON.parse(localStorage.getItem('hamLogs')) || [];
-    let isEditing = false;
+    let currentPage = 1;
+    const logsPerPage = 20;
 
-    // Cambiar pestañas
-    function showTab(tabId, el) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('d-none'));
+    function switchTab(id, el) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        document.getElementById(tabId + '-tab').classList.remove('d-none');
+        document.getElementById(id).classList.add('active');
         el.classList.add('active');
     }
 
-    // Guardar o Actualizar
-    function handleSubmit() {
+    function saveQSO() {
         const id = document.getElementById('editId').value;
-        const data = {
+        const qso = {
             id: id ? parseInt(id) : Date.now(),
-            timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
+            date: new Date().toLocaleString(),
             callsign: document.getElementById('callsign').value.toUpperCase(),
             rst: document.getElementById('rst').value,
             band: document.getElementById('band').value,
@@ -267,37 +159,53 @@
             comment: document.getElementById('comment').value
         };
 
-        if(isEditing) {
-            logs = logs.map(l => l.id === data.id ? data : l);
+        if(id) {
+            logs = logs.map(l => l.id === qso.id ? qso : l);
             cancelEdit();
         } else {
-            logs.unshift(data);
+            logs.unshift(qso);
         }
 
         localStorage.setItem('hamLogs', JSON.stringify(logs));
-        renderLogs();
         document.getElementById('qsoForm').reset();
+        render();
     }
 
-    // Renderizar la tabla
-    function renderLogs() {
-        const container = document.getElementById('logList');
-        container.innerHTML = logs.map(log => `
-            <tr>
-                <td class="text-muted small">${log.timestamp}</td>
-                <td><span class="fw-bold text-primary">${log.callsign}</span></td>
-                <td><span class="badge badge-band">${log.band}</span></td>
-                <td><span class="badge bg-light text-dark">${log.mode}</span></td>
-                <td>${log.rst}</td>
-                <td>
-                    <button class="btn btn-sm btn-outline-primary" onclick="editEntry(${log.id})"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteEntry(${log.id})"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>
+    function render() {
+        const container = document.getElementById('logCardsContainer');
+        const start = (currentPage - 1) * logsPerPage;
+        const pagedLogs = logs.slice(start, start + logsPerPage);
+
+        container.innerHTML = pagedLogs.map(log => `
+            <div class="card qso-card mb-3 shadow-sm" id="card-${log.id}">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <span class="callsign-text">${log.callsign}</span>
+                            <div class="text-muted small">${log.date}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <span class="badge bg-primary fs-6">${log.band}</span>
+                            <span class="badge bg-secondary fs-6">${log.mode}</span>
+                        </div>
+                        <div class="col-md-1">
+                            <span class="fw-bold">${log.rst}</span>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-0 text-secondary italic small">${log.comment || '<span class="opacity-25">Sin comentarios</span>'}</p>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <button class="btn btn-outline-primary btn-sm me-2" onclick="editLog(${log.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteLog(${log.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         `).join('');
+        renderPagination();
     }
 
-    function editEntry(id) {
+    function editLog(id) {
         const log = logs.find(l => l.id === id);
         document.getElementById('editId').value = log.id;
         document.getElementById('callsign').value = log.callsign;
@@ -306,57 +214,58 @@
         document.getElementById('mode').value = log.mode;
         document.getElementById('comment').value = log.comment;
 
-        isEditing = true;
-        document.getElementById('btnText').innerText = "Actualizar";
-        document.getElementById('saveBtn').classList.replace('btn-primary', 'btn-warning');
-        window.scrollTo(0,0);
+        document.getElementById('formContainer').classList.add('edit-mode');
+        document.getElementById('saveBtn').className = "btn btn-warning btn-lg w-100";
+        document.getElementById('saveBtn').innerHTML = '<i class="fas fa-sync me-2"></i>Actualizar';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function cancelEdit() {
-        isEditing = false;
         document.getElementById('editId').value = '';
-        document.getElementById('btnText').innerText = "Registrar";
-        document.getElementById('saveBtn').classList.replace('btn-warning', 'btn-primary');
+        document.getElementById('formContainer').classList.remove('edit-mode');
+        document.getElementById('saveBtn').className = "btn btn-primary btn-lg w-100";
+        document.getElementById('saveBtn').innerHTML = '<i class="fas fa-save me-2"></i>Guardar';
     }
 
-    function deleteEntry(id) {
+    function deleteLog(id) {
         if(confirm("¿Seguro que quieres borrar este QSO?")) {
             logs = logs.filter(l => l.id !== id);
             localStorage.setItem('hamLogs', JSON.stringify(logs));
-            renderLogs();
+            render();
         }
     }
 
-    // Gestión de Archivos
+    function renderPagination() {
+        const totalPages = Math.ceil(logs.length / logsPerPage);
+        const nav = document.getElementById('pagination');
+        let html = '';
+        for(let i=1; i<=totalPages; i++) {
+            html += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+            </li>`;
+        }
+        nav.innerHTML = html;
+    }
+
+    function changePage(p) { currentPage = p; render(); }
+
     function exportJSON() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "radiolog_backup.json");
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
+        const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs));
+        const a = document.createElement('a');
+        a.href = data; a.download = 'radio_log.json'; a.click();
     }
 
-    function importJSON(event) {
+    function importJSON(e) {
         const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                logs = JSON.parse(e.target.result);
-                localStorage.setItem('hamLogs', JSON.stringify(logs));
-                renderLogs();
-                alert("Base de datos importada con éxito.");
-            } catch (err) {
-                alert("Error al procesar el archivo JSON.");
-            }
+        reader.onload = (event) => {
+            logs = JSON.parse(event.target.result);
+            localStorage.setItem('hamLogs', JSON.stringify(logs));
+            render();
         };
-        reader.readAsText(event.target.files[0]);
+        reader.readAsText(e.target.files[0]);
     }
 
-    // Inicio
-    renderLogs();
+    render();
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
