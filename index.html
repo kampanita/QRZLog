@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RadioLog Pro v14 | Basauri High-Density</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --sidebar-dark: #0f172a; --accent: #38bdf8; --tx-green: #22c55e; --rx-red: #ef4444; }
+        body { background-color: #f1f5f9; font-family: 'Inter', system-ui, -apple-system, sans-serif; display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 320px; background: var(--sidebar-dark); color: white; display: flex; flex-direction: column; z-index: 1000; box-shadow: 4px 0 20px rgba(0,0,0,0.2); }
+        .logo-area { padding: 30px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
+        .logo-icon { font-size: 3rem; color: var(--accent); margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4)); }
+        .nav-link { color: #94a3b8 !important; padding: 18px 25px; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; font-weight: 500; }
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: white !important; }
+        .nav-link.active { background: rgba(56, 189, 248, 0.1); color: white !important; border-left-color: var(--accent); }
+        main { flex: 1; overflow-y: auto; padding: 35px; scroll-behavior: smooth; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); background: white; margin-bottom: 25px; overflow: hidden; }
+        .card-header-tech { padding: 15px 20px; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; }
+        .card-header-tech i { font-size: 1.2rem; margin-right: 12px; }
+        .bg-vhf { background: #0284c7; } .bg-uhf { background: #7c3aed; } .bg-fm { background: #059669; } .bg-danger { background: #dc2626; } .bg-info-dark { background: #0f172a; } .bg-pmr { background: #f59e0b; }
+        .table-radio { font-size: 0.88rem; margin-bottom: 0; }
+        .table-radio th { background: #f8fafc; color: #64748b; font-size: 0.75rem; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
+        .freq-code { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #1e293b; }
+        .subtone-badge { background: #fef3c7; color: #92400e; padding: 3px 8px; border-radius: 4px; font-weight: 800; }
+        .badge-status { width: 90px; text-align: center; font-weight: 800; font-size: 0.7rem; padding: 6px; border-radius: 6px; display: inline-block; text-transform: uppercase; }
+        .st-tx { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+        .st-rx { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .log-entry { background: white; border-radius: 10px; padding: 18px; margin-bottom: 12px; border-left: 6px solid var(--accent); transition: 0.2s; }
+        .log-entry:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+        .edit-mode { background: #fffbeb !important; border-color: #f59e0b !important; }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="logo-area">
+        <i class="fas fa-satellite-dish logo-icon"></i>
+        <div class="logo-text"><h4 class="fw-bold m-0">RadioPro v14</h4><small class="opacity-50">Basauri High-End Ops</small></div>
+    </div>
+    <nav class="nav flex-column mt-4">
+        <a class="nav-link active" onclick="switchTab('logbook', this)"><i class="fas fa-edit me-3"></i> <span>Logbook (Zulu)</span></a>
+        <a class="nav-link" onclick="switchTab('plan', this)"><i class="fas fa-layer-group me-3"></i> <span>Plan de Bandas</span></a>
+    </nav>
+    <div class="mt-auto p-4 border-top border-dark">
+        <button class="btn btn-primary btn-sm w-100 mb-2" onclick="exportJSON()"><i class="fas fa-file-export me-2"></i>Exportar JSON</button>
+        <button class="btn btn-outline-info btn-sm w-100" onclick="document.getElementById('importFile').click()"><i class="fas fa-file-import me-2"></i>Importar JSON</button>
+        <input type="file" id="importFile" hidden onchange="importJSON(event)">
+    </div>
+</aside>
+
+<main>
+    <div id="logbook" class="tab-content active">
+        <h2 class="fw-bold text-dark mb-4">Registro Táctico Basauri</h2>
+        <div class="card-custom p-4" id="formContainer">
+            <form id="qsoForm" onsubmit="event.preventDefault(); saveQSO();" class="row g-3">
+                <input type="hidden" id="editId">
+                <div class="col-md-3"><label class="form-label small fw-bold">INDICATIVO</label><input type="text" id="callsign" class="form-control text-uppercase fw-bold" required></div>
+                <div class="col-md-2"><label class="form-label small fw-bold">RST</label><input type="text" id="rst" class="form-control" value="59"></div>
+                <div class="col-md-3"><label class="form-label small fw-bold">BANDA</label><select id="band" class="form-select"><option>2m</option><option>70cm</option><option>PMR</option><option>Aérea</option></select></div>
+                <div class="col-md-2"><label class="form-label small fw-bold">MODO</label><select id="mode" class="form-select"><option>FM</option><option>DMR</option><option>AM</option><option>SSB</option></select></div>
+                <div class="col-md-2 d-flex align-items-end"><button type="submit" id="saveBtn" class="btn btn-primary w-100 fw-bold">REGISTRAR</button></div>
+                <div class="col-12"><input type="text" id="comment" class="form-control" placeholder="Notas: ubicación, aita saludando, condiciones QRP..."></div>
+            </form>
+        </div>
+        <div id="logList"></div>
+    </div>
+
+    <div id="plan" class="tab-content">
+        <h2 class="fw-bold text-dark mb-4">Plan de Bandas Tidradio H8 3rd Gen</h2>
+
+        <div class="card-custom">
+            <div class="card-header-tech bg-info-dark"><i class="fas fa-microchip"></i>Espectro Detallado H8 (136 - 520 MHz)</div>
+            <table class="table table-radio table-hover">
+                <thead><tr><th>Rango (MHz)</th><th>Modo</th><th>Servicio / Segmento</th><th>Potencia</th><th>TX</th></tr></thead>
+                <tbody>
+                    <tr><td class="freq-code">136.000 - 137.000</td><td>NFM</td><td>Sats Meteorológicos / Espacio</td><td>-</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                    <tr><td class="freq-code">144.000 - 144.100</td><td>CW/USB</td><td>Satélites / CW (Radioaficionados)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">144.100 - 144.400</td><td>USB/SSB</td><td>Banda Lateral / DX Terrestre</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">144.500 - 144.794</td><td>FM/DIG</td><td>Llamada FM / Modos Digitales</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">144.800 - 144.990</td><td>FM/AFSK</td><td>APRS (Tidradio Digirig/BT)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">145.000 - 145.187</td><td>FM</td><td>Entrada Repetidores (Shift -0.6)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">145.200 - 145.587</td><td>FM</td><td>Canales Simplex / Llamada 145.500</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">145.600 - 145.787</td><td>FM</td><td>Salida Repetidores (Escucha)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">146.000 - 174.000</td><td>NFM</td><td>Servicios (Marina/Comercial/Seguridad)</td><td>-</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                    <tr class="table-secondary"><td>---</td><td>---</td><td><b>Segmento UHF</b></td><td>---</td><td>---</td></tr>
+                    <tr><td class="freq-code">430.000 - 431.975</td><td>FM/DIG</td><td>Entrada Repetidores / Satélites</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">432.000 - 432.100</td><td>CW/USB</td><td>Rebote Lunar (EME) / SSB</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">433.000 - 433.600</td><td>FM</td><td>Simplex / LPD (Canal 1: 433.075)</td><td>0.5W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">434.000 - 438.000</td><td>FM/DIG</td><td>Segmento Mixto / Satélites</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">438.000 - 439.425</td><td>FM/DMR</td><td>Salida Repetidores (Shift -7.6)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">440.000 - 520.000</td><td>NFM</td><td>Servicios Profesionales / TETRA</td><td>-</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-custom">
+            <div class="card-header-tech bg-vhf"><i class="fas fa-mountain-sun"></i>Repetidores VHF (2m) - Bizkaia</div>
+            <table class="table table-radio table-hover">
+                <thead><tr><th>Ubicación</th><th>RX</th><th>TX</th><th>Offset</th><th>Tono</th><th>TX</th></tr></thead>
+                <tbody>
+                    <tr><td><b>Ganekogorta (R0)</b></td><td class="freq-code">145.600</td><td class="freq-code">145.000</td><td>-0.600</td><td><span class="subtone-badge">123.0</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>Sollube (R1)</b></td><td class="freq-code">145.625</td><td class="freq-code">145.025</td><td>-0.600</td><td><span class="subtone-badge">NONE</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>La Garbea (R2)</b></td><td class="freq-code">145.650</td><td class="freq-code">145.050</td><td>-0.600</td><td><span class="subtone-badge">123.0</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>Monte Oiz (R6)</b></td><td class="freq-code">145.750</td><td class="freq-code">145.150</td><td>-0.600</td><td><span class="subtone-badge">82.5/123.0</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-custom">
+            <div class="card-header-tech bg-pmr"><i class="fas fa-walkie-talkie"></i>Canales PMR446 (Uso Libre - NFM)</div>
+            <table class="table table-radio table-hover">
+                <thead><tr><th>Canal</th><th>Frecuencia (MHz)</th><th>Paso (kHz)</th><th>Uso</th><th>TX</th></tr></thead>
+                <tbody>
+                    <tr><td><b>PMR 1</b></td><td class="freq-code">446.00625</td><td>12.5</td><td>General / Valle Nervión</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 2</b></td><td class="freq-code">446.01875</td><td>12.5</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 3</b></td><td class="freq-code">446.03125</td><td>12.5</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 4</b></td><td class="freq-code">446.04375</td><td>12.5</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 5</b></td><td class="freq-code">446.05625</td><td>12.5</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 6</b></td><td class="freq-code">446.06875</td><td>12.5</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 7</b></td><td class="freq-code">446.08125</td><td>12.5</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 8</b></td><td class="freq-code">446.09375</td><td>12.5</td><td>Canal Montaña / Llamada</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 9-16</b></td><td class="freq-code">446.106 - 446.193</td><td>12.5</td><td>Ampliación FM/Digital</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-custom">
+            <div class="card-header-tech bg-uhf"><i class="fas fa-tower-broadcast"></i>Repetidores UHF (70cm)</div>
+            <table class="table table-radio table-hover">
+                <thead><tr><th>Ubicación</th><th>RX</th><th>TX</th><th>Offset</th><th>Tono</th><th>TX</th></tr></thead>
+                <tbody>
+                    <tr><td><b>Pagasarri (U78)</b></td><td class="freq-code">438.850</td><td class="freq-code">431.250</td><td>-7.600</td><td><span class="subtone-badge">123.0</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>Ganekogorta (U82)</b></td><td class="freq-code">438.950</td><td class="freq-code">431.350</td><td>-7.600</td><td><span class="subtone-badge">123.0</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-custom">
+            <div class="card-header-tech bg-fm"><i class="fas fa-radio"></i>Radio Comercial FM (Escucha Local)</div>
+            <table class="table table-radio">
+                <thead><tr><th>Emisora</th><th>Frecuencia</th><th>Ubicación</th><th>TX</th></tr></thead>
+                <tbody>
+                    <tr><td><b>Radio Nervión</b></td><td class="freq-code">88.0</td><td>Bilbao (Basauri High)</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                    <tr><td><b>Radio 7</b></td><td class="freq-code">92.7</td><td>Margen Izquierda</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                    <tr><td><b>Radio Euskadi</b></td><td class="freq-code">91.7</td><td>Vizcaya General</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-custom">
+            <div class="card-header-tech bg-vhf"><i class="fas fa-plane"></i>Loiu (LEBB) - Banda Aérea AM</div>
+            <table class="table table-radio">
+                <thead><tr><th>Servicio</th><th>Frecuencia</th><th>Observaciones</th><th>TX</th></tr></thead>
+                <tbody>
+                    <tr><td><b>Aproximación</b></td><td class="freq-code">120.700</td><td>Contacto inicial</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                    <tr><td><b>Torre Control</b></td><td class="freq-code">118.500</td><td>Autorización pista</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                    <tr><td><b>ATIS</b></td><td class="freq-code">125.125</td><td>Info meteorológica</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<script>
+    let logs = JSON.parse(localStorage.getItem('hamLogs')) || [];
+    function switchTab(id, el) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        el.classList.add('active');
+    }
+    function saveQSO() {
+        const id = document.getElementById('editId').value;
+        const qso = {
+            id: id ? parseInt(id) : Date.now(),
+            date: new Date().toISOString().replace('T', ' ').substring(0, 19) + ' Z',
+            callsign: document.getElementById('callsign').value.toUpperCase(),
+            rst: document.getElementById('rst').value,
+            band: document.getElementById('band').value,
+            mode: document.getElementById('mode').value,
+            comment: document.getElementById('comment').value
+        };
+        if(id) { logs = logs.map(l => l.id === qso.id ? qso : l); cancelEdit(); } 
+        else { logs.unshift(qso); }
+        localStorage.setItem('hamLogs', JSON.stringify(logs));
+        document.getElementById('qsoForm').reset();
+        render();
+    }
+    function render() {
+        const list = document.getElementById('logList');
+        list.innerHTML = logs.map(l => `
+            <div class="log-entry d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-bold m-0 text-dark">${l.callsign} <span class="badge bg-primary ms-2" style="font-size:0.65em">${l.band}</span></h5>
+                    <div class="small text-muted mt-1"><i class="far fa-clock me-1"></i>${l.date} | ${l.mode} | RST: ${l.rst}</div>
+                    <div class="small text-secondary mt-1">${l.comment || '---'}</div>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-outline-warning" onclick="editLog(${l.id})"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteLog(${l.id})"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `).join('');
+    }
+    function editLog(id) {
+        const l = logs.find(x => x.id === id);
+        document.getElementById('editId').value = l.id;
+        document.getElementById('callsign').value = l.callsign;
+        document.getElementById('rst').value = l.rst;
+        document.getElementById('band').value = l.band;
+        document.getElementById('mode').value = l.mode;
+        document.getElementById('comment').value = l.comment;
+        document.getElementById('formContainer').classList.add('edit-mode');
+        document.getElementById('saveBtn').innerText = 'ACTUALIZAR';
+        document.getElementById('saveBtn').className = 'btn btn-warning w-100 fw-bold';
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+    function cancelEdit() {
+        document.getElementById('editId').value = '';
+        document.getElementById('formContainer').classList.remove('edit-mode');
+        document.getElementById('saveBtn').innerText = 'REGISTRAR';
+        document.getElementById('saveBtn').className = 'btn btn-primary w-100 fw-bold';
+    }
+    function deleteLog(id) { if(confirm("¿Borrar?")) { logs = logs.filter(x => x.id !== id); localStorage.setItem('hamLogs', JSON.stringify(logs)); render(); } }
+    function exportJSON() { const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs)); a.download = "radio_logs_basauri.json"; a.click(); }
+    function importJSON(e) { const r = new FileReader(); r.onload = ev => { logs = JSON.parse(ev.target.result); localStorage.setItem('hamLogs', JSON.stringify(logs)); render(); }; r.readAsText(e.target.files[0]); }
+    render();
+</script>
+</body>
+</html>
