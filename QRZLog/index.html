@@ -3,143 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radio Pro - Log & Plan</title>
+    <title>Radio Log Pro v3 - IT Edition</title>
     <style>
         :root {
-            --primary: #4361ee; --primary-hover: #3a56d4;
-            --success: #2ec4b6; --danger: #e71d36;
-            --warning: #ff9f1c; --bg: #f8f9fa;
-            --text: #2b2d42; --card-bg: #ffffff;
+            --primary: #3f51b5; --primary-dark: #303f9f;
+            --bg: #f5f7fa; --card: #ffffff;
+            --text: #333; --success: #4caf50; --danger: #f44336;
+            --sidebar-width: 240px;
         }
 
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background: var(--bg); color: var(--text); margin: 0; padding-bottom: 20px; }
-        
-        /* Navegación Profesional */
-        nav { 
-            background: var(--primary); display: flex; justify-content: center; 
-            padding: 10px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        nav button { 
-            background: transparent; border: none; color: white; padding: 10px 20px; 
-            cursor: pointer; font-weight: bold; border-radius: 5px; transition: 0.3s;
-        }
-        nav button.active { background: rgba(255,255,255,0.2); }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
-        .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
-        .section { display: none; }
+        /* Sidebar - El toque profesional */
+        .sidebar {
+            width: var(--sidebar-width); background: var(--primary); color: white;
+            display: flex; flex-direction: column; padding: 20px; transition: 0.3s;
+            position: fixed; height: 100%; z-index: 1000;
+        }
+        .sidebar h2 { font-size: 1.2rem; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .sidebar button {
+            background: transparent; border: none; color: rgba(255,255,255,0.8);
+            padding: 12px; text-align: left; cursor: pointer; font-size: 1rem;
+            border-radius: 8px; margin-bottom: 5px; transition: 0.2s;
+        }
+        .sidebar button:hover, .sidebar button.active { background: rgba(255,255,255,0.1); color: white; }
+
+        /* Área Principal */
+        main { 
+            flex: 1; margin-left: var(--sidebar-width); padding: 20px; 
+            overflow-y: auto; width: calc(100% - var(--sidebar-width)); 
+        }
+
+        .section { display: none; max-width: 900px; margin: 0 auto; }
         .section.active { display: block; }
 
-        header { text-align: center; padding-bottom: 20px; }
-        .logo { width: 40px; fill: var(--primary); vertical-align: middle; }
+        /* Cards y Formularios */
+        .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
+        .full-width { grid-column: 1 / -1; }
 
-        /* Estilos Logbook (Optimizado móvil) */
-        .log-form { 
-            background: var(--card-bg); padding: 20px; border-radius: 15px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;
-        }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .full-width { grid-column: span 2; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #edf2f4; border-radius: 8px; outline: none; }
-        .btn-main { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; background: var(--primary); color: white; }
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: #666; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
+        
+        .btn { padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline { background: #eee; color: var(--text); font-size: 0.8rem; }
+        .btn-danger { background: var(--danger); color: white; }
 
-        .log-card { 
-            background: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 10px;
+        /* Lista de Logs (Responsive) */
+        .log-item { 
+            background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px;
             border-left: 5px solid var(--primary); display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
         }
-        .badge { background: #edf2f4; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; }
+        .log-item b { font-size: 1.1rem; color: var(--primary); }
+        .badge { background: #e8eaf6; color: var(--primary); padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
 
-        /* Tabla Plan de Bandas */
-        .plan-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; font-size: 0.9rem; }
+        /* Plan de Bandas */
+        .plan-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
         .plan-table th, .plan-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        .plan-table th { background: #f1f3f5; color: var(--primary); }
+        .plan-table th { background: #f8f9fa; }
         .tx-yes { color: var(--success); font-weight: bold; }
         .tx-no { color: var(--danger); font-weight: bold; }
 
-        @media (min-width: 600px) {
-            .grid { grid-template-columns: repeat(4, 1fr); }
-            .full-width { grid-column: span 4; }
+        /* Responsive Móvil */
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; padding: 10px; align-items: center; }
+            .sidebar h2, .sidebar span { display: none; }
+            main { margin-left: 60px; width: calc(100% - 60px); padding: 10px; }
+            .grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
 <body>
 
-<nav>
-    <button id="nav-log" class="active" onclick="switchTab('logbook')">LOGBOOK</button>
-    <button id="nav-plan" onclick="switchTab('plan')">PLAN DE BANDAS</button>
-</nav>
+<aside class="sidebar">
+    <h2>📡 <span>RadioPro</span></h2>
+    <button class="active" onclick="switchTab('logbook', this)">📝 <span>Logbook</span></button>
+    <button onclick="switchTab('plan', this)">📊 <span>Plan Bandas</span></button>
+    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
+        <button class="btn-outline" onclick="exportJSON()">💾 Export JSON</button>
+        <button class="btn-outline" onclick="exportADIF()">📡 Export ADIF</button>
+        <input type="file" id="importInput" style="display:none" onchange="importJSON(event)">
+        <button class="btn-outline" onclick="document.getElementById('importInput').click()">📥 Import JSON</button>
+        <button class="btn-danger" style="font-size: 0.7rem;" onclick="clearLogs()">🗑️ Reset</button>
+    </div>
+</aside>
 
-<div class="container">
-    
-    <div id="logbook" class="section active">
-        <header>
-            <svg class="logo" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
-            <h1 style="display:inline; margin-left:10px;">Radio Log</h1>
-        </header>
-
-        <div class="log-form">
+<main>
+    <section id="logbook" class="section active">
+        <div class="card">
+            <h3>Registro de QSO</h3>
             <input type="hidden" id="editId">
             <div class="grid">
-                <input type="text" id="callsign" placeholder="Indicativo">
-                <input type="text" id="rst" value="59" placeholder="RST">
-                <select id="band">
-                    <option value="40m">40m</option><option value="20m">20m</option>
-                    <option value="2m">2m</option><option value="70cm">70cm</option>
-                    <option value="PMR">PMR</option>
-                </select>
-                <select id="mode">
-                    <option value="SSB">SSB</option><option value="FM">FM</option>
-                    <option value="FT8">FT8</option><option value="CW">CW</option>
-                </select>
-                <input type="text" id="comment" class="full-width" placeholder="Comentarios...">
+                <div>
+                    <label>Indicativo</label>
+                    <input type="text" id="callsign" placeholder="Ej: EA4ABC">
+                </div>
+                <div>
+                    <label>RST</label>
+                    <input type="text" id="rst" value="59">
+                </div>
+                <div>
+                    <label>Banda</label>
+                    <select id="band">
+                        <option value="40m">40m</option>
+                        <option value="20m">20m</option>
+                        <option value="2m">2m</option>
+                        <option value="70cm">70cm</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Modo</label>
+                    <select id="mode">
+                        <option value="FM">FM</option>
+                        <option value="SSB">SSB</option>
+                        <option value="FT8">FT8</option>
+                        <option value="CW">CW</option>
+                    </select>
+                </div>
+                <div class="full-width">
+                    <label>Comentarios</label>
+                    <input type="text" id="comment" placeholder="Notas del contacto...">
+                </div>
             </div>
-            <button id="saveBtn" class="btn-main" style="margin-top:15px" onclick="handleSubmit()">REGISTRAR QSO</button>
+            <button id="saveBtn" class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="handleSubmit()">REGISTRAR QSO</button>
         </div>
 
-        <div id="logList"></div>
-    </div>
+        <div id="logList">
+            </div>
+    </section>
 
-    <div id="plan" class="section">
-        <h2>Plan de Bandas & Capacidades H8</h2>
-        <div style="overflow-x: auto;">
-            <table class="plan-table">
-                <thead>
-                    <tr>
-                        <th>Banda</th>
-                        <th>Rango (MHz)</th>
-                        <th>TX</th>
-                        <th>Mod.</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>FM Radio</td><td>65 - 108</td><td class="tx-no">NO</td><td>WFM</td></tr>
-                    <tr><td>Airband</td><td>108 - 136</td><td class="tx-no">NO</td><td>AM</td></tr>
-                    <tr><td><b>2 metros</b></td><td>144 - 146</td><td class="tx-yes">SÍ</td><td>FM/NFM</td></tr>
-                    <tr><td>VHF High</td><td>136 - 174</td><td class="tx-no">RX*</td><td>FM</td></tr>
-                    <tr><td>Banda 220</td><td>200 - 260</td><td class="tx-yes">SÍ*</td><td>FM</td></tr>
-                    <tr><td>UHF 300</td><td>350 - 390</td><td class="tx-no">NO</td><td>FM</td></tr>
-                    <tr><td><b>70 cm</b></td><td>430 - 440</td><td class="tx-yes">SÍ</td><td>FM/NFM</td></tr>
-                    <tr><td>PMR446</td><td>446.0 - 446.2</td><td class="tx-no">RX*</td><td>NFM</td></tr>
-                    <tr><td>UHF High</td><td>400 - 520</td><td class="tx-no">RX*</td><td>FM</td></tr>
-                </tbody>
-            </table>
+    <section id="plan" class="section">
+        <div class="card">
+            <h3>Plan de Bandas Tidradio H8 / Radioaficionado</h3>
+            <div style="overflow-x: auto;">
+                <table class="plan-table">
+                    <thead>
+                        <tr><th>Banda</th><th>Rango (MHz)</th><th>TX</th><th>Modulación</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>FM Comercial</td><td>65 - 108</td><td class="tx-no">NO</td><td>WFM (RX)</td></tr>
+                        <tr><td>Banda Aérea</td><td>108 - 136</td><td class="tx-no">NO</td><td>AM (RX)</td></tr>
+                        <tr><td><b>2 metros</b></td><td>144 - 146</td><td class="tx-yes">SÍ</td><td>FM / NFM</td></tr>
+                        <tr><td>VHF (Otras)</td><td>136 - 174</td><td class="tx-no">RX*</td><td>FM</td></tr>
+                        <tr><td>Banda 220</td><td>200 - 260</td><td class="tx-yes">SÍ*</td><td>FM</td></tr>
+                        <tr><td>UHF Mil</td><td>350 - 390</td><td class="tx-no">NO</td><td>FM (RX)</td></tr>
+                        <tr><td><b>70 cm</b></td><td>430 - 440</td><td class="tx-yes">SÍ</td><td>FM / NFM</td></tr>
+                        <tr><td>PMR446</td><td>446.0 - 446.2</td><td class="tx-no">RX*</td><td>NFM</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-size: 0.8rem; color: #777; margin-top: 15px;">* Nota: El hardware permite TX extendido pero requiere desbloqueo legal/técnico.</p>
         </div>
-        <p style="font-size: 0.8rem; color: #666; margin-top: 15px;">
-            * Nota: El Tidradio H8 puede transmitir en rangos extendidos (136-174 / 400-520) si está desbloqueado, pero fuera de las bandas de aficionado (en negrita) la emisión puede no ser legal o requerir licencias especiales. ¡No digas que no te avisé!
-        </p>
-    </div>
-
-</div>
+    </section>
+</main>
 
 <script>
     let logs = JSON.parse(localStorage.getItem('hamLogs')) || [];
     let isEditing = false;
 
-    function switchTab(tabId) {
+    function switchTab(tabId, btn) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.sidebar button').forEach(b => b.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
-        document.getElementById('nav-' + (tabId === 'logbook' ? 'log' : 'plan')).classList.add('active');
+        btn.classList.add('active');
     }
 
     function handleSubmit() {
@@ -154,20 +184,17 @@
             comment: document.getElementById('comment').value
         };
 
-        if(!data.callsign) return alert("¿A quién llamas? Pon un indicativo.");
+        if(!data.callsign) return alert("Error 404: Callsign not found.");
 
         if(isEditing) {
             logs = logs.map(l => l.id === data.id ? data : l);
             isEditing = false;
             document.getElementById('saveBtn').innerText = "REGISTRAR QSO";
-            document.getElementById('saveBtn').style.background = "var(--primary)";
         } else {
             logs.unshift(data);
         }
 
-        document.getElementById('editId').value = '';
-        document.getElementById('callsign').value = '';
-        document.getElementById('comment').value = '';
+        resetForm();
         saveAndRender();
     }
 
@@ -180,29 +207,68 @@
         document.getElementById('mode').value = log.mode;
         document.getElementById('comment').value = log.comment;
         isEditing = true;
-        document.getElementById('saveBtn').innerText = "ACTUALIZAR";
-        document.getElementById('saveBtn').style.background = "var(--warning)";
-        switchTab('logbook');
+        document.getElementById('saveBtn').innerText = "ACTUALIZAR REGISTRO";
         window.scrollTo(0,0);
+    }
+
+    function deleteLog(id) {
+        if(confirm("¿Eliminar registro?")) {
+            logs = logs.filter(l => l.id !== id);
+            saveAndRender();
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('editId').value = '';
+        document.getElementById('callsign').value = '';
+        document.getElementById('comment').value = '';
     }
 
     function saveAndRender() {
         localStorage.setItem('hamLogs', JSON.stringify(logs));
         const list = document.getElementById('logList');
         list.innerHTML = logs.map(log => `
-            <div class="log-card">
+            <div class="log-item">
                 <div>
                     <b>${log.callsign}</b> <span class="badge">${log.band}</span> <span class="badge">${log.mode}</span>
                     <div style="font-size:0.8rem; color:#666">${log.timestamp} - ${log.comment}</div>
                 </div>
                 <div>
-                    <button onclick="editLog(${log.id})" style="border:none; background:none; cursor:pointer; color:var(--primary)">Edit</button>
+                    <button class="btn-outline" onclick="editLog(${log.id})">Editar</button>
+                    <button class="btn-outline" style="color:red" onclick="deleteLog(${log.id})">X</button>
                 </div>
             </div>
         `).join('');
     }
 
+    // Persistencia y Archivos
+    function exportJSON() {
+        const blob = new Blob([JSON.stringify(logs, null, 2)], {type: 'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'radio_log_backup.json'; a.click();
+    }
+
+    function importJSON(event) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            logs = JSON.parse(e.target.result);
+            saveAndRender();
+            alert("Logs importados. Backup restaurado.");
+        };
+        reader.readAsText(event.target.files[0]);
+    }
+
+    function exportADIF() {
+        let adif = "ADIF Export\n<EOH>\n" + logs.map(l => `<CALL:${l.callsign.length}>${l.callsign}<BAND:${l.band.length}>${l.band}<MODE:${l.mode.length}>${l.mode}<EOR>`).join('\n');
+        const blob = new Blob([adif], {type: 'text/plain'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'radio_log.adi'; a.click();
+    }
+
+    function clearLogs() { if(confirm("¿Borrar toda la base de datos?")) { logs = []; saveAndRender(); } }
+
     saveAndRender();
 </script>
+
 </body>
 </html>
