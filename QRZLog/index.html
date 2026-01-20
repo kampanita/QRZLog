@@ -3,47 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RadioLog Pro v11 | Basauri Command</title>
+    <title>RadioLog Pro v12 | Basauri Full Spectrum</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --sidebar-dark: #0f172a; --accent: #38bdf8; --tx-green: #22c55e; --rx-red: #ef4444; }
         body { background-color: #f1f5f9; font-family: 'Inter', system-ui, -apple-system, sans-serif; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Sidebar Refinada */
         .sidebar { width: 320px; background: var(--sidebar-dark); color: white; display: flex; flex-direction: column; z-index: 1000; box-shadow: 4px 0 20px rgba(0,0,0,0.2); }
         .logo-area { padding: 30px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
         .logo-icon { font-size: 3rem; color: var(--accent); margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4)); }
-        
         .nav-link { color: #94a3b8 !important; padding: 18px 25px; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; font-weight: 500; }
         .nav-link:hover { background: rgba(255,255,255,0.05); color: white !important; }
         .nav-link.active { background: rgba(56, 189, 248, 0.1); color: white !important; border-left-color: var(--accent); }
-
         main { flex: 1; overflow-y: auto; padding: 35px; scroll-behavior: smooth; }
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Cards y Tablas */
         .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); background: white; margin-bottom: 25px; overflow: hidden; }
         .card-header-tech { padding: 15px 20px; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
-        .bg-vhf { background: #0284c7; } .bg-uhf { background: #7c3aed; } .bg-fm { background: #059669; } .bg-danger { background: #dc2626; }
-        
+        .bg-vhf { background: #0284c7; } .bg-uhf { background: #7c3aed; } .bg-fm { background: #059669; } .bg-danger { background: #dc2626; } .bg-info-dark { background: #0f172a; }
         .table-radio { font-size: 0.88rem; margin-bottom: 0; }
         .table-radio th { background: #f8fafc; color: #64748b; font-size: 0.75rem; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
         .freq-code { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #1e293b; }
         .subtone-badge { background: #fef3c7; color: #92400e; padding: 3px 8px; border-radius: 4px; font-weight: 800; }
-        
-        /* Semáforo TX/RX Estricto */
         .badge-status { width: 90px; text-align: center; font-weight: 800; font-size: 0.7rem; padding: 6px; border-radius: 6px; display: inline-block; text-transform: uppercase; }
         .st-tx { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
         .st-rx { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-
-        /* Formulario y Logbook */
         .log-entry { background: white; border-radius: 10px; padding: 18px; margin-bottom: 12px; border-left: 6px solid var(--accent); transition: 0.2s; }
         .log-entry:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
         .edit-mode { background: #fffbeb !important; border-color: #f59e0b !important; }
-
         @media (max-width: 992px) { .sidebar { width: 80px; } .sidebar span, .logo-text { display: none; } main { padding: 15px; } }
     </style>
 </head>
@@ -52,7 +40,7 @@
 <aside class="sidebar">
     <div class="logo-area">
         <i class="fas fa-satellite-dish logo-icon"></i>
-        <div class="logo-text"><h4 class="fw-bold m-0">RadioPro v11</h4><small class="opacity-50">Basauri High-End Ops</small></div>
+        <div class="logo-text"><h4 class="fw-bold m-0">RadioPro v12</h4><small class="opacity-50">Basauri High-End Ops</small></div>
     </div>
     <nav class="nav flex-column mt-4">
         <a class="nav-link active" onclick="switchTab('logbook', this)"><i class="fas fa-edit me-3"></i> <span>Logbook (Zulu)</span></a>
@@ -83,7 +71,32 @@
     </div>
 
     <div id="plan" class="tab-content">
-        <h2 class="fw-bold text-dark mb-4">Frecuencias Basauri & Gran Bilbao</h2>
+        <h2 class="fw-bold text-dark mb-4">Plan de Bandas Tidradio H8 3rd Gen (Full Range)</h2>
+
+        <div class="card-custom">
+            <div class="card-header-tech bg-info-dark">Mapa de Espectro VHF/UHF (136 - 520 MHz)</div>
+            <table class="table table-radio table-hover">
+                <thead><tr><th>Rango (MHz)</th><th>Modo Sugerido</th><th>Servicio / Uso</th><th>P. Máx</th><th>TX</th></tr></thead>
+                <tbody>
+                    <tr><td class="freq-code">136.000 - 137.000</td><td>NFM</td><td>Satélites / Meteorología</td><td>-</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                    <tr><td class="freq-code">144.000 - 144.100</td><td>USB / CW</td><td>Radioaficionados (Satélites/CW)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">144.100 - 144.400</td><td>USB / SSB</td><td>Radioaficionados (Banda Lateral)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">144.500 - 144.794</td><td>FM / DIGITAL</td><td>Radioaficionados (Modos Mixtos)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">144.800 - 144.990</td><td>FM / AFSK</td><td>APRS / Datos Digitales</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">145.000 - 145.193</td><td>FM</td><td>Entrada Repetidores VHF</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">145.200 - 145.593</td><td>FM</td><td>Simplex / Canales Directos</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">145.600 - 145.793</td><td>FM</td><td>Salida Repetidores VHF</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">146.000 - 174.000</td><td>NFM</td><td>Servicios (Bomberos/Marina/PC)</td><td>-</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                    <tr><td class="freq-code">430.000 - 431.990</td><td>FM / DIGITAL</td><td>Repetidores UHF / Satélites</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">432.000 - 432.100</td><td>USB / CW</td><td>Banda Lateral / Rebote Lunar</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">433.000 - 433.575</td><td>FM</td><td>Simplex / LPD (Baja Potencia)</td><td>0.5W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">434.000 - 438.000</td><td>FM / DIGITAL</td><td>Experimental / Satélites</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">438.000 - 440.000</td><td>FM / DMR</td><td>Salida Repetidores UHF</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">446.000 - 446.200</td><td>NFM</td><td>PMR446 (Uso Libre)</td><td>0.5W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">447.000 - 520.000</td><td>NFM</td><td>Servicios Profesionales / TETRA</td><td>-</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                </tbody>
+            </table>
+        </div>
 
         <div class="card-custom">
             <div class="card-header-tech bg-vhf">Repetidores VHF (2m) - Offset 0.6 MHz</div>
@@ -117,7 +130,6 @@
                     <tr><td><b>Radio Nervión</b></td><td class="freq-code">88.0</td><td>Bilbao/Basauri</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
                     <tr><td><b>Radio 7</b></td><td class="freq-code">92.7</td><td>Barakaldo/Bilbao</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
                     <tr><td><b>Radio Euskadi</b></td><td class="freq-code">91.7</td><td>Vizcaya</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                    <tr><td><b>Gaztea</b></td><td class="freq-code">94.7</td><td>Bilbao</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
                 </tbody>
             </table>
         </div>
@@ -135,13 +147,13 @@
         </div>
 
         <div class="card-custom">
-            <div class="card-header-tech bg-danger">Emergencias / Marítimo</div>
+            <div class="card-header-tech bg-danger">Emergencias / Marítimo / Otros</div>
             <table class="table table-radio">
-                <thead><tr><th>Servicio</th><th>Frecuencia (MHz)</th><th>Permiso</th></tr></thead>
+                <thead><tr><th>Servicio</th><th>Frecuencia (MHz)</th><th>Potencia sugerida</th><th>Permiso</th></tr></thead>
                 <tbody>
-                    <tr><td><b>Canal 16 Marítimo</b></td><td class="freq-code">156.800</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                    <tr><td><b>Emergencia REM</b></td><td class="freq-code">146.175</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                    <tr><td><b>PMR Ch 8 (Llamada)</b></td><td class="freq-code">446.093</td><td><span class="badge-status st-tx">TX VERDE*</span></td></tr>
+                    <tr><td><b>Canal 16 Marítimo</b></td><td class="freq-code">156.800</td><td>Low/Mid</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                    <tr><td><b>Emergencia REM</b></td><td class="freq-code">146.175</td><td>Low/Mid</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                    <tr><td><b>PMR Ch 8 (Llamada)</b></td><td class="freq-code">446.093</td><td>Low (0.5W)</td><td><span class="badge-status st-tx">TX VERDE*</span></td></tr>
                 </tbody>
             </table>
         </div>
@@ -150,14 +162,12 @@
 
 <script>
     let logs = JSON.parse(localStorage.getItem('hamLogs')) || [];
-
     function switchTab(id, el) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         el.classList.add('active');
     }
-
     function saveQSO() {
         const id = document.getElementById('editId').value;
         const qso = {
@@ -175,7 +185,6 @@
         document.getElementById('qsoForm').reset();
         render();
     }
-
     function render() {
         const list = document.getElementById('logList');
         list.innerHTML = logs.map(l => `
@@ -192,7 +201,6 @@
             </div>
         `).join('');
     }
-
     function editLog(id) {
         const l = logs.find(x => x.id === id);
         document.getElementById('editId').value = l.id;
@@ -206,18 +214,15 @@
         document.getElementById('saveBtn').className = 'btn btn-warning w-100 fw-bold';
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
-
     function cancelEdit() {
         document.getElementById('editId').value = '';
         document.getElementById('formContainer').classList.remove('edit-mode');
         document.getElementById('saveBtn').innerText = 'REGISTRAR';
         document.getElementById('saveBtn').className = 'btn btn-primary w-100 fw-bold';
     }
-
     function deleteLog(id) { if(confirm("¿Borrar QSO?")) { logs = logs.filter(x => x.id !== id); localStorage.setItem('hamLogs', JSON.stringify(logs)); render(); } }
     function exportJSON() { const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs)); a.download = "radio_logs_basauri.json"; a.click(); }
     function importJSON(e) { const r = new FileReader(); r.onload = ev => { logs = JSON.parse(ev.target.result); localStorage.setItem('hamLogs', JSON.stringify(logs)); render(); }; r.readAsText(e.target.files[0]); }
-
     render();
 </script>
 </body>
