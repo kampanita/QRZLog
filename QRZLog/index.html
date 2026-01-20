@@ -3,134 +3,282 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QRZLog Pro Cloud - IT Edition</title>
+    <title>QRZLog Pro Cloud - IT Ultimate</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --primary: #2563eb; --bg: #f3f4f6; --sidebar-bg: #1f2937; --accent: #10b981; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); display: flex; height: 100vh; margin: 0; }
-        .sidebar { width: 260px; background: var(--sidebar-bg); color: white; display: flex; flex-direction: column; }
-        .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 30px; }
-        .card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
-        .input-group { display: flex; flex-direction: column; gap: 5px; }
-        input, select, textarea { padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; }
-        .qso-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e5e7eb; cursor: pointer; }
-        .btn { padding: 12px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: var(--primary); color: white; }
-        .loader { display: none; color: var(--primary); font-weight: bold; }
+        :root {
+            --sidebar-width: 260px;
+            --primary: #3b82f6; --primary-dark: #2563eb;
+            --accent: #10b981; --danger: #f43f5e;
+            --bg: #f8fafc; --sidebar-bg: #0f172a;
+            --text-main: #1e293b; --text-muted: #64748b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-width); background: var(--sidebar-bg); color: white; display: flex; flex-direction: column; z-index: 1000; }
+        .sidebar-header { padding: 25px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #1e293b; }
+        .sidebar-header i { font-size: 1.8rem; color: var(--accent); }
+        .nav-menu { flex: 1; padding: 20px 0; }
+        .nav-item { padding: 14px 24px; display: flex; align-items: center; gap: 12px; cursor: pointer; color: #94a3b8; text-decoration: none; transition: 0.2s; }
+        .nav-item:hover, .nav-item.active { background: #1e293b; color: white; }
+        .nav-item.active { border-left: 4px solid var(--accent); }
+
+        /* Main Content */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        header { background: white; padding: 18px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
+
+        .content-padding { padding: 30px; max-width: 1000px; margin: 0 auto; width: 100%; }
+
+        /* Form Card */
+        .card { background: white; border-radius: 12px; padding: 24px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 24px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        input, select, textarea { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; outline: none; transition: 0.2s; }
+        input:focus { border-color: var(--primary); }
+
+        /* Filter bar */
+        .filter-bar { display: flex; gap: 15px; margin-bottom: 25px; align-items: center; flex-wrap: wrap; }
+        .filter-input { flex: 1; min-width: 250px; }
+
+        /* List Items */
+        .qso-list { display: flex; flex-direction: column; gap: 12px; }
+        .qso-item { background: white; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; display: grid; grid-template-columns: 1fr auto; cursor: pointer; transition: 0.2s; }
+        .qso-item:hover { border-color: var(--primary); transform: scale(1.01); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .qso-call { font-size: 1.4rem; font-weight: 900; color: var(--primary-dark); }
+        .badge { padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; background: #f1f5f9; }
+
+        .btn { padding: 12px 24px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+
+        #loader { display: none; font-size: 0.8rem; color: var(--primary); font-weight: bold; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; flex-direction: row; }
+            .sidebar-header, .nav-item span { display: none; }
+            .nav-menu { display: flex; padding: 0; }
+            .main-content { height: calc(100vh - 60px); }
+        }
     </style>
 </head>
 <body>
 
-<nav class="sidebar">
-    <div style="padding: 25px; font-weight: 900; color: var(--accent); border-bottom: 1px solid #374151;">QRZLOG CLOUD</div>
-    <div style="padding: 20px; font-size: 0.8rem; color: #9ca3af;">Persistencia Real en Servidor</div>
-</nav>
-
-<main class="main">
-    <div class="card">
-        <h2 style="margin-bottom: 20px; color: var(--primary);">Registro de Operaciones</h2>
-        <div id="loader" class="loader">Sincronizando con la nube...</div>
-        <input type="hidden" id="qsoId">
-        <div class="form-grid">
-            <div class="input-group"><label>Callsign</label><input type="text" id="callsign" style="text-transform: uppercase;"></div>
-            <div class="input-group"><label>RST</label><input type="text" id="rst" value="59"></div>
-            <div class="input-group">
-                <label>Banda</label>
-                <select id="band"><option value="2m">2m</option><option value="40m">40m</option><option value="20m">20m</option></select>
-            </div>
-            <div class="input-group">
-                <label>Modo</label>
-                <select id="mode"><option value="FM">FM</option><option value="SSB">SSB</option><option value="FT8">FT8</option></select>
-            </div>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <i class="fa-solid fa-tower-broadcast"></i>
+            <span style="font-weight: 900; font-size: 1.4rem;">QRZLog Pro</span>
         </div>
-        <textarea id="comment" rows="2" style="width:100%; margin-top:15px;"></textarea>
-        <button id="saveBtn" class="btn" style="margin-top: 20px;" onclick="saveToCloud()">ENVIAR A LA NUBE</button>
-    </div>
+        <div class="nav-menu">
+            <a href="#" class="nav-item active"><i class="fa-solid fa-cloud"></i> <span>Cloud Log</span></a>
+            <a href="#" class="nav-item" onclick="document.getElementById('importJson').click()"><i class="fa-solid fa-file-import"></i> <span>Importar JSON</span></a>
+            <a href="#" class="nav-item" onclick="exportJSON()"><i class="fa-solid fa-file-export"></i> <span>Exportar JSON</span></a>
+            <a href="#" class="nav-item" onclick="clearLogs()" style="color: var(--danger); margin-top:20px;"><i class="fa-solid fa-trash"></i> <span>Limpiar Nube</span></a>
+        </div>
+    </nav>
 
-    <div id="qsoList"></div>
-</main>
+    <input type="file" id="importJson" accept=".json" style="display:none" onchange="handleJson(event)">
 
-<script>
-    // ESTO ES LO QUE TIENES QUE CONFIGURAR DE TU PROYECTO SUPABASE
-    const SUPABASE_URL = 'https://svcakitmimdhltwcmadd.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_uR_yVZpJ2wOkUD0bihyGBg_E__lJACJ';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    <main class="main-content">
+        <header>
+            <h2 style="font-weight: 800;">Panel de Control Cloud</h2>
+            <div id="loader"><i class="fa-solid fa-sync fa-spin"></i> Sincronizando...</div>
+            <div id="countBadge" class="badge" style="background: #dcfce7; color: #166534;">Conectado</div>
+        </header>
 
-    let logs = [];
-
-    async function fetchLogs() {
-        document.getElementById('loader').style.display = 'block';
-        const { data, error } = await supabase.from('logs').select('*').order('created_at', { ascending: false });
-        if (!error) {
-            logs = data;
-            renderLogs();
-        }
-        document.getElementById('loader').style.display = 'none';
-    }
-
-    async function saveToCloud() {
-        const id = document.getElementById('qsoId').value;
-        const qso = {
-            callsign: document.getElementById('callsign').value.toUpperCase(),
-            rst: document.getElementById('rst').value,
-            band: document.getElementById('band').value,
-            mode: document.getElementById('mode').value,
-            comment: document.getElementById('comment').value
-        };
-
-        if (id) {
-            await supabase.from('logs').update(qso).eq('id', id);
-        } else {
-            await supabase.from('logs').insert([qso]);
-        }
-
-        resetForm();
-        fetchLogs();
-    }
-
-    async function deleteLog(id) {
-        if(confirm("¿Borrar permanentemente del servidor?")) {
-            await supabase.from('logs').delete().eq('id', id);
-            fetchLogs();
-        }
-    }
-
-    function renderLogs() {
-        const container = document.getElementById('qsoList');
-        container.innerHTML = logs.map(l => `
-            <div class="qso-item" onclick="editQSO(${l.id})">
-                <div>
-                    <div style="font-weight: 900; color: var(--primary);">${l.callsign}</div>
-                    <div style="font-size: 0.8rem; color: #6b7280;">${new Date(l.created_at).toLocaleString()}</div>
+        <div class="content-padding">
+            <div class="card">
+                <input type="hidden" id="qsoId">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Callsign</label>
+                        <input type="text" id="callsign" placeholder="EA1PRO" style="font-weight: 800; text-transform: uppercase;">
+                    </div>
+                    <div class="input-group">
+                        <label>RST</label>
+                        <input type="text" id="rst" value="59">
+                    </div>
+                    <div class="input-group">
+                        <label>Banda</label>
+                        <select id="band">
+                            <option value="2m" selected>2m</option>
+                            <option value="70cm">70cm</option>
+                            <option value="40m">40m</option>
+                            <option value="20m">20m</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Modo</label>
+                        <select id="mode">
+                            <option value="FM" selected>FM</option>
+                            <option value="SSB">SSB</option>
+                            <option value="FT8">FT8</option>
+                            <option value="CW">CW</option>
+                        </select>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <span style="font-weight: bold;">${l.band} | ${l.mode}</span>
-                    <i class="fa-solid fa-trash" style="color: red;" onclick="event.stopPropagation(); deleteLog(${l.id})"></i>
+                <div class="input-group" style="margin-top: 20px;">
+                    <label>Comentarios</label>
+                    <textarea id="comment" rows="2"></textarea>
+                </div>
+                <div style="margin-top: 25px; display: flex; gap: 12px;">
+                    <button id="saveBtn" class="btn btn-primary" onclick="saveToCloud()"><i class="fa-solid fa-cloud-arrow-up"></i> GUARDAR EN NUBE</button>
+                    <button id="cancelBtn" class="btn" style="display:none; background:#e2e8f0;" onclick="resetForm()">CANCELAR</button>
                 </div>
             </div>
-        `).join('');
-    }
 
-    function editQSO(id) {
-        const l = logs.find(x => x.id == id);
-        document.getElementById('qsoId').value = l.id;
-        document.getElementById('callsign').value = l.callsign;
-        document.getElementById('rst').value = l.rst;
-        document.getElementById('band').value = l.band;
-        document.getElementById('mode').value = l.mode;
-        document.getElementById('comment').value = l.comment;
-        document.getElementById('saveBtn').innerText = "ACTUALIZAR EN NUBE";
-    }
+            <div class="filter-bar">
+                <input type="text" id="searchCall" class="input-group" style="flex:1; padding:12px; border-radius:8px; border:1px solid #cbd5e1;" placeholder="Buscar indicativo..." oninput="renderLogs()">
+                <input type="date" id="searchDate" onchange="renderLogs()" style="padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
+            </div>
 
-    function resetForm() {
-        document.getElementById('qsoId').value = '';
-        document.getElementById('callsign').value = '';
-        document.getElementById('comment').value = '';
-        document.getElementById('saveBtn').innerText = "ENVIAR A LA NUBE";
-    }
+            <div id="qsoList" class="qso-list"></div>
+        </div>
+    </main>
 
-    fetchLogs(); // Carga inicial al abrir la web
-</script>
+    <script>
+        const SUPABASE_URL = 'https://svcakitmimdhltwcmadd.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_uR_yVZpJ2wOkUD0bihyGBg_E__lJACJ';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let logs = [];
+
+        async function fetchLogs() {
+            toggleLoader(true);
+            const { data, error } = await supabaseClient.from('logs').select('*').order('created_at', { ascending: false });
+            if (!error) {
+                logs = data;
+                renderLogs();
+            }
+            toggleLoader(false);
+        }
+
+        async function saveToCloud() {
+            const id = document.getElementById('qsoId').value;
+            const qso = {
+                callsign: document.getElementById('callsign').value.toUpperCase().trim(),
+                rst: document.getElementById('rst').value,
+                band: document.getElementById('band').value,
+                mode: document.getElementById('mode').value,
+                comment: document.getElementById('comment').value
+            };
+
+            if (!qso.callsign) return alert("Falta indicativo");
+
+            toggleLoader(true);
+            if (id) {
+                await supabaseClient.from('logs').update(qso).eq('id', id);
+            } else {
+                await supabaseClient.from('logs').insert([qso]);
+            }
+            
+            resetForm();
+            await fetchLogs();
+        }
+
+        function renderLogs() {
+            const search = document.getElementById('searchCall').value.toUpperCase();
+            const dateFilter = document.getElementById('searchDate').value;
+            const container = document.getElementById('qsoList');
+            
+            const filtered = logs.filter(l => {
+                const mCall = l.callsign.includes(search);
+                const mDate = dateFilter ? l.created_at.startsWith(dateFilter) : true;
+                return mCall && mDate;
+            });
+
+            container.innerHTML = filtered.map(l => `
+                <div class="qso-item" onclick="editQSO(${l.id})">
+                    <div>
+                        <div class="qso-call">${l.callsign}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);"><i class="fa-regular fa-calendar"></i> ${new Date(l.created_at).toLocaleString()}</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span class="badge" style="background:#dbeafe;">${l.band}</span>
+                        <span class="badge" style="background:#fef3c7;">${l.mode}</span>
+                        <i class="fa-solid fa-trash" style="color: var(--danger); padding: 10px;" onclick="event.stopPropagation(); deleteLog(${l.id})"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editQSO(id) {
+            const l = logs.find(x => x.id == id);
+            document.getElementById('qsoId').value = l.id;
+            document.getElementById('callsign').value = l.callsign;
+            document.getElementById('rst').value = l.rst;
+            document.getElementById('band').value = l.band;
+            document.getElementById('mode').value = l.mode;
+            document.getElementById('comment').value = l.comment;
+            document.getElementById('saveBtn').innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> ACTUALIZAR';
+            document.getElementById('cancelBtn').style.display = 'inline-flex';
+            document.querySelector('.main-content').scrollTo({top:0, behavior:'smooth'});
+        }
+
+        async function deleteLog(id) {
+            if(confirm("¿Eliminar de la nube?")) {
+                toggleLoader(true);
+                await supabaseClient.from('logs').delete().eq('id', id);
+                await fetchLogs();
+            }
+        }
+
+        // --- IMPORT / EXPORT ---
+        function exportJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "qrzlog_cloud_backup.json");
+            dlAnchor.click();
+        }
+
+        function handleJson(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                try {
+                    const imported = JSON.parse(ev.target.result);
+                    if(confirm(`¿Subir ${imported.length} registros a la nube?`)) {
+                        toggleLoader(true);
+                        // Limpiamos IDs locales para que Supabase genere nuevos
+                        const toInsert = imported.map(({id, created_at, ...rest}) => rest);
+                        await supabaseClient.from('logs').insert(toInsert);
+                        await fetchLogs();
+                        alert("Importación finalizada.");
+                    }
+                } catch(err) { alert("Archivo JSON no válido."); }
+            };
+            reader.readAsText(file);
+        }
+
+        async function clearLogs() {
+            if(confirm("¿BORRAR TODO EL LOG DE LA NUBE?")) {
+                toggleLoader(true);
+                // Nota: Supabase no permite delete all sin filtro si no hay una política específica, 
+                // pero esto funcionará si la política lo permite.
+                await supabaseClient.from('logs').delete().neq('id', 0); 
+                await fetchLogs();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('qsoId').value = '';
+            document.getElementById('callsign').value = '';
+            document.getElementById('comment').value = '';
+            document.getElementById('saveBtn').innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> GUARDAR EN NUBE';
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
+
+        function toggleLoader(show) {
+            document.getElementById('loader').style.display = show ? 'block' : 'none';
+        }
+
+        fetchLogs();
+    </script>
 </body>
 </html>
