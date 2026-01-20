@@ -3,50 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RadioLog Pro v5 | Ultimate Edition</title>
+    <title>RadioLog Pro v6 | Basauri Tactical Edition</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #3f51b5; --bg: #f0f2f5; }
-        body { background-color: var(--bg); font-family: 'Segoe UI', system-ui, sans-serif; display: flex; height: 100vh; overflow: hidden; }
-
-        /* Sidebar mejorado */
-        .sidebar { width: 280px; background: #212529; color: white; display: flex; flex-direction: column; z-index: 1000; transition: 0.3s; }
-        .logo-area { padding: 40px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .logo-icon { font-size: 3.5rem; color: #0d6efd; margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(13,110,253,0.3)); }
-        
-        .nav-link { color: rgba(255,255,255,0.7) !important; padding: 15px 25px; border-left: 4px solid transparent; display: flex; align-items: center; gap: 12px; }
+        :root { --primary: #1a237e; --bg: #f4f7f9; }
+        body { background-color: var(--bg); font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 280px; background: #121416; color: white; display: flex; flex-direction: column; z-index: 1000; }
+        .logo-area { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-link { color: rgba(255,255,255,0.7) !important; padding: 15px 25px; border-left: 4px solid transparent; cursor: pointer; }
         .nav-link.active { color: white !important; background: rgba(255,255,255,0.05); border-left-color: #0d6efd; }
-        
-        /* Contenido */
         main { flex: 1; overflow-y: auto; padding: 30px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
-        /* Cards de Log */
-        .qso-card { border: none; border-radius: 12px; transition: 0.2s; border-left: 6px solid var(--primary); margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .qso-card:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
-        .callsign-text { font-size: 1.4rem; font-weight: 800; color: var(--primary); letter-spacing: 1px; }
-        
-        .edit-mode { background-color: #fff3cd !important; border-left-color: #ffc107 !important; }
-
-        @media (max-width: 768px) {
-            .sidebar { width: 70px; }
-            .sidebar span, .sidebar h4 { display: none; }
-            main { padding: 15px; }
-        }
+        .qso-card { border: none; border-radius: 12px; border-left: 6px solid #0d6efd; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .table-custom { font-size: 0.85rem; }
+        .badge-tx { width: 60px; }
+        .edit-mode { background-color: #fff3cd !important; }
+        @media (max-width: 768px) { .sidebar { width: 70px; } .sidebar span, .sidebar h4 { display: none; } .content { padding: 15px; } }
     </style>
 </head>
 <body>
 
 <aside class="sidebar">
     <div class="logo-area">
-        <i class="fas fa-satellite-dish logo-icon"></i>
-        <h4 class="fw-bold">RadioPro <small class="d-block fs-6 opacity-50">v5.0 Stable</small></h4>
+        <i class="fas fa-broadcast-tower fa-3x text-primary mb-3"></i>
+        <h4 class="fw-bold">RadioPro <small class="d-block fs-6 opacity-50">Basauri v6.0</small></h4>
     </div>
     <nav class="nav flex-column mt-3">
-        <a class="nav-link active" href="#" onclick="switchTab('logbook', this)"><i class="fas fa-list-ul"></i> <span>Libro de Guardia</span></a>
-        <a class="nav-link" href="#" onclick="switchTab('plan', this)"><i class="fas fa-map"></i> <span>Plan de Bandas</span></a>
+        <a class="nav-link active" onclick="switchTab('logbook', this)"><i class="fas fa-list-ul me-2"></i> <span>Logbook</span></a>
+        <a class="nav-link" onclick="switchTab('plan', this)"><i class="fas fa-layer-group me-2"></i> <span>Plan de Bandas</span></a>
     </nav>
     <div class="mt-auto p-3">
         <button class="btn btn-outline-light btn-sm w-100 mb-2" onclick="exportJSON()"><i class="fas fa-download me-2"></i>Exportar</button>
@@ -57,78 +43,90 @@
 
 <main>
     <div id="logbook" class="tab-content active">
-        <div class="container-fluid">
-            <h2 class="mb-4 fw-bold">Registro de Actividad</h2>
-            
-            <div class="card shadow-sm mb-5" id="formContainer">
-                <div class="card-body p-4">
-                    <form id="qsoForm" onsubmit="event.preventDefault(); saveQSO();">
-                        <input type="hidden" id="editId">
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">Indicativo</label>
-                                <input type="text" id="callsign" class="form-control form-control-lg text-uppercase" placeholder="EA4ABC" required>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label fw-bold">RST</label>
-                                <input type="text" id="rst" class="form-control form-control-lg" value="59">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold">Banda</label>
-                                <select id="band" class="form-select form-select-lg">
-                                    <option value="40m">40m (HF)</option>
-                                    <option value="20m">20m (HF)</option>
-                                    <option value="2m" selected>2m (VHF)</option>
-                                    <option value="70cm">70cm (UHF)</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label fw-bold">Modo</label>
-                                <select id="mode" class="form-select form-select-lg">
-                                    <option value="FM">FM</option><option value="SSB">SSB</option>
-                                    <option value="CW">CW</option><option value="FT8">FT8</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <button type="submit" id="saveBtn" class="btn btn-primary btn-lg w-100">
-                                    <i class="fas fa-save me-2"></i>Guardar
-                                </button>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-bold">Comentario</label>
-                                <textarea id="comment" class="form-control" rows="1" placeholder="Detalles del contacto..."></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+        <h2 class="mb-4 fw-bold text-navy">Libro de Guardia Profesional</h2>
+        <div class="card shadow-sm mb-4" id="formContainer">
+            <div class="card-body p-4">
+                <form id="qsoForm" onsubmit="event.preventDefault(); saveQSO();">
+                    <input type="hidden" id="editId">
+                    <div class="row g-3">
+                        <div class="col-md-3"><label class="form-label fw-bold small">INDICATIVO</label><input type="text" id="callsign" class="form-control form-control-lg text-uppercase" required></div>
+                        <div class="col-md-2"><label class="form-label fw-bold small">RST</label><input type="text" id="rst" class="form-control form-control-lg" value="59"></div>
+                        <div class="col-md-3"><label class="form-label fw-bold small">BANDA</label><select id="band" class="form-select form-select-lg"><option value="40m">40m</option><option value="20m">20m</option><option value="2m" selected>2m (VHF)</option><option value="70cm">70cm (UHF)</option></select></div>
+                        <div class="col-md-2"><label class="form-label fw-bold small">MODO</label><select id="mode" class="form-select form-select-lg"><option value="FM">FM</option><option value="SSB">SSB</option><option value="FT8">FT8</option></select></div>
+                        <div class="col-md-2 d-flex align-items-end"><button type="submit" id="saveBtn" class="btn btn-primary btn-lg w-100">GUARDAR</button></div>
+                        <div class="col-12"><label class="form-label fw-bold small">COMENTARIOS / UBICACIÓN</label><input type="text" id="comment" class="form-control" placeholder="Escribe aquí los detalles del contacto..."></div>
+                    </div>
+                </form>
             </div>
-
-            <div id="logCardsContainer"></div>
-
-            <nav class="mt-4">
-                <ul class="pagination justify-content-center" id="pagination"></ul>
-            </nav>
         </div>
+        <div id="logCardsContainer"></div>
+        <nav><ul class="pagination justify-content-center" id="pagination"></ul></nav>
     </div>
 
     <div id="plan" class="tab-content">
-        <div class="container-fluid">
-            <h2 class="mb-4 fw-bold">Plan de Bandas Tidradio H8</h2>
-            <div class="card shadow-sm">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-dark">
-                            <tr><th>Rango (MHz)</th><th>Banda / Uso</th><th>TX</th><th>Modo</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>65 - 108</td><td>FM Comercial</td><td class="text-danger fw-bold">NO</td><td>WFM (RX)</td></tr>
-                            <tr><td>108 - 136</td><td>Airband</td><td class="text-danger fw-bold">NO</td><td>AM (RX)</td></tr>
-                            <tr><td>144 - 146</td><td>Radioaficionados (2m)</td><td class="text-success fw-bold">SÍ</td><td>FM/SSB/CW</td></tr>
-                            <tr><td>200 - 260</td><td>Banda 220</td><td class="text-success fw-bold">SÍ (H8)</td><td>FM</td></tr>
-                            <tr><td>430 - 440</td><td>Radioaficionados (70cm)</td><td class="text-success fw-bold">SÍ</td><td>FM/SSB/CW</td></tr>
-                            <tr><td>446.0 - 446.2</td><td>PMR (Uso libre)</td><td class="text-warning fw-bold">SÍ*</td><td>NFM</td></tr>
-                        </tbody>
-                    </table>
+        <h2 class="mb-4 fw-bold">Plan de Bandas & Frecuencias Locales (Vizcaya)</h2>
+        
+        <div class="card mb-4 shadow-sm border-0">
+            <div class="card-header bg-primary text-white fw-bold"><i class="fas fa-repeater me-2"></i>Repetidores Locales (VHF/UHF)</div>
+            <div class="table-responsive">
+                <table class="table table-hover table-custom mb-0">
+                    <thead class="table-light"><tr><th>Nombre</th><th>RX (Escucha)</th><th>TX (Habla)</th><th>Offset</th><th>Tono</th><th>Estado</th></tr></thead>
+                    <tbody>
+                        <tr><td>R0 Ganekogorta</td><td>145.600</td><td>145.000</td><td>-0.600</td><td>77.0</td><td><span class="badge bg-success badge-tx">TX OK</span></td></tr>
+                        <tr><td>R6 Monte Oiz</td><td>145.750</td><td>145.150</td><td>-0.600</td><td>77.0</td><td><span class="badge bg-success badge-tx">TX OK</span></td></tr>
+                        <tr><td>U78 Pagasarri</td><td>438.850</td><td>431.250</td><td>-7.600</td><td>77.0</td><td><span class="badge bg-success badge-tx">TX OK</span></td></tr>
+                        <tr><td>U82 Ganekogorta</td><td>438.950</td><td>431.350</td><td>-7.600</td><td>77.0</td><td><span class="badge bg-success badge-tx">TX OK</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-4 shadow-sm border-0">
+            <div class="card-header bg-dark text-white fw-bold"><i class="fas fa-plane me-2"></i>Banda Aérea - Aeropuerto de Bilbao (Loiu - LEBB)</div>
+            <div class="table-responsive">
+                <table class="table table-hover table-custom mb-0">
+                    <thead class="table-light"><tr><th>Servicio</th><th>Frecuencia</th><th>Modo</th><th>TX</th></tr></thead>
+                    <tbody>
+                        <tr><td>Loiu TWR (Torre)</td><td>118.500</td><td>AM</td><td><span class="badge bg-danger badge-tx">SÓLO RX</span></td></tr>
+                        <tr><td>Loiu APP (Aproximación)</td><td>120.700 / 128.100</td><td>AM</td><td><span class="badge bg-danger badge-tx">SÓLO RX</span></td></tr>
+                        <tr><td>Loiu GND (Tierra/Rodadura)</td><td>121.700</td><td>AM</td><td><span class="badge bg-danger badge-tx">SÓLO RX</span></td></tr>
+                        <tr><td>Loiu ATIS (Info Meteorológica)</td><td>125.125</td><td>AM</td><td><span class="badge bg-danger badge-tx">SÓLO RX</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-secondary text-white fw-bold">Plan 2 Metros (144-146 MHz)</div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-custom mb-0">
+                            <thead><tr><th>Rango</th><th>Uso</th><th>TX</th></tr></thead>
+                            <tbody>
+                                <tr><td>144.000 - 144.150</td><td>Telegrafía (CW)</td><td class="text-success fw-bold">SÍ (CW)</td></tr>
+                                <tr><td>144.150 - 144.400</td><td>SSB / Digitales (FT8)</td><td class="text-success fw-bold">SÍ</td></tr>
+                                <tr><td>145.200 - 145.594</td><td>FM Simplex (Canales V)</td><td class="text-success fw-bold">SÍ</td></tr>
+                                <tr><td>145.800 - 146.000</td><td>Satélites / ISS</td><td class="text-success fw-bold">SÍ</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-danger text-white fw-bold">Servicios y Emergencias (RX ÚNICAMENTE)</div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-custom mb-0">
+                            <thead><tr><th>Servicio</th><th>Freq aprox.</th><th>Nota</th></tr></thead>
+                            <tbody>
+                                <tr><td>Cruz Roja Vizcaya</td><td>164.300 / 173.350</td><td>Analógico/Digital</td></tr>
+                                <tr><td>Bomberos Bilbao/Basauri</td><td>Digital (TETRA)</td><td>Inaudible en H8</td></tr>
+                                <tr><td>Protección Civil</td><td>146.125 / 153.200</td><td>Coordinación local</td></tr>
+                                <tr><td>Canal 16 Náutico (Puerto)</td><td>156.800</td><td>Seguridad Marítima</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -158,14 +156,8 @@
             mode: document.getElementById('mode').value,
             comment: document.getElementById('comment').value
         };
-
-        if(id) {
-            logs = logs.map(l => l.id === qso.id ? qso : l);
-            cancelEdit();
-        } else {
-            logs.unshift(qso);
-        }
-
+        if(id) { logs = logs.map(l => l.id === qso.id ? qso : l); cancelEdit(); } 
+        else { logs.unshift(qso); }
         localStorage.setItem('hamLogs', JSON.stringify(logs));
         document.getElementById('qsoForm').reset();
         render();
@@ -174,29 +166,18 @@
     function render() {
         const container = document.getElementById('logCardsContainer');
         const start = (currentPage - 1) * logsPerPage;
-        const pagedLogs = logs.slice(start, start + logsPerPage);
-
-        container.innerHTML = pagedLogs.map(log => `
-            <div class="card qso-card mb-3 shadow-sm" id="card-${log.id}">
+        const paged = logs.slice(start, start + logsPerPage);
+        container.innerHTML = paged.map(log => `
+            <div class="card qso-card shadow-sm" id="card-${log.id}">
                 <div class="card-body">
                     <div class="row align-items-center">
-                        <div class="col-md-3">
-                            <span class="callsign-text">${log.callsign}</span>
-                            <div class="text-muted small">${log.date}</div>
-                        </div>
-                        <div class="col-md-2">
-                            <span class="badge bg-primary fs-6">${log.band}</span>
-                            <span class="badge bg-secondary fs-6">${log.mode}</span>
-                        </div>
-                        <div class="col-md-1">
-                            <span class="fw-bold">${log.rst}</span>
-                        </div>
-                        <div class="col-md-4">
-                            <p class="mb-0 text-secondary italic small">${log.comment || '<span class="opacity-25">Sin comentarios</span>'}</p>
-                        </div>
+                        <div class="col-md-3"><span class="h4 fw-bold text-primary mb-0">${log.callsign}</span><div class="small text-muted">${log.date}</div></div>
+                        <div class="col-md-2"><span class="badge bg-primary">${log.band}</span> <span class="badge bg-secondary">${log.mode}</span></div>
+                        <div class="col-md-1 fw-bold">${log.rst}</div>
+                        <div class="col-md-4 small text-secondary">${log.comment || '<i>Sin detalles</i>'}</div>
                         <div class="col-md-2 text-end">
-                            <button class="btn btn-outline-primary btn-sm me-2" onclick="editLog(${log.id})"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-outline-danger btn-sm" onclick="deleteLog(${log.id})"><i class="fas fa-trash"></i></button>
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editLog(${log.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteLog(${log.id})"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
                 </div>
@@ -213,10 +194,9 @@
         document.getElementById('band').value = log.band;
         document.getElementById('mode').value = log.mode;
         document.getElementById('comment').value = log.comment;
-
         document.getElementById('formContainer').classList.add('edit-mode');
         document.getElementById('saveBtn').className = "btn btn-warning btn-lg w-100";
-        document.getElementById('saveBtn').innerHTML = '<i class="fas fa-sync me-2"></i>Actualizar';
+        document.getElementById('saveBtn').innerHTML = "ACTUALIZAR";
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -224,44 +204,29 @@
         document.getElementById('editId').value = '';
         document.getElementById('formContainer').classList.remove('edit-mode');
         document.getElementById('saveBtn').className = "btn btn-primary btn-lg w-100";
-        document.getElementById('saveBtn').innerHTML = '<i class="fas fa-save me-2"></i>Guardar';
+        document.getElementById('saveBtn').innerHTML = "GUARDAR";
     }
 
-    function deleteLog(id) {
-        if(confirm("¿Seguro que quieres borrar este QSO?")) {
-            logs = logs.filter(l => l.id !== id);
-            localStorage.setItem('hamLogs', JSON.stringify(logs));
-            render();
-        }
-    }
+    function deleteLog(id) { if(confirm("¿Borrar QSO?")) { logs = logs.filter(l => l.id !== id); localStorage.setItem('hamLogs', JSON.stringify(logs)); render(); } }
 
     function renderPagination() {
-        const totalPages = Math.ceil(logs.length / logsPerPage);
+        const total = Math.ceil(logs.length / logsPerPage);
         const nav = document.getElementById('pagination');
         let html = '';
-        for(let i=1; i<=totalPages; i++) {
-            html += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
-            </li>`;
+        for(let i=1; i<=total; i++) {
+            html += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" onclick="currentPage=${i};render()">${i}</a></li>`;
         }
         nav.innerHTML = html;
     }
 
-    function changePage(p) { currentPage = p; render(); }
-
     function exportJSON() {
         const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs));
-        const a = document.createElement('a');
-        a.href = data; a.download = 'radio_log.json'; a.click();
+        const a = document.createElement('a'); a.href = data; a.download = 'log_basauri.json'; a.click();
     }
 
     function importJSON(e) {
         const reader = new FileReader();
-        reader.onload = (event) => {
-            logs = JSON.parse(event.target.result);
-            localStorage.setItem('hamLogs', JSON.stringify(logs));
-            render();
-        };
+        reader.onload = (event) => { logs = JSON.parse(event.target.result); localStorage.setItem('hamLogs', JSON.stringify(logs)); render(); };
         reader.readAsText(e.target.files[0]);
     }
 
