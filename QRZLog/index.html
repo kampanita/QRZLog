@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QRZLog Pro Cloud - IT Ultimate</title>
+    <title>QRZLog Pro Cloud - Enterprise Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -11,7 +11,7 @@
             --sidebar-width: 260px;
             --primary: #3b82f6; --primary-dark: #2563eb;
             --accent: #10b981; --danger: #f43f5e;
-            --bg: #f8fafc; --sidebar-bg: #0f172a;
+            --bg: #f1f5f9; --sidebar-bg: #0f172a;
             --text-main: #1e293b; --text-muted: #64748b;
         }
 
@@ -29,32 +29,40 @@
 
         /* Main Content */
         .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        header { background: white; padding: 18px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
+        header { background: white; padding: 18px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; sticky: top; }
 
-        .content-padding { padding: 30px; max-width: 1000px; margin: 0 auto; width: 100%; }
+        .content-padding { padding: 30px; max-width: 1100px; margin: 0 auto; width: 100%; }
 
-        /* Form Card */
-        .card { background: white; border-radius: 12px; padding: 24px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 24px; }
+        /* Section Differentiation */
+        .section-title { font-size: 1.1rem; font-weight: 800; color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px; }
+
+        .card { background: white; border-radius: 12px; padding: 24px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 40px; }
+        
+        /* Form Layout */
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
         .input-group { display: flex; flex-direction: column; gap: 8px; }
-        label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-        input, select, textarea { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; outline: none; transition: 0.2s; }
-        input:focus { border-color: var(--primary); }
-
-        /* Filter bar */
-        .filter-bar { display: flex; gap: 15px; margin-bottom: 25px; align-items: center; flex-wrap: wrap; }
-        .filter-input { flex: 1; min-width: 250px; }
+        label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+        input, select, textarea { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; outline: none; transition: 0.2s; background: #fff; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
 
         /* List Items */
-        .qso-list { display: flex; flex-direction: column; gap: 12px; }
-        .qso-item { background: white; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; display: grid; grid-template-columns: 1fr auto; cursor: pointer; transition: 0.2s; }
-        .qso-item:hover { border-color: var(--primary); transform: scale(1.01); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .qso-call { font-size: 1.4rem; font-weight: 900; color: var(--primary-dark); }
-        .badge { padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; background: #f1f5f9; }
+        .qso-list { display: flex; flex-direction: column; gap: 15px; }
+        .qso-item { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; transition: 0.2s; position: relative; }
+        .qso-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        
+        .qso-main { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .qso-call { font-size: 1.5rem; font-weight: 900; color: var(--primary-dark); letter-spacing: -0.5px; }
+        .qso-comment { background: #f8fafc; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; color: #475569; border-left: 4px solid #cbd5e1; margin-top: 10px; font-style: italic; }
+        
+        .badge { padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
 
+        /* Paginación */
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 30px; padding-bottom: 50px; }
+        
         .btn { padding: 12px 24px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: 0.2s; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
+        .btn-outline { background: white; border: 1px solid #cbd5e1; color: var(--text-main); }
+        .btn-outline:disabled { opacity: 0.5; cursor: not-allowed; }
 
         #loader { display: none; font-size: 0.8rem; color: var(--primary); font-weight: bold; }
 
@@ -78,7 +86,7 @@
             <a href="#" class="nav-item active"><i class="fa-solid fa-cloud"></i> <span>Cloud Log</span></a>
             <a href="#" class="nav-item" onclick="document.getElementById('importJson').click()"><i class="fa-solid fa-file-import"></i> <span>Importar JSON</span></a>
             <a href="#" class="nav-item" onclick="exportJSON()"><i class="fa-solid fa-file-export"></i> <span>Exportar JSON</span></a>
-            <a href="#" class="nav-item" onclick="clearLogs()" style="color: var(--danger); margin-top:20px;"><i class="fa-solid fa-trash"></i> <span>Limpiar Nube</span></a>
+            <a href="#" class="nav-item" onclick="clearLogs()" style="color: var(--danger); margin-top:20px;"><i class="fa-solid fa-trash"></i> <span>Vaciar Nube</span></a>
         </div>
     </nav>
 
@@ -86,18 +94,20 @@
 
     <main class="main-content">
         <header>
-            <h2 style="font-weight: 800;">Panel de Control Cloud</h2>
+            <h2 style="font-weight: 800;">Gestión de Radioaficionado</h2>
             <div id="loader"><i class="fa-solid fa-sync fa-spin"></i> Sincronizando...</div>
-            <div id="countBadge" class="badge" style="background: #dcfce7; color: #166534;">Conectado</div>
+            <div id="countBadge" class="badge" style="background: #dcfce7; color: #166534;">Nube Activa</div>
         </header>
 
         <div class="content-padding">
+            
+            <div class="section-title"><i class="fa-solid fa-plus-circle"></i> Nuevo Contacto (QSO)</div>
             <div class="card">
                 <input type="hidden" id="qsoId">
                 <div class="form-grid">
                     <div class="input-group">
                         <label>Callsign</label>
-                        <input type="text" id="callsign" placeholder="EA1PRO" style="font-weight: 800; text-transform: uppercase;">
+                        <input type="text" id="callsign" placeholder="EA1ABC" style="font-weight: 900; text-transform: uppercase;">
                     </div>
                     <div class="input-group">
                         <label>RST</label>
@@ -106,38 +116,47 @@
                     <div class="input-group">
                         <label>Banda</label>
                         <select id="band">
-                            <option value="2m" selected>2m</option>
+                            <option value="2m">2m</option>
                             <option value="70cm">70cm</option>
                             <option value="40m">40m</option>
                             <option value="20m">20m</option>
+                            <option value="10m">10m</option>
                         </select>
                     </div>
                     <div class="input-group">
                         <label>Modo</label>
                         <select id="mode">
-                            <option value="FM" selected>FM</option>
+                            <option value="FM">FM</option>
                             <option value="SSB">SSB</option>
                             <option value="FT8">FT8</option>
                             <option value="CW">CW</option>
+                            <option value="DMR">DMR</option>
                         </select>
                     </div>
                 </div>
                 <div class="input-group" style="margin-top: 20px;">
-                    <label>Comentarios</label>
-                    <textarea id="comment" rows="2"></textarea>
+                    <label>Comentarios del contacto</label>
+                    <textarea id="comment" rows="2" placeholder="Ej: Operador muy amable, hablando desde el monte..."></textarea>
                 </div>
                 <div style="margin-top: 25px; display: flex; gap: 12px;">
-                    <button id="saveBtn" class="btn btn-primary" onclick="saveToCloud()"><i class="fa-solid fa-cloud-arrow-up"></i> GUARDAR EN NUBE</button>
-                    <button id="cancelBtn" class="btn" style="display:none; background:#e2e8f0;" onclick="resetForm()">CANCELAR</button>
+                    <button id="saveBtn" class="btn btn-primary" onclick="saveToCloud()"><i class="fa-solid fa-cloud-arrow-up"></i> REGISTRAR QSO</button>
+                    <button id="cancelBtn" class="btn btn-outline" style="display:none;" onclick="resetForm()">CANCELAR</button>
                 </div>
             </div>
 
-            <div class="filter-bar">
-                <input type="text" id="searchCall" class="input-group" style="flex:1; padding:12px; border-radius:8px; border:1px solid #cbd5e1;" placeholder="Buscar indicativo..." oninput="renderLogs()">
-                <input type="date" id="searchDate" onchange="renderLogs()" style="padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
+            <div class="section-title"><i class="fa-solid fa-list"></i> Historial de Contactos</div>
+            
+            <div class="filter-bar" style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <input type="text" id="searchCall" style="flex:1; padding:12px; border-radius:8px; border:1px solid #cbd5e1;" placeholder="Filtrar por indicativo..." oninput="currentPage=0; fetchLogs()">
             </div>
 
             <div id="qsoList" class="qso-list"></div>
+
+            <div class="pagination">
+                <button id="prevPage" class="btn btn-outline" onclick="changePage(-1)"><i class="fa-solid fa-chevron-left"></i> Anterior</button>
+                <span id="pageInfo" style="font-weight: bold; color: var(--text-muted);">Página 1</span>
+                <button id="nextPage" class="btn btn-outline" onclick="changePage(1)">Siguiente <i class="fa-solid fa-chevron-right"></i></button>
+            </div>
         </div>
     </main>
 
@@ -147,15 +166,60 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let logs = [];
+        let currentPage = 0;
+        const pageSize = 5; // Límite de logs por página
 
         async function fetchLogs() {
             toggleLoader(true);
-            const { data, error } = await supabaseClient.from('logs').select('*').order('created_at', { ascending: false });
+            const search = document.getElementById('searchCall').value.toUpperCase();
+            
+            let query = supabaseClient
+                .from('logs')
+                .select('*', { count: 'exact' })
+                .order('created_at', { ascending: false })
+                .range(currentPage * pageSize, (currentPage * pageSize) + pageSize - 1);
+
+            if (search) {
+                query = query.ilike('callsign', `%${search}%`);
+            }
+
+            const { data, count, error } = await query;
+
             if (!error) {
                 logs = data;
                 renderLogs();
+                updatePagination(count);
             }
             toggleLoader(false);
+        }
+
+        function renderLogs() {
+            const container = document.getElementById('qsoList');
+            if (logs.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted);">No se encontraron contactos.</div>`;
+                return;
+            }
+
+            container.innerHTML = logs.map(l => `
+                <div class="qso-item">
+                    <div class="qso-main">
+                        <div>
+                            <div class="qso-call">${l.callsign}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top:4px;">
+                                <i class="fa-regular fa-clock"></i> ${new Date(l.created_at).toLocaleString()}
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <span class="badge" style="background:#dbeafe; color:#1e40af;">${l.band}</span>
+                            <span class="badge" style="background:#fef3c7; color:#92400e;">${l.mode}</span>
+                            <span class="badge" style="background:#f1f5f9; color:#475569;">${l.rst}</span>
+                            <button class="btn-outline" style="padding:5px 10px; border-radius:6px; margin-left:10px;" onclick="editQSO(${l.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn-outline" style="padding:5px 10px; border-radius:6px; color:var(--danger);" onclick="deleteLog(${l.id})"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    ${l.comment ? `<div class="qso-comment">${l.comment}</div>` : ''}
+                </div>
+            `).join('');
         }
 
         async function saveToCloud() {
@@ -168,7 +232,7 @@
                 comment: document.getElementById('comment').value
             };
 
-            if (!qso.callsign) return alert("Falta indicativo");
+            if (!qso.callsign) return alert("El indicativo es obligatorio.");
 
             toggleLoader(true);
             if (id) {
@@ -178,33 +242,8 @@
             }
             
             resetForm();
+            currentPage = 0;
             await fetchLogs();
-        }
-
-        function renderLogs() {
-            const search = document.getElementById('searchCall').value.toUpperCase();
-            const dateFilter = document.getElementById('searchDate').value;
-            const container = document.getElementById('qsoList');
-            
-            const filtered = logs.filter(l => {
-                const mCall = l.callsign.includes(search);
-                const mDate = dateFilter ? l.created_at.startsWith(dateFilter) : true;
-                return mCall && mDate;
-            });
-
-            container.innerHTML = filtered.map(l => `
-                <div class="qso-item" onclick="editQSO(${l.id})">
-                    <div>
-                        <div class="qso-call">${l.callsign}</div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);"><i class="fa-regular fa-calendar"></i> ${new Date(l.created_at).toLocaleString()}</div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <span class="badge" style="background:#dbeafe;">${l.band}</span>
-                        <span class="badge" style="background:#fef3c7;">${l.mode}</span>
-                        <i class="fa-solid fa-trash" style="color: var(--danger); padding: 10px;" onclick="event.stopPropagation(); deleteLog(${l.id})"></i>
-                    </div>
-                </div>
-            `).join('');
         }
 
         function editQSO(id) {
@@ -214,18 +253,32 @@
             document.getElementById('rst').value = l.rst;
             document.getElementById('band').value = l.band;
             document.getElementById('mode').value = l.mode;
-            document.getElementById('comment').value = l.comment;
-            document.getElementById('saveBtn').innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> ACTUALIZAR';
+            document.getElementById('comment').value = l.comment || '';
+            document.getElementById('saveBtn').innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> ACTUALIZAR QSO';
             document.getElementById('cancelBtn').style.display = 'inline-flex';
-            document.querySelector('.main-content').scrollTo({top:0, behavior:'smooth'});
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         async function deleteLog(id) {
-            if(confirm("¿Eliminar de la nube?")) {
+            if(confirm("¿Seguro que quieres borrar este contacto?")) {
                 toggleLoader(true);
                 await supabaseClient.from('logs').delete().eq('id', id);
                 await fetchLogs();
             }
+        }
+
+        // --- PAGINACIÓN ---
+        function changePage(step) {
+            currentPage += step;
+            fetchLogs();
+            window.scrollTo({top: 500, behavior: 'smooth'});
+        }
+
+        function updatePagination(totalCount) {
+            const totalPages = Math.ceil(totalCount / pageSize);
+            document.getElementById('pageInfo').innerText = `Página ${currentPage + 1} de ${totalPages || 1}`;
+            document.getElementById('prevPage').disabled = currentPage === 0;
+            document.getElementById('nextPage').disabled = (currentPage + 1) >= totalPages;
         }
 
         // --- IMPORT / EXPORT ---
@@ -233,7 +286,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2));
             const dlAnchor = document.createElement('a');
             dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", "qrzlog_cloud_backup.json");
+            dlAnchor.setAttribute("download", "qrzlog_backup.json");
             dlAnchor.click();
         }
 
@@ -243,34 +296,23 @@
             reader.onload = async (ev) => {
                 try {
                     const imported = JSON.parse(ev.target.result);
-                    if(confirm(`¿Subir ${imported.length} registros a la nube?`)) {
+                    if(confirm(`¿Importar ${imported.length} registros a la nube?`)) {
                         toggleLoader(true);
-                        // Limpiamos IDs locales para que Supabase genere nuevos
                         const toInsert = imported.map(({id, created_at, ...rest}) => rest);
                         await supabaseClient.from('logs').insert(toInsert);
+                        currentPage = 0;
                         await fetchLogs();
-                        alert("Importación finalizada.");
                     }
-                } catch(err) { alert("Archivo JSON no válido."); }
+                } catch(err) { alert("JSON inválido."); }
             };
             reader.readAsText(file);
-        }
-
-        async function clearLogs() {
-            if(confirm("¿BORRAR TODO EL LOG DE LA NUBE?")) {
-                toggleLoader(true);
-                // Nota: Supabase no permite delete all sin filtro si no hay una política específica, 
-                // pero esto funcionará si la política lo permite.
-                await supabaseClient.from('logs').delete().neq('id', 0); 
-                await fetchLogs();
-            }
         }
 
         function resetForm() {
             document.getElementById('qsoId').value = '';
             document.getElementById('callsign').value = '';
             document.getElementById('comment').value = '';
-            document.getElementById('saveBtn').innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> GUARDAR EN NUBE';
+            document.getElementById('saveBtn').innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> REGISTRAR QSO';
             document.getElementById('cancelBtn').style.display = 'none';
         }
 
