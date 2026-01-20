@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RadioLog Pro v12 | Basauri Full Spectrum</title>
+    <title>RadioLog Pro v13 | Basauri Icon Edition</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -20,8 +20,9 @@
         .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); background: white; margin-bottom: 25px; overflow: hidden; }
-        .card-header-tech { padding: 15px 20px; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
-        .bg-vhf { background: #0284c7; } .bg-uhf { background: #7c3aed; } .bg-fm { background: #059669; } .bg-danger { background: #dc2626; } .bg-info-dark { background: #0f172a; }
+        .card-header-tech { padding: 15px 20px; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; }
+        .card-header-tech i { font-size: 1.2rem; margin-right: 12px; }
+        .bg-vhf { background: #0284c7; } .bg-uhf { background: #7c3aed; } .bg-fm { background: #059669; } .bg-danger { background: #dc2626; } .bg-info-dark { background: #0f172a; } .bg-pmr { background: #f59e0b; }
         .table-radio { font-size: 0.88rem; margin-bottom: 0; }
         .table-radio th { background: #f8fafc; color: #64748b; font-size: 0.75rem; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
         .freq-code { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #1e293b; }
@@ -32,7 +33,6 @@
         .log-entry { background: white; border-radius: 10px; padding: 18px; margin-bottom: 12px; border-left: 6px solid var(--accent); transition: 0.2s; }
         .log-entry:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
         .edit-mode { background: #fffbeb !important; border-color: #f59e0b !important; }
-        @media (max-width: 992px) { .sidebar { width: 80px; } .sidebar span, .logo-text { display: none; } main { padding: 15px; } }
     </style>
 </head>
 <body>
@@ -40,7 +40,7 @@
 <aside class="sidebar">
     <div class="logo-area">
         <i class="fas fa-satellite-dish logo-icon"></i>
-        <div class="logo-text"><h4 class="fw-bold m-0">RadioPro v12</h4><small class="opacity-50">Basauri High-End Ops</small></div>
+        <div class="logo-text"><h4 class="fw-bold m-0">RadioPro v13</h4><small class="opacity-50">Basauri High-End Ops</small></div>
     </div>
     <nav class="nav flex-column mt-4">
         <a class="nav-link active" onclick="switchTab('logbook', this)"><i class="fas fa-edit me-3"></i> <span>Logbook (Zulu)</span></a>
@@ -71,37 +71,26 @@
     </div>
 
     <div id="plan" class="tab-content">
-        <h2 class="fw-bold text-dark mb-4">Plan de Bandas Tidradio H8 3rd Gen (Full Range)</h2>
+        <h2 class="fw-bold text-dark mb-4">Plan de Bandas Tidradio H8 3rd Gen</h2>
 
         <div class="card-custom">
-            <div class="card-header-tech bg-info-dark">Mapa de Espectro VHF/UHF (136 - 520 MHz)</div>
+            <div class="card-header-tech bg-info-dark"><i class="fas fa-wave-square"></i>Mapa de Espectro VHF/UHF (136 - 520 MHz)</div>
             <table class="table table-radio table-hover">
-                <thead><tr><th>Rango (MHz)</th><th>Modo Sugerido</th><th>Servicio / Uso</th><th>P. Máx</th><th>TX</th></tr></thead>
+                <thead><tr><th>Rango (MHz)</th><th>Modo</th><th>Uso Principal</th><th>P. Máx</th><th>TX</th></tr></thead>
                 <tbody>
-                    <tr><td class="freq-code">136.000 - 137.000</td><td>NFM</td><td>Satélites / Meteorología</td><td>-</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                    <tr><td class="freq-code">144.000 - 144.100</td><td>USB / CW</td><td>Radioaficionados (Satélites/CW)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">144.100 - 144.400</td><td>USB / SSB</td><td>Radioaficionados (Banda Lateral)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">144.500 - 144.794</td><td>FM / DIGITAL</td><td>Radioaficionados (Modos Mixtos)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">144.800 - 144.990</td><td>FM / AFSK</td><td>APRS / Datos Digitales</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">145.000 - 145.193</td><td>FM</td><td>Entrada Repetidores VHF</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">145.200 - 145.593</td><td>FM</td><td>Simplex / Canales Directos</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">145.600 - 145.793</td><td>FM</td><td>Salida Repetidores VHF</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">146.000 - 174.000</td><td>NFM</td><td>Servicios (Bomberos/Marina/PC)</td><td>-</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                    <tr><td class="freq-code">430.000 - 431.990</td><td>FM / DIGITAL</td><td>Repetidores UHF / Satélites</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">432.000 - 432.100</td><td>USB / CW</td><td>Banda Lateral / Rebote Lunar</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">433.000 - 433.575</td><td>FM</td><td>Simplex / LPD (Baja Potencia)</td><td>0.5W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">434.000 - 438.000</td><td>FM / DIGITAL</td><td>Experimental / Satélites</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">438.000 - 440.000</td><td>FM / DMR</td><td>Salida Repetidores UHF</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">446.000 - 446.200</td><td>NFM</td><td>PMR446 (Uso Libre)</td><td>0.5W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">447.000 - 520.000</td><td>NFM</td><td>Servicios Profesionales / TETRA</td><td>-</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                    <tr><td class="freq-code">136 - 137</td><td>NFM</td><td>Sats Meteorológicos</td><td>-</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                    <tr><td class="freq-code">144 - 146</td><td>FM/USB</td><td>Radioaficionados (2m)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">156 - 162</td><td>FM</td><td>Banda Marítima</td><td>-</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                    <tr><td class="freq-code">430 - 440</td><td>FM/DMR</td><td>Radioaficionados (70cm)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td class="freq-code">446 - 446.2</td><td>NFM</td><td>PMR446 Uso Libre</td><td>0.5W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
                 </tbody>
             </table>
         </div>
 
         <div class="card-custom">
-            <div class="card-header-tech bg-vhf">Repetidores VHF (2m) - Offset 0.6 MHz</div>
+            <div class="card-header-tech bg-vhf"><i class="fas fa-mountain-sun"></i>Repetidores VHF (2m) - Bizkaia</div>
             <table class="table table-radio table-hover">
-                <thead><tr><th>Ubicación</th><th>RX (Escucha)</th><th>TX (Hablar)</th><th>Offset</th><th>Subtono</th><th>Permiso</th></tr></thead>
+                <thead><tr><th>Ubicación</th><th>RX</th><th>TX</th><th>Offset</th><th>Tono</th><th>TX</th></tr></thead>
                 <tbody>
                     <tr><td><b>Ganekogorta (R0)</b></td><td class="freq-code">145.600</td><td class="freq-code">145.000</td><td>-0.600</td><td><span class="subtone-badge">123.0</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
                     <tr><td><b>Sollube (R1)</b></td><td class="freq-code">145.625</td><td class="freq-code">145.025</td><td>-0.600</td><td><span class="subtone-badge">NONE</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
@@ -112,9 +101,27 @@
         </div>
 
         <div class="card-custom">
-            <div class="card-header-tech bg-uhf">Repetidores UHF (70cm) - Offset 7.6 MHz</div>
+            <div class="card-header-tech bg-pmr"><i class="fas fa-walkie-talkie"></i>Canales PMR446 (Uso Libre - NFM)</div>
             <table class="table table-radio table-hover">
-                <thead><tr><th>Ubicación</th><th>RX (Escucha)</th><th>TX (Hablar)</th><th>Offset</th><th>Subtono</th><th>Permiso</th></tr></thead>
+                <thead><tr><th>Canal</th><th>Frecuencia (MHz)</th><th>Modo</th><th>Uso Sugerido</th><th>TX</th></tr></thead>
+                <tbody>
+                    <tr><td><b>PMR 1</b></td><td class="freq-code">446.00625</td><td>NFM</td><td>General / Basauri</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 2</b></td><td class="freq-code">446.01875</td><td>NFM</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 3</b></td><td class="freq-code">446.03125</td><td>NFM</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 4</b></td><td class="freq-code">446.04375</td><td>NFM</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 5</b></td><td class="freq-code">446.05625</td><td>NFM</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 6</b></td><td class="freq-code">446.06875</td><td>NFM</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 7</b></td><td class="freq-code">446.08125</td><td>NFM</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 8</b></td><td class="freq-code">446.09375</td><td>NFM</td><td>Canal de Llamada</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                    <tr><td><b>PMR 9-16</b></td><td class="freq-code">446.106 - 446.193</td><td>NFM</td><td>Digital/FM Canales nuevos</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-custom">
+            <div class="card-header-tech bg-uhf"><i class="fas fa-tower-broadcast"></i>Repetidores UHF (70cm)</div>
+            <table class="table table-radio table-hover">
+                <thead><tr><th>Ubicación</th><th>RX</th><th>TX</th><th>Offset</th><th>Tono</th><th>TX</th></tr></thead>
                 <tbody>
                     <tr><td><b>Pagasarri (U78)</b></td><td class="freq-code">438.850</td><td class="freq-code">431.250</td><td>-7.600</td><td><span class="subtone-badge">123.0</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
                     <tr><td><b>Ganekogorta (U82)</b></td><td class="freq-code">438.950</td><td class="freq-code">431.350</td><td>-7.600</td><td><span class="subtone-badge">123.0</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
@@ -123,37 +130,34 @@
         </div>
 
         <div class="card-custom">
-            <div class="card-header-tech bg-fm">Emisoras Comerciales (FM)</div>
+            <div class="card-header-tech bg-fm"><i class="fas fa-radio"></i>Radio Comercial FM (Escucha)</div>
             <table class="table table-radio">
-                <thead><tr><th>Emisora</th><th>Frecuencia (MHz)</th><th>Área</th><th>Permiso</th></tr></thead>
+                <thead><tr><th>Emisora</th><th>Frecuencia</th><th>Zona</th><th>TX</th></tr></thead>
                 <tbody>
-                    <tr><td><b>Radio Nervión</b></td><td class="freq-code">88.0</td><td>Bilbao/Basauri</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                    <tr><td><b>Radio Nervión</b></td><td class="freq-code">88.0</td><td>Basauri/Bilbao</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
                     <tr><td><b>Radio 7</b></td><td class="freq-code">92.7</td><td>Barakaldo/Bilbao</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                    <tr><td><b>Radio Euskadi</b></td><td class="freq-code">91.7</td><td>Vizcaya</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
                 </tbody>
             </table>
         </div>
 
         <div class="card-custom">
-            <div class="card-header-tech bg-vhf">Loiu (LEBB) - Banda Aérea AM</div>
+            <div class="card-header-tech bg-vhf"><i class="fas fa-plane"></i>Loiu (LEBB) - Banda Aérea AM</div>
             <table class="table table-radio">
-                <thead><tr><th>Servicio</th><th>Frecuencia (MHz)</th><th>Modo</th><th>Permiso</th></tr></thead>
+                <thead><tr><th>Servicio</th><th>Frecuencia</th><th>Modo</th><th>TX</th></tr></thead>
                 <tbody>
                     <tr><td><b>Aproximación</b></td><td class="freq-code">120.700</td><td>AM</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
                     <tr><td><b>Torre Control</b></td><td class="freq-code">118.500</td><td>AM</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                    <tr><td><b>ATIS Loiu</b></td><td class="freq-code">125.125</td><td>AM</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
                 </tbody>
             </table>
         </div>
 
         <div class="card-custom">
-            <div class="card-header-tech bg-danger">Emergencias / Marítimo / Otros</div>
+            <div class="card-header-tech bg-danger"><i class="fas fa-life-ring"></i>Emergencias / Marítimo</div>
             <table class="table table-radio">
-                <thead><tr><th>Servicio</th><th>Frecuencia (MHz)</th><th>Potencia sugerida</th><th>Permiso</th></tr></thead>
+                <thead><tr><th>Servicio</th><th>Frecuencia</th><th>Modo</th><th>TX</th></tr></thead>
                 <tbody>
-                    <tr><td><b>Canal 16 Marítimo</b></td><td class="freq-code">156.800</td><td>Low/Mid</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                    <tr><td><b>Emergencia REM</b></td><td class="freq-code">146.175</td><td>Low/Mid</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                    <tr><td><b>PMR Ch 8 (Llamada)</b></td><td class="freq-code">446.093</td><td>Low (0.5W)</td><td><span class="badge-status st-tx">TX VERDE*</span></td></tr>
+                    <tr><td><b>Canal 16 Marítimo</b></td><td class="freq-code">156.800</td><td>FM</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
+                    <tr><td><b>Emergencia REM</b></td><td class="freq-code">146.175</td><td>FM</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
                 </tbody>
             </table>
         </div>
