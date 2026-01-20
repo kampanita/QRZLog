@@ -3,324 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QRZLog Pro Cloud - Enterprise Edition</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>Radio Pro - Log & Plan</title>
     <style>
         :root {
-            --sidebar-width: 260px;
-            --primary: #3b82f6; --primary-dark: #2563eb;
-            --accent: #10b981; --danger: #f43f5e;
-            --bg: #f1f5f9; --sidebar-bg: #0f172a;
-            --text-main: #1e293b; --text-muted: #64748b;
+            --primary: #4361ee; --primary-hover: #3a56d4;
+            --success: #2ec4b6; --danger: #e71d36;
+            --warning: #ff9f1c; --bg: #f8f9fa;
+            --text: #2b2d42; --card-bg: #ffffff;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
-
-        /* Sidebar */
-        .sidebar { width: var(--sidebar-width); background: var(--sidebar-bg); color: white; display: flex; flex-direction: column; z-index: 1000; }
-        .sidebar-header { padding: 25px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #1e293b; }
-        .sidebar-header i { font-size: 1.8rem; color: var(--accent); }
-        .nav-menu { flex: 1; padding: 20px 0; }
-        .nav-item { padding: 14px 24px; display: flex; align-items: center; gap: 12px; cursor: pointer; color: #94a3b8; text-decoration: none; transition: 0.2s; }
-        .nav-item:hover, .nav-item.active { background: #1e293b; color: white; }
-        .nav-item.active { border-left: 4px solid var(--accent); }
-
-        /* Main Content */
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        header { background: white; padding: 18px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; sticky: top; }
-
-        .content-padding { padding: 30px; max-width: 1100px; margin: 0 auto; width: 100%; }
-
-        /* Section Differentiation */
-        .section-title { font-size: 1.1rem; font-weight: 800; color: var(--text-muted); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px; }
-
-        .card { background: white; border-radius: 12px; padding: 24px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 40px; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background: var(--bg); color: var(--text); margin: 0; padding-bottom: 20px; }
         
-        /* Form Layout */
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
-        .input-group { display: flex; flex-direction: column; gap: 8px; }
-        label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-        input, select, textarea { padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; outline: none; transition: 0.2s; background: #fff; }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        /* Navegación Profesional */
+        nav { 
+            background: var(--primary); display: flex; justify-content: center; 
+            padding: 10px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        nav button { 
+            background: transparent; border: none; color: white; padding: 10px 20px; 
+            cursor: pointer; font-weight: bold; border-radius: 5px; transition: 0.3s;
+        }
+        nav button.active { background: rgba(255,255,255,0.2); }
 
-        /* List Items */
-        .qso-list { display: flex; flex-direction: column; gap: 15px; }
-        .qso-item { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; transition: 0.2s; position: relative; }
-        .qso-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
-        
-        .qso-main { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        .qso-call { font-size: 1.5rem; font-weight: 900; color: var(--primary-dark); letter-spacing: -0.5px; }
-        .qso-comment { background: #f8fafc; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; color: #475569; border-left: 4px solid #cbd5e1; margin-top: 10px; font-style: italic; }
-        
-        .badge { padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
+        .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
+        .section { display: none; }
+        .section.active { display: block; }
 
-        /* Paginación */
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 30px; padding-bottom: 50px; }
-        
-        .btn { padding: 12px 24px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { background: white; border: 1px solid #cbd5e1; color: var(--text-main); }
-        .btn-outline:disabled { opacity: 0.5; cursor: not-allowed; }
+        header { text-align: center; padding-bottom: 20px; }
+        .logo { width: 40px; fill: var(--primary); vertical-align: middle; }
 
-        #loader { display: none; font-size: 0.8rem; color: var(--primary); font-weight: bold; }
+        /* Estilos Logbook (Optimizado móvil) */
+        .log-form { 
+            background: var(--card-bg); padding: 20px; border-radius: 15px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;
+        }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .full-width { grid-column: span 2; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #edf2f4; border-radius: 8px; outline: none; }
+        .btn-main { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; background: var(--primary); color: white; }
 
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; flex-direction: row; }
-            .sidebar-header, .nav-item span { display: none; }
-            .nav-menu { display: flex; padding: 0; }
-            .main-content { height: calc(100vh - 60px); }
+        .log-card { 
+            background: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 10px;
+            border-left: 5px solid var(--primary); display: flex; justify-content: space-between; align-items: center;
+        }
+        .badge { background: #edf2f4; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; }
+
+        /* Tabla Plan de Bandas */
+        .plan-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; font-size: 0.9rem; }
+        .plan-table th, .plan-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        .plan-table th { background: #f1f3f5; color: var(--primary); }
+        .tx-yes { color: var(--success); font-weight: bold; }
+        .tx-no { color: var(--danger); font-weight: bold; }
+
+        @media (min-width: 600px) {
+            .grid { grid-template-columns: repeat(4, 1fr); }
+            .full-width { grid-column: span 4; }
         }
     </style>
 </head>
 <body>
 
-    <nav class="sidebar">
-        <div class="sidebar-header">
-            <i class="fa-solid fa-tower-broadcast"></i>
-            <span style="font-weight: 900; font-size: 1.4rem;">QRZLog Pro</span>
-        </div>
-        <div class="nav-menu">
-            <a href="#" class="nav-item active"><i class="fa-solid fa-cloud"></i> <span>Cloud Log</span></a>
-            <a href="#" class="nav-item" onclick="document.getElementById('importJson').click()"><i class="fa-solid fa-file-import"></i> <span>Importar JSON</span></a>
-            <a href="#" class="nav-item" onclick="exportJSON()"><i class="fa-solid fa-file-export"></i> <span>Exportar JSON</span></a>
-            <a href="#" class="nav-item" onclick="clearLogs()" style="color: var(--danger); margin-top:20px;"><i class="fa-solid fa-trash"></i> <span>Vaciar Nube</span></a>
-        </div>
-    </nav>
+<nav>
+    <button id="nav-log" class="active" onclick="switchTab('logbook')">LOGBOOK</button>
+    <button id="nav-plan" onclick="switchTab('plan')">PLAN DE BANDAS</button>
+</nav>
 
-    <input type="file" id="importJson" accept=".json" style="display:none" onchange="handleJson(event)">
-
-    <main class="main-content">
+<div class="container">
+    
+    <div id="logbook" class="section active">
         <header>
-            <h2 style="font-weight: 800;">Gestión de Radioaficionado</h2>
-            <div id="loader"><i class="fa-solid fa-sync fa-spin"></i> Sincronizando...</div>
-            <div id="countBadge" class="badge" style="background: #dcfce7; color: #166534;">Nube Activa</div>
+            <svg class="logo" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+            <h1 style="display:inline; margin-left:10px;">Radio Log</h1>
         </header>
 
-        <div class="content-padding">
-            
-            <div class="section-title"><i class="fa-solid fa-plus-circle"></i> Nuevo Contacto (QSO)</div>
-            <div class="card">
-                <input type="hidden" id="qsoId">
-                <div class="form-grid">
-                    <div class="input-group">
-                        <label>Callsign</label>
-                        <input type="text" id="callsign" placeholder="EA1ABC" style="font-weight: 900; text-transform: uppercase;">
-                    </div>
-                    <div class="input-group">
-                        <label>RST</label>
-                        <input type="text" id="rst" value="59">
-                    </div>
-                    <div class="input-group">
-                        <label>Banda</label>
-                        <select id="band">
-                            <option value="2m">2m</option>
-                            <option value="70cm">70cm</option>
-                            <option value="40m">40m</option>
-                            <option value="20m">20m</option>
-                            <option value="10m">10m</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>Modo</label>
-                        <select id="mode">
-                            <option value="FM">FM</option>
-                            <option value="SSB">SSB</option>
-                            <option value="FT8">FT8</option>
-                            <option value="CW">CW</option>
-                            <option value="DMR">DMR</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="input-group" style="margin-top: 20px;">
-                    <label>Comentarios del contacto</label>
-                    <textarea id="comment" rows="2" placeholder="Ej: Operador muy amable, hablando desde el monte..."></textarea>
-                </div>
-                <div style="margin-top: 25px; display: flex; gap: 12px;">
-                    <button id="saveBtn" class="btn btn-primary" onclick="saveToCloud()"><i class="fa-solid fa-cloud-arrow-up"></i> REGISTRAR QSO</button>
-                    <button id="cancelBtn" class="btn btn-outline" style="display:none;" onclick="resetForm()">CANCELAR</button>
-                </div>
+        <div class="log-form">
+            <input type="hidden" id="editId">
+            <div class="grid">
+                <input type="text" id="callsign" placeholder="Indicativo">
+                <input type="text" id="rst" value="59" placeholder="RST">
+                <select id="band">
+                    <option value="40m">40m</option><option value="20m">20m</option>
+                    <option value="2m">2m</option><option value="70cm">70cm</option>
+                    <option value="PMR">PMR</option>
+                </select>
+                <select id="mode">
+                    <option value="SSB">SSB</option><option value="FM">FM</option>
+                    <option value="FT8">FT8</option><option value="CW">CW</option>
+                </select>
+                <input type="text" id="comment" class="full-width" placeholder="Comentarios...">
             </div>
-
-            <div class="section-title"><i class="fa-solid fa-list"></i> Historial de Contactos</div>
-            
-            <div class="filter-bar" style="display: flex; gap: 15px; margin-bottom: 20px;">
-                <input type="text" id="searchCall" style="flex:1; padding:12px; border-radius:8px; border:1px solid #cbd5e1;" placeholder="Filtrar por indicativo..." oninput="currentPage=0; fetchLogs()">
-            </div>
-
-            <div id="qsoList" class="qso-list"></div>
-
-            <div class="pagination">
-                <button id="prevPage" class="btn btn-outline" onclick="changePage(-1)"><i class="fa-solid fa-chevron-left"></i> Anterior</button>
-                <span id="pageInfo" style="font-weight: bold; color: var(--text-muted);">Página 1</span>
-                <button id="nextPage" class="btn btn-outline" onclick="changePage(1)">Siguiente <i class="fa-solid fa-chevron-right"></i></button>
-            </div>
+            <button id="saveBtn" class="btn-main" style="margin-top:15px" onclick="handleSubmit()">REGISTRAR QSO</button>
         </div>
-    </main>
 
-    <script>
-        const SUPABASE_URL = 'https://svcakitmimdhltwcmadd.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_uR_yVZpJ2wOkUD0bihyGBg_E__lJACJ';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        <div id="logList"></div>
+    </div>
 
-        let logs = [];
-        let currentPage = 0;
-        const pageSize = 5; // Límite de logs por página
+    <div id="plan" class="section">
+        <h2>Plan de Bandas & Capacidades H8</h2>
+        <div style="overflow-x: auto;">
+            <table class="plan-table">
+                <thead>
+                    <tr>
+                        <th>Banda</th>
+                        <th>Rango (MHz)</th>
+                        <th>TX</th>
+                        <th>Mod.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>FM Radio</td><td>65 - 108</td><td class="tx-no">NO</td><td>WFM</td></tr>
+                    <tr><td>Airband</td><td>108 - 136</td><td class="tx-no">NO</td><td>AM</td></tr>
+                    <tr><td><b>2 metros</b></td><td>144 - 146</td><td class="tx-yes">SÍ</td><td>FM/NFM</td></tr>
+                    <tr><td>VHF High</td><td>136 - 174</td><td class="tx-no">RX*</td><td>FM</td></tr>
+                    <tr><td>Banda 220</td><td>200 - 260</td><td class="tx-yes">SÍ*</td><td>FM</td></tr>
+                    <tr><td>UHF 300</td><td>350 - 390</td><td class="tx-no">NO</td><td>FM</td></tr>
+                    <tr><td><b>70 cm</b></td><td>430 - 440</td><td class="tx-yes">SÍ</td><td>FM/NFM</td></tr>
+                    <tr><td>PMR446</td><td>446.0 - 446.2</td><td class="tx-no">RX*</td><td>NFM</td></tr>
+                    <tr><td>UHF High</td><td>400 - 520</td><td class="tx-no">RX*</td><td>FM</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="font-size: 0.8rem; color: #666; margin-top: 15px;">
+            * Nota: El Tidradio H8 puede transmitir en rangos extendidos (136-174 / 400-520) si está desbloqueado, pero fuera de las bandas de aficionado (en negrita) la emisión puede no ser legal o requerir licencias especiales. ¡No digas que no te avisé!
+        </p>
+    </div>
 
-        async function fetchLogs() {
-            toggleLoader(true);
-            const search = document.getElementById('searchCall').value.toUpperCase();
-            
-            let query = supabaseClient
-                .from('logs')
-                .select('*', { count: 'exact' })
-                .order('created_at', { ascending: false })
-                .range(currentPage * pageSize, (currentPage * pageSize) + pageSize - 1);
+</div>
 
-            if (search) {
-                query = query.ilike('callsign', `%${search}%`);
-            }
+<script>
+    let logs = JSON.parse(localStorage.getItem('hamLogs')) || [];
+    let isEditing = false;
 
-            const { data, count, error } = await query;
+    function switchTab(tabId) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.getElementById('nav-' + (tabId === 'logbook' ? 'log' : 'plan')).classList.add('active');
+    }
 
-            if (!error) {
-                logs = data;
-                renderLogs();
-                updatePagination(count);
-            }
-            toggleLoader(false);
+    function handleSubmit() {
+        const id = document.getElementById('editId').value;
+        const data = {
+            id: id ? parseInt(id) : Date.now(),
+            timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
+            callsign: document.getElementById('callsign').value.toUpperCase(),
+            rst: document.getElementById('rst').value,
+            band: document.getElementById('band').value,
+            mode: document.getElementById('mode').value,
+            comment: document.getElementById('comment').value
+        };
+
+        if(!data.callsign) return alert("¿A quién llamas? Pon un indicativo.");
+
+        if(isEditing) {
+            logs = logs.map(l => l.id === data.id ? data : l);
+            isEditing = false;
+            document.getElementById('saveBtn').innerText = "REGISTRAR QSO";
+            document.getElementById('saveBtn').style.background = "var(--primary)";
+        } else {
+            logs.unshift(data);
         }
 
-        function renderLogs() {
-            const container = document.getElementById('qsoList');
-            if (logs.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted);">No se encontraron contactos.</div>`;
-                return;
-            }
+        document.getElementById('editId').value = '';
+        document.getElementById('callsign').value = '';
+        document.getElementById('comment').value = '';
+        saveAndRender();
+    }
 
-            container.innerHTML = logs.map(l => `
-                <div class="qso-item">
-                    <div class="qso-main">
-                        <div>
-                            <div class="qso-call">${l.callsign}</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top:4px;">
-                                <i class="fa-regular fa-clock"></i> ${new Date(l.created_at).toLocaleString()}
-                            </div>
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <span class="badge" style="background:#dbeafe; color:#1e40af;">${l.band}</span>
-                            <span class="badge" style="background:#fef3c7; color:#92400e;">${l.mode}</span>
-                            <span class="badge" style="background:#f1f5f9; color:#475569;">${l.rst}</span>
-                            <button class="btn-outline" style="padding:5px 10px; border-radius:6px; margin-left:10px;" onclick="editQSO(${l.id})"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn-outline" style="padding:5px 10px; border-radius:6px; color:var(--danger);" onclick="deleteLog(${l.id})"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                    ${l.comment ? `<div class="qso-comment">${l.comment}</div>` : ''}
+    function editLog(id) {
+        const log = logs.find(l => l.id === id);
+        document.getElementById('editId').value = log.id;
+        document.getElementById('callsign').value = log.callsign;
+        document.getElementById('rst').value = log.rst;
+        document.getElementById('band').value = log.band;
+        document.getElementById('mode').value = log.mode;
+        document.getElementById('comment').value = log.comment;
+        isEditing = true;
+        document.getElementById('saveBtn').innerText = "ACTUALIZAR";
+        document.getElementById('saveBtn').style.background = "var(--warning)";
+        switchTab('logbook');
+        window.scrollTo(0,0);
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('hamLogs', JSON.stringify(logs));
+        const list = document.getElementById('logList');
+        list.innerHTML = logs.map(log => `
+            <div class="log-card">
+                <div>
+                    <b>${log.callsign}</b> <span class="badge">${log.band}</span> <span class="badge">${log.mode}</span>
+                    <div style="font-size:0.8rem; color:#666">${log.timestamp} - ${log.comment}</div>
                 </div>
-            `).join('');
-        }
+                <div>
+                    <button onclick="editLog(${log.id})" style="border:none; background:none; cursor:pointer; color:var(--primary)">Edit</button>
+                </div>
+            </div>
+        `).join('');
+    }
 
-        async function saveToCloud() {
-            const id = document.getElementById('qsoId').value;
-            const qso = {
-                callsign: document.getElementById('callsign').value.toUpperCase().trim(),
-                rst: document.getElementById('rst').value,
-                band: document.getElementById('band').value,
-                mode: document.getElementById('mode').value,
-                comment: document.getElementById('comment').value
-            };
-
-            if (!qso.callsign) return alert("El indicativo es obligatorio.");
-
-            toggleLoader(true);
-            if (id) {
-                await supabaseClient.from('logs').update(qso).eq('id', id);
-            } else {
-                await supabaseClient.from('logs').insert([qso]);
-            }
-            
-            resetForm();
-            currentPage = 0;
-            await fetchLogs();
-        }
-
-        function editQSO(id) {
-            const l = logs.find(x => x.id == id);
-            document.getElementById('qsoId').value = l.id;
-            document.getElementById('callsign').value = l.callsign;
-            document.getElementById('rst').value = l.rst;
-            document.getElementById('band').value = l.band;
-            document.getElementById('mode').value = l.mode;
-            document.getElementById('comment').value = l.comment || '';
-            document.getElementById('saveBtn').innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> ACTUALIZAR QSO';
-            document.getElementById('cancelBtn').style.display = 'inline-flex';
-            window.scrollTo({top: 0, behavior: 'smooth'});
-        }
-
-        async function deleteLog(id) {
-            if(confirm("¿Seguro que quieres borrar este contacto?")) {
-                toggleLoader(true);
-                await supabaseClient.from('logs').delete().eq('id', id);
-                await fetchLogs();
-            }
-        }
-
-        // --- PAGINACIÓN ---
-        function changePage(step) {
-            currentPage += step;
-            fetchLogs();
-            window.scrollTo({top: 500, behavior: 'smooth'});
-        }
-
-        function updatePagination(totalCount) {
-            const totalPages = Math.ceil(totalCount / pageSize);
-            document.getElementById('pageInfo').innerText = `Página ${currentPage + 1} de ${totalPages || 1}`;
-            document.getElementById('prevPage').disabled = currentPage === 0;
-            document.getElementById('nextPage').disabled = (currentPage + 1) >= totalPages;
-        }
-
-        // --- IMPORT / EXPORT ---
-        function exportJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2));
-            const dlAnchor = document.createElement('a');
-            dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", "qrzlog_backup.json");
-            dlAnchor.click();
-        }
-
-        function handleJson(e) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = async (ev) => {
-                try {
-                    const imported = JSON.parse(ev.target.result);
-                    if(confirm(`¿Importar ${imported.length} registros a la nube?`)) {
-                        toggleLoader(true);
-                        const toInsert = imported.map(({id, created_at, ...rest}) => rest);
-                        await supabaseClient.from('logs').insert(toInsert);
-                        currentPage = 0;
-                        await fetchLogs();
-                    }
-                } catch(err) { alert("JSON inválido."); }
-            };
-            reader.readAsText(file);
-        }
-
-        function resetForm() {
-            document.getElementById('qsoId').value = '';
-            document.getElementById('callsign').value = '';
-            document.getElementById('comment').value = '';
-            document.getElementById('saveBtn').innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> REGISTRAR QSO';
-            document.getElementById('cancelBtn').style.display = 'none';
-        }
-
-        function toggleLoader(show) {
-            document.getElementById('loader').style.display = show ? 'block' : 'none';
-        }
-
-        fetchLogs();
-    </script>
+    saveAndRender();
+</script>
 </body>
 </html>
