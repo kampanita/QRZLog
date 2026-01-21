@@ -1,16 +1,15 @@
 {
-  "name": "RadioLog Pro v109",
+  "name": "QRZLog Basauri",
   "short_name": "QRZLog",
-  "description": "Logbook y Plan de Bandas para Tidradio H8",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f172a",
-  "theme_color": "#0ea5e9",
+  "theme_color": "#0f172a",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      "src": "icon.svg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ]
