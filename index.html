@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RadioLog Pro v108 | EA2Lxx</title>
+    <title>RadioLog Pro v109 | EA2Lxx</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -117,7 +117,7 @@
                 </svg>
                 
             </div>
-            <h1 class="text-xl font-black tracking-tighter italic uppercase">RADIOLOG <span class="text-sky-500">PRO</span> <span class="text-xl font-black 100">v1.0</span></h1>
+            <h1 class="text-xl font-black tracking-tighter italic uppercase">RADIOLOG <span class="text-sky-500">PRO</span> <span class="text-xl font-black 100">v1.1</span></h1>
             <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">by Kepa iNKuBo</p>
             <div id="sync-indicator" class="mt-3 text-[8px] font-black bg-slate-800 px-2 py-1 rounded text-slate-400 inline-block uppercase tracking-widest transition-colors">Sync: Initializing</div>
         </div>
@@ -154,7 +154,7 @@
                 <span id="log-count" class="bg-slate-800 text-white px-3 py-1 rounded text-[10px] font-black uppercase w-full md:w-auto text-center">Cargando...</span>
             </div>
             
-            <div class="card-tactical p-4 md:p-6 border-l-[10px] border-l-sky-500">
+            <div class="card-tactical p-4 md:p-6 border-l-[10px] border-l-sky-500 transition-colors" id="form-card">
                 <form id="qso-form" class="grid grid-cols-1 md:grid-cols-12 gap-4">
                     <div class="md:col-span-4">
                         <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Indicativo</label>
@@ -174,8 +174,9 @@
                             <option>HF / DX</option>
                         </select>
                     </div>
-                    <div class="md:col-span-3 flex items-end">
+                    <div class="md:col-span-3 flex items-end gap-2">
                         <button type="submit" id="submit-btn" class="btn-primary w-full shadow-lg shadow-sky-200 disabled:opacity-50">Nuevo QRZ</button>
+                        <button type="button" id="cancel-edit-btn" onclick="cancelEdit()" class="hidden bg-slate-300 text-slate-600 px-3 rounded font-bold hover:bg-slate-400"><i class="fas fa-times"></i></button>
                     </div>
                     <div class="md:col-span-12">
                         <textarea id="comment" rows="2" placeholder="Ubicación, Notas del corresponsal, Meteo..."></textarea>
@@ -492,6 +493,7 @@
 
         // --- SYNC LOGIC ---
         let logs = [];
+        let editingId = null;
 
         function updateStatus(msg, color) {
             const indicator = document.getElementById('sync-indicator');
@@ -560,6 +562,18 @@
             }
         }
 
+        async function updateCloud(qso) {
+            if (!supabaseClient) return;
+            try {
+                const { id, ...data } = qso;
+                const { error } = await supabaseClient.from('logs').update(data).eq('id', id);
+                if(error) throw error;
+                sysLog(`Cloud Update OK: ${id}`, "text-blue-400");
+            } catch(e) {
+                sysLog("Update Failed: " + e.message, "text-rose-400");
+            }
+        }
+
         async function deleteFromCloud(id) {
             if (!supabaseClient) return false;
             try {
@@ -618,7 +632,10 @@
                                 <div class="text-[8px] font-black text-slate-300">SIGNAL</div>
                                 <div class="text-lg md:text-xl font-black text-blue-900 mono">${l.rst}</div>
                             </div>
-                            <button onclick="handleDelete('${l.id}')" class="text-rose-600 hover:bg-rose-50 p-2 rounded transition-colors"><i class="fas fa-trash"></i></button>
+                            <div class="flex flex-col gap-1">
+                                <button onclick="handleEdit('${l.id}')" class="text-sky-600 hover:bg-sky-50 p-2 rounded transition-colors"><i class="fas fa-edit"></i></button>
+                                <button onclick="handleDelete('${l.id}')" class="text-rose-600 hover:bg-rose-50 p-2 rounded transition-colors"><i class="fas fa-trash"></i></button>
+                            </div>
                         </div>
                     </div>
                 `).join('') : '<div class="p-10 text-center text-slate-300 font-bold uppercase italic text-sm">Sin resultados</div>';
@@ -645,56 +662,116 @@
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
             btn.disabled = true;
-            btn.innerText = "Guardando...";
+            btn.innerText = editingId ? "Actualizando..." : "Guardando...";
 
-            const qso = {
+            const formValues = {
                 callsign: document.getElementById('callsign').value.toUpperCase(),
                 rst: document.getElementById('rst').value,
                 band: document.getElementById('band').value,
-                comment: document.getElementById('comment').value,
-                date: new Date().toLocaleString(),
-                created_at: new Date().toISOString()
+                comment: document.getElementById('comment').value
             };
 
-            // 1. Optimistic UI
-            const tempId = 'local_' + Date.now();
-            const localQso = { ...qso, id: tempId };
-            logs.unshift(localQso);
-            localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
-            renderAll();
-            
-            // 2. Try Background Sync (solo si hay cliente)
-            if(supabaseClient) {
-                const result = await saveToCloud(qso);
-                if(result) {
-                    const idx = logs.findIndex(l => l.id === tempId);
-                    if(idx !== -1) {
-                        logs[idx] = result;
-                        localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
-                        renderAll();
-                        sysLog(`QSO saved & synced. ID: ${result.id}`, "text-emerald-500");
+            if (editingId) {
+                // UPDATE LOGIC
+                const index = logs.findIndex(l => l.id == editingId);
+                if (index !== -1) {
+                    logs[index] = { ...logs[index], ...formValues }; // Merge changes
+                    localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
+                    renderAll();
+                    sysLog(`Updated Local ID: ${editingId}`, "text-blue-400");
+                    
+                    if (supabaseClient && !logs[index].id.toString().startsWith('local_')) {
+                        await updateCloud(logs[index]);
+                    }
+                }
+                cancelEdit(); // Reset UI
+            } else {
+                // CREATE LOGIC
+                const qso = {
+                    ...formValues,
+                    date: new Date().toLocaleString(),
+                    created_at: new Date().toISOString()
+                };
+
+                const tempId = 'local_' + Date.now();
+                const localQso = { ...qso, id: tempId };
+                logs.unshift(localQso);
+                localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
+                renderAll();
+                
+                this.reset(); // Only reset on create
+
+                if(supabaseClient) {
+                    const result = await saveToCloud(qso);
+                    if(result) {
+                        const idx = logs.findIndex(l => l.id === tempId);
+                        if(idx !== -1) {
+                            logs[idx] = result;
+                            localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
+                            renderAll();
+                            sysLog(`QSO saved & synced. ID: ${result.id}`, "text-emerald-500");
+                        }
+                    } else {
+                        sysLog("Guardado local. Falló Nube.", "text-amber-500");
                     }
                 } else {
-                    sysLog("Guardado local. Falló Nube.", "text-amber-500");
+                    sysLog("Guardado local (Modo Offline).", "text-amber-500");
                 }
-            } else {
-                sysLog("Guardado local (Modo Offline).", "text-amber-500");
             }
-            
-            this.reset();
+
             btn.disabled = false;
-            btn.innerText = "Grabar QSO";
+            if(!editingId) btn.innerText = "Nuevo QRZ";
         };
+
+        function handleEdit(id) {
+            const l = logs.find(x => x.id == id);
+            if(!l) return;
+            
+            editingId = id;
+            document.getElementById('callsign').value = l.callsign;
+            document.getElementById('rst').value = l.rst;
+            document.getElementById('band').value = l.band;
+            document.getElementById('comment').value = l.comment || '';
+            
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = "ACTUALIZAR DATOS";
+            btn.classList.remove('btn-primary');
+            btn.classList.add('bg-amber-600', 'text-white', 'hover:bg-amber-700');
+            
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            document.getElementById('form-card').classList.add('border-l-amber-500');
+            document.getElementById('form-card').classList.remove('border-l-sky-500');
+            
+            // Scroll to form
+            document.getElementById('tab-logbook').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            editingId = null;
+            document.getElementById('qso-form').reset();
+            
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = "Nuevo QRZ";
+            btn.classList.add('btn-primary');
+            btn.classList.remove('bg-amber-600', 'text-white', 'hover:bg-amber-700');
+            
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+            document.getElementById('form-card').classList.remove('border-l-amber-500');
+            document.getElementById('form-card').classList.add('border-l-sky-500');
+        }
 
         async function handleDelete(id) {
             if(!confirm("¿ELIMINAR CONTACTO?")) return;
             
+            // Si estamos editando este mismo, cancelar edición primero
+            if(editingId == id) cancelEdit();
+
             const backup = [...logs];
-            logs = logs.filter(l => l.id !== id);
+            logs = logs.filter(l => l.id != id); // Loose equality for string/int IDs
             localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
             renderAll();
 
-            if(!id.startsWith('local_') && supabaseClient) {
+            if(!id.toString().startsWith('local_') && supabaseClient) {
                 const success = await deleteFromCloud(id);
                 if(!success) { 
                     alert("Error al borrar en nube. Se revertirá la acción."); 
