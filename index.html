@@ -411,20 +411,56 @@
             return { c: i+1, f: freqs[i], m: 'NFM', p: i === 7 ? 'MID' : 'LOW', u: i === 7 ? 'EMERGENCIA' : 'Uso Libre' };
         });
 
-        const EMERG_DATA = [
-            { s: 'Salvamento Marítimo', f: '156.800', m: 'FM', n: 'Canal 16 Náutico', tx: 'RX' },
-            { s: 'REM (Montaña)', f: '146.175', m: 'FM', n: 'Auxilio Montaña', tx: 'RX' },
-            { s: 'Prot. Civil Basauri', f: '152.325', m: 'FM', n: 'Coordinación Local', tx: 'RX' },
-            { s: 'Cruz Roja Euskadi', f: '164.300', m: 'FM', n: 'Operativos', tx: 'RX' },
-            { s: 'Emergencias Bizkaia', f: '146.500', m: 'FM', n: 'QAP Local', tx: 'RX' }
-        ];
+       const EMERG_DATA = [
+    // ==================== RED DE EMERGENCIAS & AUXILIO ====================
+            { s: 'Salvamento Marítimo', f: '156.800', m: 'FM', n: 'Canal 16 Náutico Internacional', tx: 'RX ONLY' },
+            { s: 'REM (Montaña)', f: '146.175', m: 'FM', n: 'Red Emergencia Montaña - Auxilio', tx: 'RX ONLY' },
+            { s: 'Prot. Civil Basauri', f: '152.325', m: 'FM', n: 'Coordinación Local Protección Civil', tx: 'RX ONLY' },
+            { s: 'Cruz Roja Euskadi', f: '164.308', m: 'FM', n: 'Operativos Cruz Roja', tx: 'RX ONLY' },
+            { s: 'Emergencias Bizkaia', f: '146.508', m: 'FM', n: 'QAP Local - Coordinación Emergencias', tx: 'RX ONLY' },
+
+    // ==================== BOMBEROS Y SERVICIOS DE RESCATE ====================
+            { s: 'Bomberos Bizkaia', f: '169.5125', m: 'FM', n: 'Consorcio Bomberos - Operativa Principal', tx: 'RX ONLY' },
+            { s: 'Bomberos Bizkaia', f: '169.7625', m: 'FM', n: 'Consorcio Bomberos - Coordinación', tx: 'RX ONLY' },
+            { s: 'DYA Euskadi', f: '144.800', m: 'FM', n: 'Asistencia Sanitaria Voluntaria', tx: 'RX ONLY' },
+            { s: 'DYA Euskadi', f: '146.200', m: 'FM', n: 'Emergencias DYA', tx: 'RX ONLY' },
+
+    // ==================== SERVICIOS MÉDICOS Y URGENCIAS ====================
+            { s: 'Osakidetza Ambulancias', f: '164.0625', m: 'FM', n: 'Coordinación ambulancias', tx: 'RX ONLY' },
+            { s: 'Osakidetza Soporte Avanzado', f: '164.2875', m: 'FM', n: 'Emergencias sanitarias', tx: 'RX ONLY' },
+            { s: 'SAMUR País Vasco', f: '155.275', m: 'FM', n: 'Emergencia sanitaria móvil', tx: 'RX ONLY' },
+
+    // ==================== SERVICIOS MARÍTIMOS Y PORTUARIOS ====================
+            { s: 'Puerto de Bilbao', f: '156.600', m: 'FM', n: 'Canal 12 - Operaciones portuarias', tx: 'RX ONLY' },
+            { s: 'Puerto de Bilbao', f: '156.700', m: 'FM', n: 'Canal 14 - Control tráfico portuario', tx: 'RX ONLY' },
+            { s: 'Puerto de Bilbao', f: '156.450', m: 'FM', n: 'Canal 9 - Comunicaciones internas', tx: 'RX ONLY' },
+            { s: 'Capitán Marítima Bilbao', f: '157.850', m: 'FM', n: 'Canal 27 - Coordinación marítima', tx: 'RX ONLY' },
+
+    // ==================== TRANSPORTE PÚBLICO ====================
+            { s: 'Metro de Bilbao', f: '160.050', m: 'FM', n: 'Comunicaciones trenes/control', tx: 'RX ONLY' },
+            { s: 'Metro de Bilbao', f: '161.300', m: 'FM', n: 'Seguridad y mantenimiento', tx: 'RX ONLY' },
+            { s: 'EuskoTren', f: '161.625', m: 'FM', n: 'Operaciones ferroviarias', tx: 'RX ONLY' },
+            { s: 'Bilbobus', f: '169.2125', m: 'FM', n: 'Coordinación flota transporte urbano', tx: 'RX ONLY' },
+
+    // ==================== PROTECCIÓN CIVIL MUNICIPAL ====================
+            { s: 'Protección Civil Bilbao', f: '152.225', m: 'FM', n: 'Coordinación municipal Bilbao', tx: 'RX ONLY' },
+            { s: 'Protección Civil Barakaldo', f: '152.425', m: 'FM', n: 'Coordinación municipal Barakaldo', tx: 'RX ONLY' },
+            { s: 'Protección Civil Portugalete', f: '152.525', m: 'FM', n: 'Coordinación municipal Portugalete', tx: 'RX ONLY' }    
+];
+
+// NOTAS:
+// * RX ONLY = Sólo recepción (no transmitir nunca)
+// * RX* = Repetidor de radioaficionados - Sólo recepción si no tienes licencia de radioaficionado
 
         const AIR_DATA = [
             { s: 'LEBB Loiu APP', f: '120.700', m: 'AM', n: 'Aproximación' },
             { s: 'LEBB Loiu Torre', f: '118.500', m: 'AM', n: 'Torre de Control' },
             { s: 'LEBB Loiu Tierra', f: '121.700', m: 'AM', n: 'Rodadura' },
             { s: 'LEBB Loiu ATIS', f: '127.350', m: 'AM', n: 'Info Meteorológica' },
-            { s: 'Euskadi Control', f: '132.050', m: 'AM', n: 'Centro Control Norte' }
+            { s: 'Euskadi Control', f: '132.050', m: 'AM', n: 'Centro Control Norte' },
+               // ==================== METEOROLOGÍA Y CONTROL AÉREO REGIONAL ====================
+            { s: 'Control Aéreo Barcelona', f: '128.058', m: 'AM', n: 'Control regional accesible desde Bizkaia', tx: 'RX ONLY' },
+            { s: 'Información Vuelos', f: '135.975', m: 'AM', n: 'Información tráfico aéreo', tx: 'RX ONLY' }
         ];
 
         const FM_DATA = [
