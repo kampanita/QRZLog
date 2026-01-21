@@ -453,11 +453,11 @@
 // * RX* = Repetidor de radioaficionados - Sólo recepción si no tienes licencia de radioaficionado
 
         const AIR_DATA = [
-            { s: 'LEBB Loiu APP', f: '120.700', m: 'AM', n: 'Aproximación' ,tx: 'RX ONLY'},
-            { s: 'LEBB Loiu Torre', f: '118.500', m: 'AM', n: 'Torre de Control',tx: 'RX ONLY' },
-            { s: 'LEBB Loiu Tierra', f: '121.700', m: 'AM', n: 'Rodadura' ,tx: 'RX ONLY'},
-            { s: 'LEBB Loiu ATIS', f: '127.350', m: 'AM', n: 'Info Meteorológica',tx: 'RX ONLY' },
-            { s: 'Euskadi Control', f: '132.050', m: 'AM', n: 'Centro Control Norte',tx: 'RX ONLY' },
+            { s: 'LEBB Loiu APP', f: '120.700', m: 'AM', n: 'Aproximación', tx: 'RX ONLY'},
+            { s: 'LEBB Loiu Torre', f: '118.500', m: 'AM', n: 'Torre de Control', tx: 'RX ONLY' },
+            { s: 'LEBB Loiu Tierra', f: '121.700', m: 'AM', n: 'Rodadura', tx: 'RX ONLY'},
+            { s: 'LEBB Loiu ATIS', f: '127.350', m: 'AM', n: 'Info Meteorológica', tx: 'RX ONLY' },
+            { s: 'Euskadi Control', f: '132.050', m: 'AM', n: 'Centro Control Norte', tx: 'RX ONLY' },
                // ==================== METEOROLOGÍA Y CONTROL AÉREO REGIONAL ====================
             { s: 'Control Aéreo Barcelona', f: '128.058', m: 'AM', n: 'Control regional accesible desde Bizkaia', tx: 'RX ONLY' },
             { s: 'Información Vuelos', f: '135.975', m: 'AM', n: 'Información tráfico aéreo', tx: 'RX ONLY' }
@@ -897,130 +897,125 @@
 
         // --- CSV EXPORT LOGIC (Tidradio H8 Compatible) ---
         function downloadCSV() {
-    const headers = [
-        "Location","Name","Frequency","Duplex","Offset","Tone",
-        "rToneFreq","cToneFreq","DtcsCode","DtcsPolarity",
-        "RxDtcsCode","CrossMode","Mode","TStep","Skip",
-        "Power","Comment","URCALL","RPT1CALL","RPT2CALL","DVCODE"
-    ].join(",");
+            const headers = [
+                "Location","Name","Frequency","Duplex","Offset","Tone",
+                "rToneFreq","cToneFreq","DtcsCode","DtcsPolarity",
+                "RxDtcsCode","CrossMode","Mode","TStep","Skip",
+                "Power","Comment","URCALL","RPT1CALL","RPT2CALL","DVCODE"
+            ].join(",");
 
-    let loc = 1;
-    const rows = [];
-    const fmt = f => parseFloat(f).toFixed(5);
-    const name = s => s.replace(/,/g,'').substring(0,12).toUpperCase();
+            let loc = 1;
+            const rows = [];
+            const fmt = f => parseFloat(f).toFixed(5);
+            const name = s => s.replace(/,/g,'').substring(0,12).toUpperCase();
 
-    /* =======================
-       REPETIDORES ANALÓGICOS
-       ======================= */
-    REPEATERS.forEach(r => {
-        let duplex = '';
-        let offset = '0.00000';
+            // COLUMNAS FIJAS EXACTAS ODMASTER
+            const magicCols = "023,NN,023,Tone->Tone";
 
-        if (r.off && r.off !== '0.000') {
-            const o = parseFloat(r.off);
-            duplex = o < 0 ? '-' : '+';
-            offset = fmt(Math.abs(o));
+            // 1. REPETIDORES
+            REPEATERS.forEach(r => {
+                let duplex = '';
+                let offset = '0.00000';
+                if (r.off && r.off !== '0.000') {
+                    const o = parseFloat(r.off);
+                    duplex = o < 0 ? '-' : '+';
+                    offset = fmt(Math.abs(o));
+                }
+
+                let toneStr = '';
+                let cTone = '88.5';
+                if (r.t && r.t !== 'NONE' && !r.t.startsWith('CC')) {
+                    toneStr = 'Tone';
+                    cTone = parseFloat(r.t).toFixed(1);
+                }
+
+                rows.push([
+                    loc++,
+                    name(`${r.id} ${r.loc}`),
+                    fmt(r.rx),
+                    duplex, // +/-
+                    offset,
+                    toneStr,
+                    "88.5", // rToneFreq
+                    cTone,  // cToneFreq
+                    magicCols, // 023,NN,023,Tone->Tone
+                    "FM",
+                    "12.5",
+                    "",
+                    "10.0W", // High Power H8
+                    "", "", "", "", ""
+                ].join(','));
+            });
+
+            // 2. PMR (Simplex = Empty Duplex)
+            PMR_DATA.forEach(p => {
+                rows.push([
+                    loc++,
+                    name(`PMR ${p.c}`),
+                    fmt(p.f),
+                    "", // Empty for Simplex
+                    "0.00000",
+                    "",
+                    "88.5", "88.5",
+                    magicCols,
+                    "NFM",
+                    "12.5",
+                    "",
+                    "0.5W", // Low Power
+                    "", "", "", "", ""
+                ].join(','));
+            });
+
+            // 3. EMERG (RX Only = off)
+            EMERG_DATA.forEach(e => {
+                rows.push([
+                    loc++,
+                    name(e.s),
+                    fmt(e.f),
+                    "off", // RX ONLY
+                    "0.00000",
+                    "",
+                    "88.5", "88.5",
+                    magicCols,
+                    "FM",
+                    "12.5",
+                    "",
+                    "10.0W", // Power irrelevante en RX pero formato requerido
+                    e.n || "", 
+                    "", "", "", ""
+                ].join(','));
+            });
+
+            // 4. AIR (RX Only = off)
+            AIR_DATA.forEach(a => {
+                rows.push([
+                    loc++,
+                    name(a.s.replace('LEBB','BIO')),
+                    fmt(a.f),
+                    "off", // RX ONLY
+                    "0.00000",
+                    "",
+                    "88.5", "88.5",
+                    magicCols,
+                    "AM",
+                    "25.0", // Paso estándar aéreo
+                    "",
+                    "10.0W",
+                    a.n || "", 
+                    "", "", "", ""
+                ].join(','));
+            });
+
+            // EXCLUIDO FM COMERCIAL
+
+            const csv = [headers, ...rows].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'MASTER_H8.csv';
+            a.click();
         }
-
-        let tone = '';
-        let cTone = '';
-        if (r.t && r.t !== 'NONE' && !r.t.startsWith('CC')) {
-            tone = 'Tone';
-            cTone = parseFloat(r.t).toFixed(1);
-        }
-
-        rows.push([
-            loc++,
-            name(`${r.id} ${r.loc}`),
-            fmt(r.rx),
-            duplex,
-            offset,
-            tone,
-            '',                 // rToneFreq
-            cTone,              // cToneFreq
-            '', '', '', '',     // DTCS OFF
-            'FM',
-            '12.5',
-            '',
-            'HIGH',
-            '', '', '', '', ''
-        ].join(','));
-    });
-
-    /* ==========
-       PMR446
-       ========== */
-    PMR_DATA.forEach(p => {
-        rows.push([
-            loc++,
-            name(`PMR${p.c}`),
-            fmt(p.f),
-            '',
-            '0.00000',
-            '',
-            '', '',
-            '', '', '', '',
-            'NFM',
-            '12.5',
-            '',
-            'LOW',
-            '', '', '', '', ''
-        ].join(','));
-    });
-
-    /* ==========
-       EMERGENCIAS
-       ========== */
-    EMERG_DATA.forEach(e => {
-        rows.push([
-            loc++,
-            name(e.s),
-            fmt(e.f),
-            'off',
-            '0.00000',
-            '',
-            '', '',
-            '', '', '', '',
-            'FM',
-            '12.5',
-            '',
-            'LOW',
-            e.n || '',
-            '', '', '', ''
-        ].join(','));
-    });
-
-    /* ==========
-       BANDA AÉREA
-       ========== */
-    AIR_DATA.forEach(a => {
-        rows.push([
-            loc++,
-            name(a.s.replace('LEBB','BIO')),
-            fmt(a.f),
-            'off',
-            '0.00000',
-            '',
-            '', '',
-            '', '', '', '',
-            'AM',
-            '25.0',
-            '',
-            'LOW',
-            a.n || '',
-            '', '', '', ''
-        ].join(','));
-    });
-
-    const csv = [headers, ...rows].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'MASTER_H8.csv';
-    a.click();
-}
 
 
         window.onload = () => {
