@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RadioLog Pro v105 | Basauri Tactical Mobile</title>
+    <title>RadioLog Pro v107 | Basauri Tactical Export</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -151,6 +151,7 @@
                 </div>
                 <span id="log-count" class="bg-slate-800 text-white px-3 py-1 rounded text-[10px] font-black uppercase w-full md:w-auto text-center">Cargando...</span>
             </div>
+            
             <div class="card-tactical p-4 md:p-6 border-l-[10px] border-l-sky-500">
                 <form id="qso-form" class="grid grid-cols-1 md:grid-cols-12 gap-4">
                     <div class="md:col-span-4">
@@ -181,6 +182,15 @@
                     </div>
                 </form>
             </div>
+            
+            <!-- SEARCH BAR -->
+            <div class="mb-6 relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-slate-400"></i>
+                </div>
+                <input type="text" id="search-input" onkeyup="renderAll()" placeholder="Filtrar por Indicativo o Fecha..." class="w-full pl-10 p-3 rounded-lg border-2 border-slate-200 bg-white font-bold text-slate-700 uppercase focus:border-sky-500 focus:outline-none transition-all shadow-sm">
+            </div>
+
             <div id="logs-container" class="space-y-4"></div>
         </div>
 
@@ -253,10 +263,10 @@
         <div id="tab-hardware" class="tab-content">
             <h2 class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">Espectro Tidradio H8 Gen3</h2>
             <div class="card-tactical">
-                <div class="card-header bg-black text-sky-400"><i class="fas fa-wave-square"></i> Capacidades del Hardware Unlocked</div>
+                <div class="card-header bg-black text-sky-400"><i class="fas fa-wave-square"></i> IARU Región 1 (Basauri Local)</div>
                 <div class="overflow-x-auto">
                     <table class="table-tactical text-left">
-                        <thead><tr><th>Rango (MHz)</th><th>Servicio</th><th>Modo</th><th>Capacidad TX</th><th>Step</th></tr></thead>
+                        <thead><tr><th>Rango (MHz)</th><th>Sub-Banda</th><th>Uso Exclusivo / Notas</th><th>Modo</th><th>TX</th></tr></thead>
                         <tbody id="table-h8"></tbody>
                     </table>
                 </div>
@@ -305,8 +315,8 @@
                 <div class="card-tactical p-8 text-center space-y-4 border-2 border-transparent hover:border-emerald-500 transition-all bg-slate-50">
                     <i class="fas fa-file-csv text-emerald-600 text-5xl"></i>
                     <h3 class="text-xl font-black uppercase italic">Export H8 CSV</h3>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase">Formato compatible con Tidradio Bluetooth App.</p>
-                    <button onclick="downloadCSV()" class="bg-emerald-600 text-white font-black py-4 rounded w-full text-[10px] uppercase shadow-lg">Descargar H8_ABS.csv</button>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase">Base de Datos Completa (Repetidores + PMR + Aire + FM)</p>
+                    <button onclick="downloadCSV()" class="bg-emerald-600 text-white font-black py-4 rounded w-full text-[10px] uppercase shadow-lg">Descargar MASTER_H8.csv</button>
                 </div>
             </div>
         </div>
@@ -461,14 +471,23 @@
             { e: 'Tropical FM', f: '102.2', z: 'Bilbao', s: 'BAJA' }
         ];
 
+        // ACTUALIZADO CON IARU REGION 1 (ESPAÑA)
         const HARDWARE_PLAN = [
-            { r: '65 - 108', s: 'FM Broadcast', m: 'WFM', tx: 'SÓLO RX', st: '100k' },
-            { r: '108 - 136', s: 'Banda Aérea', m: 'AM', tx: 'SÓLO RX', st: '8.33k' },
-            { r: '136 - 174', s: 'VHF Amateur / Public', m: 'FM/NFM', tx: 'TX OK', st: '12.5k' },
-            { r: '174 - 350', s: 'VHF High / Military', m: 'FM/NFM', tx: 'UNLOCKED', st: '12.5k' },
-            { r: '350 - 400', s: 'Military UHF Low', m: 'FM/NFM', tx: 'UNLOCKED', st: '12.5k' },
-            { r: '400 - 470', s: 'UHF Amateur / PMR', m: 'FM/NFM', tx: 'TX OK', st: '5/12.5k' },
-            { r: '470 - 600', s: 'UHF Public S. / High', m: 'FM/NFM', tx: 'UNLOCKED', st: '12.5k' }
+            { r: '65.0 - 108.0', s: 'FM Comercial', u: 'Radiodifusión FM (WFM)', m: 'WFM', tx: 'RX' },
+            { r: '108.0 - 117.9', s: 'Banda Aérea', u: 'VOR / Navegación (Solo Balizas)', m: 'AM', tx: 'RX' },
+            { r: '118.0 - 136.9', s: 'Banda Aérea', u: 'Comunicaciones Voz Aérea (AM)', m: 'AM', tx: 'RX' },
+            { r: '144.0 - 144.150', s: '2M Amateur', u: 'CW (Telegrafía) - Uso Exclusivo', m: 'CW', tx: 'TX OK' },
+            { r: '144.150 - 144.4', s: '2M Amateur', u: 'SSB (Banda Lateral) / DX', m: 'USB', tx: 'TX OK' },
+            { r: '144.5 - 144.9', s: '2M Amateur', u: 'Todos los Modos / Digital / SSTV', m: 'FM', tx: 'TX OK' },
+            { r: '145.0 - 145.175', s: '2M Amateur', u: 'Entrada Repetidores (R0-R7)', m: 'FM', tx: 'TX OK' },
+            { r: '145.2 - 145.575', s: '2M Amateur', u: 'FM Simplex (145.500 Llamada)', m: 'FM', tx: 'TX OK' },
+            { r: '145.6 - 145.775', s: '2M Amateur', u: 'Salida Repetidores (R0-R7)', m: 'FM', tx: 'TX OK' },
+            { r: '145.8 - 146.0', s: '2M Amateur', u: 'Satélites (ISS Downlink)', m: 'FM', tx: 'TX OK' },
+            { r: '146.0 - 174.0', s: 'VHF Pro', u: 'Servicios Profesionales / Caza / Emerg', m: 'FM', tx: 'TX OK' },
+            { r: '430.0 - 432.0', s: '70cm Amateur', u: 'CW / SSB / Digital', m: 'USB', tx: 'TX OK' },
+            { r: '433.0 - 433.575', s: '70cm Amateur', u: 'FM Simplex (433.500 Llamada)', m: 'FM', tx: 'TX OK' },
+            { r: '438.650 - 439.425', s: '70cm Amateur', u: 'Salida Repetidores UHF', m: 'FM', tx: 'TX OK' },
+            { r: '446.0 - 446.2', s: 'PMR446', u: 'Uso Libre sin licencia', m: 'NFM', tx: 'TX OK' }
         ];
 
         // --- SYNC LOGIC ---
@@ -565,12 +584,25 @@
         }
 
         function renderAll() {
+            // Logic de Búsqueda
+            const searchVal = document.getElementById('search-input')?.value.toUpperCase() || '';
+            const filteredLogs = logs.filter(l => 
+                l.callsign.includes(searchVal) || 
+                (l.date && l.date.toUpperCase().includes(searchVal))
+            );
+
             const logCountEl = document.getElementById('log-count');
-            if (logCountEl) logCountEl.innerText = `${logs.length} QSO REGISTRADOS`;
+            if (logCountEl) {
+                if(searchVal) {
+                    logCountEl.innerText = `${filteredLogs.length} / ${logs.length} RECOLECCION`;
+                } else {
+                    logCountEl.innerText = `${logs.length} QSO REGISTRADOS`;
+                }
+            }
             
             const container = document.getElementById('logs-container');
             if (container) {
-                container.innerHTML = logs.length > 0 ? logs.map((l) => `
+                container.innerHTML = filteredLogs.length > 0 ? filteredLogs.map((l) => `
                     <div class="card-tactical p-4 flex justify-between items-center border-l-4 border-l-sky-500 hover:shadow-lg transition-all">
                         <div class="overflow-hidden">
                             <div class="flex items-center gap-2 md:gap-3 flex-wrap">
@@ -589,7 +621,7 @@
                             <button onclick="handleDelete('${l.id}')" class="text-rose-600 hover:bg-rose-50 p-2 rounded transition-colors"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
-                `).join('') : '<div class="p-10 text-center text-slate-300 font-bold uppercase italic text-sm">No hay contactos registrados</div>';
+                `).join('') : '<div class="p-10 text-center text-slate-300 font-bold uppercase italic text-sm">Sin resultados</div>';
             }
 
             // Tablas Estáticas (Ahora dentro de wrappers responsivos)
@@ -599,7 +631,7 @@
                 'table-emerg': EMERG_DATA.map(e => `<tr><td class="font-bold text-slate-800 text-[11px]">${e.s}</td><td class="mono font-bold text-rose-600">${e.f}</td><td class="text-slate-400 font-bold text-[10px]">${e.m}</td><td class="text-[10px] text-slate-500">${e.n}</td><td><span class="badge-status status-rx">${e.tx} ONLY</span></td></tr>`).join(''),
                 'table-air': AIR_DATA.map(a => `<tr><td class="font-bold text-[11px] text-slate-700">${a.s}</td><td class="mono font-bold">${a.f}</td><td class="text-[10px] font-black">${a.m}</td><td class="italic text-[10px] text-slate-400">${a.n}</td></tr>`).join(''),
                 'table-fm': FM_DATA.map(f => `<tr><td class="font-bold text-slate-800">${f.e}</td><td class="mono font-bold text-indigo-700">${f.f}</td><td class="text-slate-400 text-[11px]">${f.z}</td><td class="text-[9px] font-black text-indigo-300 uppercase">${f.s}</td></tr>`).join(''),
-                'table-h8': HARDWARE_PLAN.map(h => `<tr class="hover:bg-slate-50"><td class="mono font-bold text-slate-900">${h.r}</td><td class="font-black text-sky-800 uppercase text-[10px]">${h.s}</td><td class="font-bold text-slate-400 text-[9px] uppercase">${h.m}</td><td><span class="badge-status ${h.tx === 'TX OK' ? 'status-tx' : (h.tx === 'UNLOCKED' ? 'status-unlocked' : 'status-rx')}">${h.tx}</span></td><td class="mono text-[10px] font-bold text-slate-400">${h.st}</td></tr>`).join('')
+                'table-h8': HARDWARE_PLAN.map(h => `<tr class="hover:bg-slate-50"><td class="mono font-bold text-slate-900 whitespace-nowrap">${h.r}</td><td class="font-black text-sky-800 uppercase text-[10px]">${h.s}</td><td class="font-bold text-slate-500 text-[9px] italic">${h.u}</td><td class="font-bold text-slate-900 text-[10px] uppercase">${h.m}</td><td><span class="badge-status ${h.tx === 'TX OK' ? 'status-tx' : (h.tx === 'UNLOCKED' ? 'status-unlocked' : 'status-rx')}">${h.tx}</span></td></tr>`).join('')
             };
 
             Object.entries(tables).forEach(([id, html]) => {
@@ -705,7 +737,6 @@
                     renderAll();
                     sysLog("Importación local finalizada.", "text-emerald-500");
 
-                    // Intentar sync solo si hay cliente configurado
                     if(supabaseClient) {
                          sysLog("Intentando subir a la nube en background...");
                          let synced = 0;
@@ -748,13 +779,66 @@
             a.click();
         }
 
+        // --- CSV EXPORT LOGIC (Tidradio H8 Compatible) ---
         function downloadCSV() {
             const headers = "Location,Name,Frequency,Duplex,Offset,Tone,rToneFreq,cToneFreq,DtcsCode,DtcsPolarity,RxDtcsCode,CrossMode,Mode,TStep,Skip,Power,Comment,URCALL,RPT1CALL,RPT2CALL,DVCODE";
-            const rows = REPEATERS.map((r, i) => `${i+1},${r.id},${r.rx},-,${r.off.replace('-','')},Tone,${r.t === 'NONE' ? '88.5' : r.t},88.5,023,NN,023,Tone->Tone,FM,12.5,,High,,,,,`);
-            const blob = new Blob([[headers, ...rows].join('\n')], { type: 'text/csv' });
+            
+            let loc = 1;
+            const rows = [];
+
+            // Helper to format frequency to 5 decimals (e.g., 145.60000)
+            const fmtFreq = (f) => parseFloat(f).toFixed(5);
+
+            // 1. REPEATERS
+            REPEATERS.forEach(r => {
+                const duplex = r.off.startsWith('-') ? '-' : (r.off === '0.000' ? 'off' : '+');
+                const offsetAbs = Math.abs(parseFloat(r.off)).toFixed(5);
+                const hasTone = r.t !== 'NONE' && r.t !== 'CC 1'; // CC 1 es DMR, lo tratamos diferente o simple FM
+                const toneType = hasTone ? 'Tone' : '';
+                const rTone = hasTone ? r.t : '88.5';
+                
+                rows.push(`${loc},${r.id},${fmtFreq(r.rx)},${duplex},${offsetAbs},${toneType},${rTone},88.5,023,NN,023,Tone->Tone,FM,12.5,,4.0W,,,,,`);
+                loc++;
+            });
+
+            // 2. PMR446
+            PMR_DATA.forEach(p => {
+                const name = `PMR ${p.c}`;
+                // PMR channels are simplex (off), NFM, Low Power (approx 1.0W in H8 terms for Low)
+                rows.push(`${loc},${name},${fmtFreq(p.f)},off,0.00000,,88.5,88.5,023,NN,023,Tone->Tone,NFM,12.5,,1.0W,,,,,`);
+                loc++;
+            });
+
+            // 3. EMERG
+            EMERG_DATA.forEach(e => {
+                // Shorten name to ~8 chars
+                const shortName = e.s.substring(0, 8).toUpperCase();
+                rows.push(`${loc},${shortName},${fmtFreq(e.f)},off,0.00000,,88.5,88.5,023,NN,023,Tone->Tone,FM,12.5,,4.0W,,,,,`);
+                loc++;
+            });
+
+            // 4. AIR BAND
+            AIR_DATA.forEach(a => {
+                const shortName = a.s.replace('LEBB Loiu', 'BIO').substring(0, 8).toUpperCase();
+                // Air band uses AM and usually 8.33kHz step (or 25kHz legacy). H8 supports 8.33.
+                rows.push(`${loc},${shortName},${fmtFreq(a.f)},off,0.00000,,88.5,88.5,023,NN,023,Tone->Tone,AM,8.33,,4.0W,,,,,`);
+                loc++;
+            });
+
+            // 5. FM COMMERCIAL
+            FM_DATA.forEach(f => {
+                const shortName = f.e.substring(0, 8).toUpperCase();
+                // WFM is usually handled separately, but we add them as potential RX channels. Mode FM (Wide not always avail in CSV import as 'WFM', falling back to FM/NFM or skipping if radio ignores).
+                // Note: H8 standard CSV often ignores < 108MHz for memory channels, but some firmwares allow it. We will add them as FM.
+                rows.push(`${loc},${shortName},${fmtFreq(f.f)},off,0.00000,,88.5,88.5,023,NN,023,Tone->Tone,FM,100.0,,1.0W,,,,,`);
+                loc++;
+            });
+
+            const csvContent = [headers, ...rows].join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'H8_BASAURI_SYNC.csv';
+            a.download = 'H8_MASTER_BASAURI.csv';
             a.click();
         }
 
