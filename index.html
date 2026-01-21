@@ -104,6 +104,7 @@
             </button>
 
             <div class="relative w-16 h-16 mb-2">
+                <!--
                 <svg viewBox="0 0 100 100" class="w-full h-full text-sky-500 overflow-visible">
                     <circle cx="50" cy="30" r="8" class="radio-wave" fill="none" stroke="currentColor" stroke-width="2"/>
                     <circle cx="50" cy="30" r="8" class="radio-wave wave-2" fill="none" stroke="currentColor" stroke-width="1.5"/>
@@ -114,6 +115,111 @@
                     <rect x="30" y="80" width="40" height="12" rx="2" fill="currentColor"/>
                     <circle cx="50" cy="30" r="4" fill="white"/>
                 </svg>
+                -->
+                <svg viewBox="0 0 320 420"
+     width="320"
+     height="420"
+     xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <!-- Sombra general -->
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="0" dy="12"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.35"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Material plástico -->
+    <linearGradient id="plastic" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2e3440"/>
+      <stop offset="60%" stop-color="#1a1f26"/>
+      <stop offset="100%" stop-color="#0b0e13"/>
+    </linearGradient>
+
+    <!-- Borde mecanizado -->
+    <linearGradient id="machined" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5b6472"/>
+      <stop offset="100%" stop-color="#0b0e13"/>
+    </linearGradient>
+
+    <!-- Cristal -->
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#dff6ff"/>
+      <stop offset="100%" stop-color="#1e90c8"/>
+    </linearGradient>
+
+    <!-- Reflejo -->
+    <linearGradient id="reflection" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Antena -->
+  <g filter="url(#drop)">
+    <rect x="154" y="10" width="12" height="70" rx="6" fill="#e5e7eb"/>
+    <rect x="154" y="80" width="12" height="40" rx="6" fill="#cbd5f5"/>
+    <rect x="154" y="120" width="12" height="30" rx="6" fill="#94a3b8"/>
+  </g>
+
+  <!-- Cuerpo -->
+  <g filter="url(#drop)">
+    <rect x="60" y="140" width="200" height="260" rx="36"
+          fill="url(#plastic)"/>
+
+    <!-- Marco mecanizado -->
+    <rect x="72" y="152" width="176" height="236" rx="28"
+          fill="url(#machined)" opacity="0.6"/>
+  </g>
+
+  <!-- Tornillos -->
+  <g fill="#6b7280">
+    <circle cx="88" cy="172" r="4"/>
+    <circle cx="232" cy="172" r="4"/>
+    <circle cx="88" cy="372" r="4"/>
+    <circle cx="232" cy="372" r="4"/>
+  </g>
+
+  <!-- Pantalla -->
+  <g>
+    <rect x="100" y="180" width="120" height="60" rx="12"
+          fill="url(#glass)"/>
+
+    <!-- Reflejo -->
+    <path d="M100 180 h120 v26 c-40 -10 -80 -10 -120 0 z"
+          fill="url(#reflection)"/>
+  </g>
+
+  <!-- Espectro -->
+  <g fill="#0f172a" opacity="0.75">
+    <rect x="112" y="206" width="10" height="24"/>
+    <rect x="126" y="198" width="10" height="32"/>
+    <rect x="140" y="194" width="10" height="36"/>
+    <rect x="154" y="198" width="10" height="32"/>
+    <rect x="168" y="206" width="10" height="24"/>
+  </g>
+
+  <!-- Botones -->
+  <g>
+    <rect x="100" y="270" width="44" height="30" rx="8" fill="#374151"/>
+    <rect x="176" y="270" width="44" height="30" rx="8" fill="#374151"/>
+
+    <rect x="100" y="320" width="44" height="30" rx="8" fill="#1f2937"/>
+    <rect x="176" y="320" width="44" height="30" rx="8" fill="#1f2937"/>
+  </g>
+
+  <!-- LED -->
+  <circle cx="160" cy="370" r="10" fill="#22c55e"/>
+  <circle cx="160" cy="370" r="18" fill="#22c55e" opacity="0.15"/>
+
+</svg>
+
             </div>
             <h1 class="text-xl font-black tracking-tighter italic uppercase">RADIOLOG <span class="text-sky-500">PRO</span></h1>
             <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">H8 Gen3 Basauri Tactical</p>
@@ -781,146 +887,131 @@
 
         // --- CSV EXPORT LOGIC (Tidradio H8 Compatible) ---
         function downloadCSV() {
-            // Header ODMaster / Tidradio H8 standard
-            const headers = "Location,Name,Frequency,Duplex,Offset,Tone,rToneFreq,cToneFreq,DtcsCode,DtcsPolarity,RxDtcsCode,CrossMode,Mode,TStep,Skip,Power,Comment,URCALL,RPT1CALL,RPT2CALL,DVCODE";
-            
-            let loc = 1;
-            const rows = [];
-            const fmtFreq = (f) => parseFloat(f).toFixed(5);
+    const headers = [
+        "Location","Name","Frequency","Duplex","Offset","Tone",
+        "rToneFreq","cToneFreq","DtcsCode","DtcsPolarity",
+        "RxDtcsCode","CrossMode","Mode","TStep","Skip",
+        "Power","Comment","URCALL","RPT1CALL","RPT2CALL","DVCODE"
+    ].join(",");
 
-            // Helper to clean names
-            const cleanName = (n) => n.replace(/,/g, '').substring(0, 12).toUpperCase();
+    let loc = 1;
+    const rows = [];
+    const fmt = f => parseFloat(f).toFixed(5);
+    const name = s => s.replace(/,/g,'').substring(0,12).toUpperCase();
 
-            // 1. REPETIDORES
-            REPEATERS.forEach(r => {
-                const freq = fmtFreq(r.rx);
-                let duplex = '';
-                let offset = '0.00000';
-                
-                // Logic for Repeaters
-                if (r.off && r.off !== '0.000') {
-                    const offVal = parseFloat(r.off);
-                    duplex = offVal < 0 ? '-' : '+';
-                    offset = fmtFreq(Math.abs(offVal));
-                }
+    /* =======================
+       REPETIDORES ANALÓGICOS
+       ======================= */
+    REPEATERS.forEach(r => {
+        let duplex = '';
+        let offset = '0.00000';
 
-                // Logic for Tones (Only TX Tone if specified)
-                let toneMode = ''; // Empty by default
-                let cTone = '88.5'; // Default placeholder
-                
-                // r.t usually contains '123.0' or 'NONE'
-                if (r.t && r.t !== 'NONE' && !r.t.startsWith('CC')) {
-                    toneMode = 'Tone';
-                    cTone = parseFloat(r.t).toFixed(1);
-                }
-
-                rows.push([
-                    loc,
-                    cleanName(r.id + ' ' + r.loc),
-                    freq,
-                    duplex,
-                    offset,
-                    toneMode,
-                    '88.5', // rToneFreq (RX Tone - usually none for repeaters unless TSQ)
-                    cTone,  // cToneFreq (TX Tone)
-                    '023', 'NN', '023', 'Tone->Tone', // Default DTCS
-                    'FM', // Mode
-                    '12.5', // Step
-                    '', // Skip
-                    '10.0W', // Power
-                    '', '', '', '', '' // Extras
-                ].join(','));
-                loc++;
-            });
-
-            // 2. PMR446 (Simplex)
-            PMR_DATA.forEach(p => {
-                rows.push([
-                    loc,
-                    cleanName(`PMR ${p.c}`),
-                    fmtFreq(p.f),
-                    '', // Duplex empty = Simplex
-                    '0.00000',
-                    '', // Tone empty
-                    '88.5', '88.5', // Default tone placeholders
-                    '023', 'NN', '023', 'Tone->Tone',
-                    'NFM', // Narrow FM for PMR
-                    '12.5',
-                    '',
-                    '0.5W', // Low power
-                    '', '', '', '', ''
-                ].join(','));
-                loc++;
-            });
-
-            // 3. EMERG (Mixed)
-            EMERG_DATA.forEach(e => {
-                const isRxOnly = e.tx === 'RX';
-                rows.push([
-                    loc,
-                    cleanName(e.s),
-                    fmtFreq(e.f),
-                    isRxOnly ? 'off' : '', // 'off' for RX only
-                    '0.00000',
-                    '',
-                    '88.5', '88.5',
-                    '023', 'NN', '023', 'Tone->Tone',
-                    'FM',
-                    '12.5',
-                    '',
-                    '10.0W',
-                    '', '', '', '', ''
-                ].join(','));
-                loc++;
-            });
-
-            // 4. AIR BAND (RX Only, AM)
-            AIR_DATA.forEach(a => {
-                rows.push([
-                    loc,
-                    cleanName(a.s.replace('LEBB', 'BIO')),
-                    fmtFreq(a.f),
-                    'off', // RX Only
-                    '0.00000',
-                    '',
-                    '88.5', '88.5',
-                    '023', 'NN', '023', 'Tone->Tone',
-                    'AM', // AM Mode
-                    '8.33', // Air band step
-                    '',
-                    '10.0W', // Power irrelevant for RX but field needed
-                    '', '', '', '', ''
-                ].join(','));
-                loc++;
-            });
-
-            // 5. FM COMMERCIAL (RX Only)
-            FM_DATA.forEach(f => {
-                 rows.push([
-                    loc,
-                    cleanName(f.e),
-                    fmtFreq(f.f),
-                    'off',
-                    '0.00000',
-                    '',
-                    '88.5', '88.5',
-                    '023', 'NN', '023', 'Tone->Tone',
-                    'FM', // H8 uses FM wide for broadcast usually
-                    '100.0', // Step
-                    '',
-                    '10.0W',
-                    '', '', '', '', ''
-                ].join(','));
-                loc++;
-            });
-
-            const csvContent = [headers, ...rows].join('\n');
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'H8_BASAURI_MASTER.csv';
-            a.click();
+        if (r.off && r.off !== '0.000') {
+            const o = parseFloat(r.off);
+            duplex = o < 0 ? '-' : '+';
+            offset = fmt(Math.abs(o));
         }
+
+        let tone = '';
+        let cTone = '';
+        if (r.t && r.t !== 'NONE' && !r.t.startsWith('CC')) {
+            tone = 'Tone';
+            cTone = parseFloat(r.t).toFixed(1);
+        }
+
+        rows.push([
+            loc++,
+            name(`${r.id} ${r.loc}`),
+            fmt(r.rx),
+            duplex,
+            offset,
+            tone,
+            '',                 // rToneFreq
+            cTone,              // cToneFreq
+            '', '', '', '',     // DTCS OFF
+            'FM',
+            '12.5',
+            '',
+            'HIGH',
+            '', '', '', '', ''
+        ].join(','));
+    });
+
+    /* ==========
+       PMR446
+       ========== */
+    PMR_DATA.forEach(p => {
+        rows.push([
+            loc++,
+            name(`PMR${p.c}`),
+            fmt(p.f),
+            '',
+            '0.00000',
+            '',
+            '', '',
+            '', '', '', '',
+            'NFM',
+            '12.5',
+            '',
+            'LOW',
+            '', '', '', '', ''
+        ].join(','));
+    });
+
+    /* ==========
+       EMERGENCIAS
+       ========== */
+    EMERG_DATA.forEach(e => {
+        rows.push([
+            loc++,
+            name(e.s),
+            fmt(e.f),
+            'off',
+            '0.00000',
+            '',
+            '', '',
+            '', '', '', '',
+            'FM',
+            '12.5',
+            '',
+            'LOW',
+            e.n || '',
+            '', '', '', ''
+        ].join(','));
+    });
+
+    /* ==========
+       BANDA AÉREA
+       ========== */
+    AIR_DATA.forEach(a => {
+        rows.push([
+            loc++,
+            name(a.s.replace('LEBB','BIO')),
+            fmt(a.f),
+            'off',
+            '0.00000',
+            '',
+            '', '',
+            '', '', '', '',
+            'AM',
+            '25.0',
+            '',
+            'LOW',
+            a.n || '',
+            '', '', '', ''
+        ].join(','));
+    });
+
+    const csv = [headers, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'MASTER_H8.csv';
+    a.click();
+}
+
 
         window.onload = () => {
             initSupabase();
