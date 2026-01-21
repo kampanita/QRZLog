@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RadioLog Pro v107 | Basauri Tactical Export</title>
+    <title>RadioLog Pro v108 | Basauri Tactical Export Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -781,56 +781,136 @@
 
         // --- CSV EXPORT LOGIC (Tidradio H8 Compatible) ---
         function downloadCSV() {
+            // Header ODMaster / Tidradio H8 standard
             const headers = "Location,Name,Frequency,Duplex,Offset,Tone,rToneFreq,cToneFreq,DtcsCode,DtcsPolarity,RxDtcsCode,CrossMode,Mode,TStep,Skip,Power,Comment,URCALL,RPT1CALL,RPT2CALL,DVCODE";
             
             let loc = 1;
             const rows = [];
-
-            // Helper to format frequency to 5 decimals (e.g., 145.60000)
             const fmtFreq = (f) => parseFloat(f).toFixed(5);
 
-            // 1. REPEATERS
+            // Helper to clean names
+            const cleanName = (n) => n.replace(/,/g, '').substring(0, 12).toUpperCase();
+
+            // 1. REPETIDORES
             REPEATERS.forEach(r => {
-                const duplex = r.off.startsWith('-') ? '-' : (r.off === '0.000' ? 'off' : '+');
-                const offsetAbs = Math.abs(parseFloat(r.off)).toFixed(5);
-                const hasTone = r.t !== 'NONE' && r.t !== 'CC 1'; // CC 1 es DMR, lo tratamos diferente o simple FM
-                const toneType = hasTone ? 'Tone' : '';
-                const rTone = hasTone ? r.t : '88.5';
+                const freq = fmtFreq(r.rx);
+                let duplex = '';
+                let offset = '0.00000';
                 
-                rows.push(`${loc},${r.id},${fmtFreq(r.rx)},${duplex},${offsetAbs},${toneType},${rTone},88.5,023,NN,023,Tone->Tone,FM,12.5,,4.0W,,,,,`);
+                // Logic for Repeaters
+                if (r.off && r.off !== '0.000') {
+                    const offVal = parseFloat(r.off);
+                    duplex = offVal < 0 ? '-' : '+';
+                    offset = fmtFreq(Math.abs(offVal));
+                }
+
+                // Logic for Tones (Only TX Tone if specified)
+                let toneMode = ''; // Empty by default
+                let cTone = '88.5'; // Default placeholder
+                
+                // r.t usually contains '123.0' or 'NONE'
+                if (r.t && r.t !== 'NONE' && !r.t.startsWith('CC')) {
+                    toneMode = 'Tone';
+                    cTone = parseFloat(r.t).toFixed(1);
+                }
+
+                rows.push([
+                    loc,
+                    cleanName(r.id + ' ' + r.loc),
+                    freq,
+                    duplex,
+                    offset,
+                    toneMode,
+                    '88.5', // rToneFreq (RX Tone - usually none for repeaters unless TSQ)
+                    cTone,  // cToneFreq (TX Tone)
+                    '023', 'NN', '023', 'Tone->Tone', // Default DTCS
+                    'FM', // Mode
+                    '12.5', // Step
+                    '', // Skip
+                    '10.0W', // Power
+                    '', '', '', '', '' // Extras
+                ].join(','));
                 loc++;
             });
 
-            // 2. PMR446
+            // 2. PMR446 (Simplex)
             PMR_DATA.forEach(p => {
-                const name = `PMR ${p.c}`;
-                // PMR channels are simplex (off), NFM, Low Power (approx 1.0W in H8 terms for Low)
-                rows.push(`${loc},${name},${fmtFreq(p.f)},off,0.00000,,88.5,88.5,023,NN,023,Tone->Tone,NFM,12.5,,1.0W,,,,,`);
+                rows.push([
+                    loc,
+                    cleanName(`PMR ${p.c}`),
+                    fmtFreq(p.f),
+                    '', // Duplex empty = Simplex
+                    '0.00000',
+                    '', // Tone empty
+                    '88.5', '88.5', // Default tone placeholders
+                    '023', 'NN', '023', 'Tone->Tone',
+                    'NFM', // Narrow FM for PMR
+                    '12.5',
+                    '',
+                    '0.5W', // Low power
+                    '', '', '', '', ''
+                ].join(','));
                 loc++;
             });
 
-            // 3. EMERG
+            // 3. EMERG (Mixed)
             EMERG_DATA.forEach(e => {
-                // Shorten name to ~8 chars
-                const shortName = e.s.substring(0, 8).toUpperCase();
-                rows.push(`${loc},${shortName},${fmtFreq(e.f)},off,0.00000,,88.5,88.5,023,NN,023,Tone->Tone,FM,12.5,,4.0W,,,,,`);
+                const isRxOnly = e.tx === 'RX';
+                rows.push([
+                    loc,
+                    cleanName(e.s),
+                    fmtFreq(e.f),
+                    isRxOnly ? 'off' : '', // 'off' for RX only
+                    '0.00000',
+                    '',
+                    '88.5', '88.5',
+                    '023', 'NN', '023', 'Tone->Tone',
+                    'FM',
+                    '12.5',
+                    '',
+                    '10.0W',
+                    '', '', '', '', ''
+                ].join(','));
                 loc++;
             });
 
-            // 4. AIR BAND
+            // 4. AIR BAND (RX Only, AM)
             AIR_DATA.forEach(a => {
-                const shortName = a.s.replace('LEBB Loiu', 'BIO').substring(0, 8).toUpperCase();
-                // Air band uses AM and usually 8.33kHz step (or 25kHz legacy). H8 supports 8.33.
-                rows.push(`${loc},${shortName},${fmtFreq(a.f)},off,0.00000,,88.5,88.5,023,NN,023,Tone->Tone,AM,8.33,,4.0W,,,,,`);
+                rows.push([
+                    loc,
+                    cleanName(a.s.replace('LEBB', 'BIO')),
+                    fmtFreq(a.f),
+                    'off', // RX Only
+                    '0.00000',
+                    '',
+                    '88.5', '88.5',
+                    '023', 'NN', '023', 'Tone->Tone',
+                    'AM', // AM Mode
+                    '8.33', // Air band step
+                    '',
+                    '10.0W', // Power irrelevant for RX but field needed
+                    '', '', '', '', ''
+                ].join(','));
                 loc++;
             });
 
-            // 5. FM COMMERCIAL
+            // 5. FM COMMERCIAL (RX Only)
             FM_DATA.forEach(f => {
-                const shortName = f.e.substring(0, 8).toUpperCase();
-                // WFM is usually handled separately, but we add them as potential RX channels. Mode FM (Wide not always avail in CSV import as 'WFM', falling back to FM/NFM or skipping if radio ignores).
-                // Note: H8 standard CSV often ignores < 108MHz for memory channels, but some firmwares allow it. We will add them as FM.
-                rows.push(`${loc},${shortName},${fmtFreq(f.f)},off,0.00000,,88.5,88.5,023,NN,023,Tone->Tone,FM,100.0,,1.0W,,,,,`);
+                 rows.push([
+                    loc,
+                    cleanName(f.e),
+                    fmtFreq(f.f),
+                    'off',
+                    '0.00000',
+                    '',
+                    '88.5', '88.5',
+                    '023', 'NN', '023', 'Tone->Tone',
+                    'FM', // H8 uses FM wide for broadcast usually
+                    '100.0', // Step
+                    '',
+                    '10.0W',
+                    '', '', '', '', ''
+                ].join(','));
                 loc++;
             });
 
@@ -838,7 +918,7 @@
             const blob = new Blob([csvContent], { type: 'text/csv' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'H8_MASTER_BASAURI.csv';
+            a.download = 'H8_BASAURI_MASTER.csv';
             a.click();
         }
 
