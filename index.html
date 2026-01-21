@@ -508,25 +508,6 @@
             { e: 'Tropical FM', f: '102.2', z: 'Bilbao', s: 'BAJA' }
         ];
 
-        // ACTUALIZADO CON IARU REGION 1 (ESPAÑA)
-        const HARDWARE_PLAN = [
-            { r: '65.0 - 108.0', s: 'FM Comercial', u: 'Radiodifusión FM (WFM)', m: 'WFM', tx: 'RX' },
-            { r: '108.0 - 117.9', s: 'Banda Aérea', u: 'VOR / Navegación (Solo Balizas)', m: 'AM', tx: 'RX' },
-            { r: '118.0 - 136.9', s: 'Banda Aérea', u: 'Comunicaciones Voz Aérea (AM)', m: 'AM', tx: 'RX' },
-            { r: '144.0 - 144.150', s: '2M Amateur', u: 'CW (Telegrafía) - Uso Exclusivo', m: 'CW', tx: 'TX OK' },
-            { r: '144.150 - 144.4', s: '2M Amateur', u: 'SSB (Banda Lateral) / DX', m: 'USB', tx: 'TX OK' },
-            { r: '144.5 - 144.9', s: '2M Amateur', u: 'Todos los Modos / Digital / SSTV', m: 'FM', tx: 'TX OK' },
-            { r: '145.0 - 145.175', s: '2M Amateur', u: 'Entrada Repetidores (R0-R7)', m: 'FM', tx: 'TX OK' },
-            { r: '145.2 - 145.575', s: '2M Amateur', u: 'FM Simplex (145.500 Llamada)', m: 'FM', tx: 'TX OK' },
-            { r: '145.6 - 145.775', s: '2M Amateur', u: 'Salida Repetidores (R0-R7)', m: 'FM', tx: 'TX OK' },
-            { r: '145.8 - 146.0', s: '2M Amateur', u: 'Satélites (ISS Downlink)', m: 'FM', tx: 'TX OK' },
-            { r: '146.0 - 174.0', s: 'VHF Pro', u: 'Servicios Profesionales / Caza / Emerg', m: 'FM', tx: 'TX OK' },
-            { r: '430.0 - 432.0', s: '70cm Amateur', u: 'CW / SSB / Digital', m: 'USB', tx: 'TX OK' },
-            { r: '433.0 - 433.575', s: '70cm Amateur', u: 'FM Simplex (433.500 Llamada)', m: 'FM', tx: 'TX OK' },
-            { r: '438.650 - 439.425', s: '70cm Amateur', u: 'Salida Repetidores UHF', m: 'FM', tx: 'TX OK' },
-            { r: '446.0 - 446.2', s: 'PMR446', u: 'Uso Libre sin licencia', m: 'NFM', tx: 'TX OK' }
-        ];
-
         // --- SYNC LOGIC ---
         let logs = [];
         let editingId = null;
@@ -912,6 +893,11 @@
             // COLUMNAS FIJAS EXACTAS ODMASTER
             const magicCols = "023,NN,023,Tone->Tone";
 
+            // Helper para salto de zona
+            const nextZone = () => {
+                if (loc > 1) loc = Math.ceil(loc / 10) * 10;
+            };
+
             // 1. REPETIDORES
             REPEATERS.forEach(r => {
                 let duplex = '';
@@ -947,6 +933,8 @@
                 ].join(','));
             });
 
+            nextZone();
+
             // 2. PMR (Simplex = Empty Duplex)
             PMR_DATA.forEach(p => {
                 rows.push([
@@ -965,6 +953,8 @@
                     "", "", "", "", ""
                 ].join(','));
             });
+
+            nextZone();
 
             // 3. EMERG (RX Only = off)
             EMERG_DATA.forEach(e => {
@@ -985,6 +975,8 @@
                     "", "", "", ""
                 ].join(','));
             });
+
+            nextZone();
 
             // 4. AIR (RX Only = off)
             AIR_DATA.forEach(a => {
