@@ -3,233 +3,696 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RadioLog Pro v14 | Basauri High-Density</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>RadioLog Pro v104 | Basauri Tactical Absolute</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --sidebar-dark: #0f172a; --accent: #38bdf8; --tx-green: #22c55e; --rx-red: #ef4444; }
-        body { background-color: #f1f5f9; font-family: 'Inter', system-ui, -apple-system, sans-serif; display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 320px; background: var(--sidebar-dark); color: white; display: flex; flex-direction: column; z-index: 1000; box-shadow: 4px 0 20px rgba(0,0,0,0.2); }
-        .logo-area { padding: 30px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
-        .logo-icon { font-size: 3rem; color: var(--accent); margin-bottom: 15px; filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4)); }
-        .nav-link { color: #94a3b8 !important; padding: 18px 25px; border-left: 4px solid transparent; cursor: pointer; transition: 0.3s; font-weight: 500; }
-        .nav-link:hover { background: rgba(255,255,255,0.05); color: white !important; }
-        .nav-link.active { background: rgba(56, 189, 248, 0.1); color: white !important; border-left-color: var(--accent); }
-        main { flex: 1; overflow-y: auto; padding: 35px; scroll-behavior: smooth; }
+        :root { --main-dark: #0f172a; --accent: #0ea5e9; --tx-ok: #10b981; --rx-only: #ef4444; }
+        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .sidebar { width: 300px; background: var(--main-dark); color: white; display: flex; flex-direction: column; flex-shrink: 0; border-right: 4px solid var(--accent); }
+        .logo-area { padding: 30px; background: black; border-bottom: 1px solid #1e293b; }
+        
+        @keyframes radio-ping {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+        .radio-wave {
+            transform-origin: 50% 30%;
+            animation: radio-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        .wave-2 { animation-delay: 0.6s; }
+        .wave-3 { animation-delay: 1.2s; }
+        
+        .nav-link { color: #64748b; padding: 15px 30px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; border: none; background: none; width: 100%; text-align: left; display: flex; align-items: center; gap: 12px; }
+        .nav-link:hover { color: white; background: #1e293b; }
+        .nav-link.active { color: white; background: var(--accent); }
+
+        main { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); background: white; margin-bottom: 25px; overflow: hidden; }
-        .card-header-tech { padding: 15px 20px; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; }
-        .card-header-tech i { font-size: 1.2rem; margin-right: 12px; }
-        .bg-vhf { background: #0284c7; } .bg-uhf { background: #7c3aed; } .bg-fm { background: #059669; } .bg-danger { background: #dc2626; } .bg-info-dark { background: #0f172a; } .bg-pmr { background: #f59e0b; }
-        .table-radio { font-size: 0.88rem; margin-bottom: 0; }
-        .table-radio th { background: #f8fafc; color: #64748b; font-size: 0.75rem; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
-        .freq-code { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #1e293b; }
-        .subtone-badge { background: #fef3c7; color: #92400e; padding: 3px 8px; border-radius: 4px; font-weight: 800; }
-        .badge-status { width: 90px; text-align: center; font-weight: 800; font-size: 0.7rem; padding: 6px; border-radius: 6px; display: inline-block; text-transform: uppercase; }
-        .st-tx { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
-        .st-rx { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-        .log-entry { background: white; border-radius: 10px; padding: 18px; margin-bottom: 12px; border-left: 6px solid var(--accent); transition: 0.2s; }
-        .log-entry:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
-        .edit-mode { background: #fffbeb !important; border-color: #f59e0b !important; }
+        .tab-content.active { display: block; animation: slideUp 0.2s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card-tactical { background: white; border-radius: 4px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 2rem; overflow: hidden; }
+        .card-header { padding: 12px 20px; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; color: white; display: flex; align-items: center; gap: 10px; }
+        
+        .badge-status { padding: 2px 8px; border-radius: 3px; font-weight: 900; font-size: 0.65rem; border: 1px solid; text-transform: uppercase; }
+        .status-tx { border-color: var(--tx-ok); color: var(--tx-ok); background: #f0fdf4; }
+        .status-rx { border-color: var(--rx-only); color: var(--rx-only); background: #fef2f2; }
+        .status-unlocked { border-color: #8b5cf6; color: #8b5cf6; background: #f5f3ff; }
+
+        input, select, textarea { width: 100%; padding: 10px 15px; border: 2px solid #e2e8f0; border-radius: 4px; font-weight: 700; outline: none; transition: 0.2s; font-size: 0.85rem; }
+        input:focus { border-color: var(--accent); }
+        .btn-primary { background: var(--accent); color: white; font-weight: 900; text-transform: uppercase; padding: 12px; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        .btn-primary:hover { filter: brightness(1.1); }
+        
+        .table-tactical { width: 100%; font-size: 0.8rem; }
+        .table-tactical thead th { background: #f1f5f9; padding: 12px 20px; color: #475569; font-weight: 900; text-transform: uppercase; font-size: 0.65rem; border-bottom: 2px solid #e2e8f0; }
+        .table-tactical td { padding: 12px 20px; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
     </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react/": "https://esm.sh/react@^19.2.3/"
+  }
+}
+</script>
 </head>
 <body>
 
-<aside class="sidebar">
-    <div class="logo-area">
-        <i class="fas fa-satellite-dish logo-icon"></i>
-        <div class="logo-text"><h4 class="fw-bold m-0">RadioPro v14</h4><small class="opacity-50">Basauri High-End Ops</small></div>
-    </div>
-    <nav class="nav flex-column mt-4">
-        <a class="nav-link active" onclick="switchTab('logbook', this)"><i class="fas fa-edit me-3"></i> <span>Logbook (Zulu)</span></a>
-        <a class="nav-link" onclick="switchTab('plan', this)"><i class="fas fa-layer-group me-3"></i> <span>Plan de Bandas</span></a>
-    </nav>
-    <div class="mt-auto p-4 border-top border-dark">
-        <button class="btn btn-primary btn-sm w-100 mb-2" onclick="exportJSON()"><i class="fas fa-file-export me-2"></i>Exportar JSON</button>
-        <button class="btn btn-outline-info btn-sm w-100" onclick="document.getElementById('importFile').click()"><i class="fas fa-file-import me-2"></i>Importar JSON</button>
-        <input type="file" id="importFile" hidden onchange="importJSON(event)">
-    </div>
-</aside>
-
-<main>
-    <div id="logbook" class="tab-content active">
-        <h2 class="fw-bold text-dark mb-4">Registro Táctico Basauri</h2>
-        <div class="card-custom p-4" id="formContainer">
-            <form id="qsoForm" onsubmit="event.preventDefault(); saveQSO();" class="row g-3">
-                <input type="hidden" id="editId">
-                <div class="col-md-3"><label class="form-label small fw-bold">INDICATIVO</label><input type="text" id="callsign" class="form-control text-uppercase fw-bold" required></div>
-                <div class="col-md-2"><label class="form-label small fw-bold">RST</label><input type="text" id="rst" class="form-control" value="59"></div>
-                <div class="col-md-3"><label class="form-label small fw-bold">BANDA</label><select id="band" class="form-select"><option>2m</option><option>70cm</option><option>PMR</option><option>Aérea</option></select></div>
-                <div class="col-md-2"><label class="form-label small fw-bold">MODO</label><select id="mode" class="form-select"><option>FM</option><option>DMR</option><option>AM</option><option>SSB</option></select></div>
-                <div class="col-md-2 d-flex align-items-end"><button type="submit" id="saveBtn" class="btn btn-primary w-100 fw-bold">REGISTRAR</button></div>
-                <div class="col-12"><input type="text" id="comment" class="form-control" placeholder="Notas: ubicación, aita saludando, condiciones QRP..."></div>
-            </form>
+    <aside class="sidebar">
+        <div class="logo-area flex flex-col items-start">
+            <div class="relative w-16 h-16 mb-2">
+                <svg viewBox="0 0 100 100" class="w-full h-full text-sky-500 overflow-visible">
+                    <circle cx="50" cy="30" r="8" class="radio-wave" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="50" cy="30" r="8" class="radio-wave wave-2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="50" cy="30" r="8" class="radio-wave wave-3" fill="none" stroke="currentColor" stroke-width="1"/>
+                    <path d="M50 30 L50 85" stroke="white" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M35 50 L50 45 L65 50" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M40 65 L50 60 L60 65" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <rect x="30" y="80" width="40" height="12" rx="2" fill="currentColor"/>
+                    <circle cx="50" cy="30" r="4" fill="white"/>
+                </svg>
+            </div>
+            <h1 class="text-xl font-black tracking-tighter italic uppercase">RADIOLOG <span class="text-sky-500">PRO</span></h1>
+            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">H8 Gen3 Basauri Tactical</p>
+            <div id="sync-indicator" class="mt-3 text-[8px] font-black bg-slate-800 px-2 py-1 rounded text-slate-400 inline-block uppercase tracking-widest transition-colors">Sync: Initializing</div>
         </div>
-        <div id="logList"></div>
-    </div>
-
-    <div id="plan" class="tab-content">
-        <h2 class="fw-bold text-dark mb-4">Plan de Bandas Tidradio H8 3rd Gen</h2>
-
-        <div class="card-custom">
-            <div class="card-header-tech bg-info-dark"><i class="fas fa-microchip"></i>Espectro Detallado H8 (136 - 520 MHz)</div>
-            <table class="table table-radio table-hover">
-                <thead><tr><th>Rango (MHz)</th><th>Modo</th><th>Servicio / Segmento</th><th>Potencia</th><th>TX</th></tr></thead>
-                <tbody>
-                    <tr><td class="freq-code">136.000 - 137.000</td><td>NFM</td><td>Sats Meteorológicos / Espacio</td><td>-</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                    <tr><td class="freq-code">144.000 - 144.100</td><td>CW/USB</td><td>Satélites / CW (Radioaficionados)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">144.100 - 144.400</td><td>USB/SSB</td><td>Banda Lateral / DX Terrestre</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">144.500 - 144.794</td><td>FM/DIG</td><td>Llamada FM / Modos Digitales</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">144.800 - 144.990</td><td>FM/AFSK</td><td>APRS (Tidradio Digirig/BT)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">145.000 - 145.187</td><td>FM</td><td>Entrada Repetidores (Shift -0.6)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">145.200 - 145.587</td><td>FM</td><td>Canales Simplex / Llamada 145.500</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">145.600 - 145.787</td><td>FM</td><td>Salida Repetidores (Escucha)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">146.000 - 174.000</td><td>NFM</td><td>Servicios (Marina/Comercial/Seguridad)</td><td>-</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                    <tr class="table-secondary"><td>---</td><td>---</td><td><b>Segmento UHF</b></td><td>---</td><td>---</td></tr>
-                    <tr><td class="freq-code">430.000 - 431.975</td><td>FM/DIG</td><td>Entrada Repetidores / Satélites</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">432.000 - 432.100</td><td>CW/USB</td><td>Rebote Lunar (EME) / SSB</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">433.000 - 433.600</td><td>FM</td><td>Simplex / LPD (Canal 1: 433.075)</td><td>0.5W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">434.000 - 438.000</td><td>FM/DIG</td><td>Segmento Mixto / Satélites</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">438.000 - 439.425</td><td>FM/DMR</td><td>Salida Repetidores (Shift -7.6)</td><td>50W</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td class="freq-code">440.000 - 520.000</td><td>NFM</td><td>Servicios Profesionales / TETRA</td><td>-</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                </tbody>
-            </table>
+        <nav class="mt-4 flex-1">
+            <button onclick="switchTab('logbook')" id="btn-logbook" class="nav-link active"><i class="fas fa-terminal"></i> Logbook Tactico</button>
+            <button onclick="switchTab('repeaters')" id="btn-repeaters" class="nav-link"><i class="fas fa-tower-broadcast"></i> Repetidores Bizkaia</button>
+            <button onclick="switchTab('pmr')" id="btn-pmr" class="nav-link"><i class="fas fa-walkie-talkie"></i> Canales PMR446</button>
+            <button onclick="switchTab('emerg')" id="btn-emerg" class="nav-link"><i class="fas fa-life-ring"></i> Emergencias & Aire</button>
+            <button onclick="switchTab('fm')" id="btn-fm" class="nav-link"><i class="fas fa-radio"></i> FM Comercial</button>
+            <button onclick="switchTab('hardware')" id="btn-hardware" class="nav-link"><i class="fas fa-microchip"></i> Espectro Hardware</button>
+            <button onclick="switchTab('sync')" id="btn-sync" class="nav-link"><i class="fas fa-sync"></i> Sincronización</button>
+        </nav>
+        <div class="p-4 text-[9px] font-bold text-slate-600 border-t border-slate-800 text-center uppercase tracking-tighter">
+            Hardware Status: 65-600 MHz Absolute
         </div>
+    </aside>
 
-        <div class="card-custom">
-            <div class="card-header-tech bg-vhf"><i class="fas fa-mountain-sun"></i>Repetidores VHF (2m) - Bizkaia</div>
-            <table class="table table-radio table-hover">
-                <thead><tr><th>Ubicación</th><th>RX</th><th>TX</th><th>Offset</th><th>Tono</th><th>TX</th></tr></thead>
-                <tbody>
-                    <tr><td><b>Ganekogorta (R0)</b></td><td class="freq-code">145.600</td><td class="freq-code">145.000</td><td>-0.600</td><td><span class="subtone-badge">123.0</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td><b>Sollube (R1)</b></td><td class="freq-code">145.625</td><td class="freq-code">145.025</td><td>-0.600</td><td><span class="subtone-badge">NONE</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td><b>La Garbea (R2)</b></td><td class="freq-code">145.650</td><td class="freq-code">145.050</td><td>-0.600</td><td><span class="subtone-badge">123.0</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td><b>Monte Oiz (R6)</b></td><td class="freq-code">145.750</td><td class="freq-code">145.150</td><td>-0.600</td><td><span class="subtone-badge">82.5/123.0</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="card-custom">
-            <div class="card-header-tech bg-pmr"><i class="fas fa-walkie-talkie"></i>Canales PMR446 (Uso Libre - NFM)</div>
-            <table class="table table-radio table-hover">
-                <thead><tr><th>Canal</th><th>Frecuencia (MHz)</th><th>Paso (kHz)</th><th>Uso</th><th>TX</th></tr></thead>
-                <tbody>
-                    <tr><td><b>PMR 1</b></td><td class="freq-code">446.00625</td><td>12.5</td><td>General / Valle Nervión</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td><b>PMR 2</b></td><td class="freq-code">446.01875</td><td>12.5</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td><b>PMR 3</b></td><td class="freq-code">446.03125</td><td>12.5</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td><b>PMR 4</b></td><td class="freq-code">446.04375</td><td>12.5</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td><b>PMR 5</b></td><td class="freq-code">446.05625</td><td>12.5</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td><b>PMR 6</b></td><td class="freq-code">446.06875</td><td>12.5</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td><b>PMR 7</b></td><td class="freq-code">446.08125</td><td>12.5</td><td>General</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td><b>PMR 8</b></td><td class="freq-code">446.09375</td><td>12.5</td><td>Canal Montaña / Llamada</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td><b>PMR 9-16</b></td><td class="freq-code">446.106 - 446.193</td><td>12.5</td><td>Ampliación FM/Digital</td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="card-custom">
-            <div class="card-header-tech bg-uhf"><i class="fas fa-tower-broadcast"></i>Repetidores UHF (70cm)</div>
-            <table class="table table-radio table-hover">
-                <thead><tr><th>Ubicación</th><th>RX</th><th>TX</th><th>Offset</th><th>Tono</th><th>TX</th></tr></thead>
-                <tbody>
-                    <tr><td><b>Pagasarri (U78)</b></td><td class="freq-code">438.850</td><td class="freq-code">431.250</td><td>-7.600</td><td><span class="subtone-badge">123.0</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                    <tr><td><b>Ganekogorta (U82)</b></td><td class="freq-code">438.950</td><td class="freq-code">431.350</td><td>-7.600</td><td><span class="subtone-badge">123.0</span></td><td><span class="badge-status st-tx">TX VERDE</span></td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="card-custom">
-            <div class="card-header-tech bg-fm"><i class="fas fa-radio"></i>Radio Comercial FM (Escucha Local)</div>
-            <table class="table table-radio">
-                <thead><tr><th>Emisora</th><th>Frecuencia</th><th>Ubicación</th><th>TX</th></tr></thead>
-                <tbody>
-                    <tr><td><b>Radio Nervión</b></td><td class="freq-code">88.0</td><td>Bilbao (Basauri High)</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                    <tr><td><b>Radio 7</b></td><td class="freq-code">92.7</td><td>Margen Izquierda</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                    <tr><td><b>Radio Euskadi</b></td><td class="freq-code">91.7</td><td>Vizcaya General</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="card-custom">
-            <div class="card-header-tech bg-vhf"><i class="fas fa-plane"></i>Loiu (LEBB) - Banda Aérea AM</div>
-            <table class="table table-radio">
-                <thead><tr><th>Servicio</th><th>Frecuencia</th><th>Observaciones</th><th>TX</th></tr></thead>
-                <tbody>
-                    <tr><td><b>Aproximación</b></td><td class="freq-code">120.700</td><td>Contacto inicial</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                    <tr><td><b>Torre Control</b></td><td class="freq-code">118.500</td><td>Autorización pista</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                    <tr><td><b>ATIS</b></td><td class="freq-code">125.125</td><td>Info meteorológica</td><td><span class="badge-status st-rx">RX ROJO</span></td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</main>
-
-<script>
-    let logs = JSON.parse(localStorage.getItem('hamLogs')) || [];
-    function switchTab(id, el) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        el.classList.add('active');
-    }
-    function saveQSO() {
-        const id = document.getElementById('editId').value;
-        const qso = {
-            id: id ? parseInt(id) : Date.now(),
-            date: new Date().toISOString().replace('T', ' ').substring(0, 19) + ' Z',
-            callsign: document.getElementById('callsign').value.toUpperCase(),
-            rst: document.getElementById('rst').value,
-            band: document.getElementById('band').value,
-            mode: document.getElementById('mode').value,
-            comment: document.getElementById('comment').value
-        };
-        if(id) { logs = logs.map(l => l.id === qso.id ? qso : l); cancelEdit(); } 
-        else { logs.unshift(qso); }
-        localStorage.setItem('hamLogs', JSON.stringify(logs));
-        document.getElementById('qsoForm').reset();
-        render();
-    }
-    function render() {
-        const list = document.getElementById('logList');
-        list.innerHTML = logs.map(l => `
-            <div class="log-entry d-flex justify-content-between align-items-center">
+    <main>
+        <!-- TAB: LOGBOOK -->
+        <div id="tab-logbook" class="tab-content active">
+            <div class="flex justify-between items-end mb-6">
                 <div>
-                    <h5 class="fw-bold m-0 text-dark">${l.callsign} <span class="badge bg-primary ms-2" style="font-size:0.65em">${l.band}</span></h5>
-                    <div class="small text-muted mt-1"><i class="far fa-clock me-1"></i>${l.date} | ${l.mode} | RST: ${l.rst}</div>
-                    <div class="small text-secondary mt-1">${l.comment || '---'}</div>
+                    <h2 class="text-3xl font-black italic uppercase text-slate-800 tracking-tighter text-blue-900">Terminal Logbook</h2>
+                    <div class="flex gap-2 mt-2">
+                        <label class="text-[9px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-black px-2 py-1 rounded uppercase transition-colors cursor-pointer inline-flex items-center">
+                            <i class="fas fa-file-import mr-1"></i> Importar JSON
+                            <input type="file" id="import-json" class="hidden" accept=".json">
+                        </label>
+                        <button onclick="exportJSON()" class="text-[9px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-black px-2 py-1 rounded uppercase transition-colors"><i class="fas fa-file-export mr-1"></i> Exportar JSON</button>
+                    </div>
                 </div>
-                <div>
-                    <button class="btn btn-sm btn-outline-warning" onclick="editLog(${l.id})"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteLog(${l.id})"><i class="fas fa-trash"></i></button>
+                <span id="log-count" class="bg-slate-800 text-white px-3 py-1 rounded text-[10px] font-black uppercase">Cargando...</span>
+            </div>
+            <div class="card-tactical p-6 border-l-[10px] border-l-sky-500">
+                <form id="qso-form" class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <div class="md:col-span-4">
+                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Corresponsal</label>
+                        <input type="text" id="callsign" placeholder="EA2XXX" class="uppercase mono" required>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Reporte (RST)</label>
+                        <input type="text" id="rst" value="59" class="mono text-center">
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Banda / Modo</label>
+                        <select id="band">
+                            <option>2m VHF (FM)</option>
+                            <option>70cm UHF (FM)</option>
+                            <option>PMR446</option>
+                            <option>Banda Aérea (RX)</option>
+                            <option>HF / DX</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-3 flex items-end">
+                        <button type="submit" id="submit-btn" class="btn-primary w-full shadow-lg shadow-sky-200 disabled:opacity-50">Grabar QSO</button>
+                    </div>
+                    <div class="md:col-span-12">
+                        <textarea id="comment" rows="1" placeholder="Ubicación, Notas del corresponsal, Meteo..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div id="logs-container" class="space-y-4"></div>
+        </div>
+
+        <!-- TAB: REPETIDORES -->
+        <div id="tab-repeaters" class="tab-content">
+            <h2 class="text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">Repetidores Analógicos Bizkaia</h2>
+            <div class="card-tactical">
+                <div class="card-header bg-sky-700"><i class="fas fa-mountain"></i> Infraestructura de Red Local</div>
+                <table class="table-tactical text-left">
+                    <thead><tr><th>ID / Ubicación</th><th>RX (MHz)</th><th>TX (MHz)</th><th>Offset</th><th>Tono</th><th>Acceso</th></tr></thead>
+                    <tbody id="table-repeaters"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: PMR446 -->
+        <div id="tab-pmr" class="tab-content">
+            <h2 class="text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">Canales PMR446 Pro</h2>
+            <div class="card-tactical">
+                <div class="card-header bg-emerald-600"><i class="fas fa-walkie-talkie"></i> Uso Libre - NFM Modulación</div>
+                <table class="table-tactical text-left">
+                    <thead><tr><th>Canal</th><th>Frecuencia (MHz)</th><th>Modo</th><th>Potencia</th><th>Uso</th></tr></thead>
+                    <tbody id="table-pmr"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: EMERG & AIRE -->
+        <div id="tab-emerg" class="tab-content">
+            <h2 class="text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">Frecuencias Críticas</h2>
+            <div class="card-tactical mb-8">
+                <div class="card-header bg-rose-700"><i class="fas fa-life-ring"></i> Red de Emergencias & Auxilio</div>
+                <table class="table-tactical text-left">
+                    <thead><tr><th>Servicio</th><th>Frecuencia</th><th>Modo</th><th>Notas</th><th>TX</th></tr></thead>
+                    <tbody id="table-emerg"></tbody>
+                </table>
+            </div>
+            <div class="card-tactical">
+                <div class="card-header bg-slate-700"><i class="fas fa-plane"></i> Banda Aérea LEBB Loiu</div>
+                <table class="table-tactical text-left">
+                    <thead><tr><th>Servicio</th><th>Freq (MHz)</th><th>Modo</th><th>Función</th></tr></thead>
+                    <tbody id="table-air"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: FM -->
+        <div id="tab-fm" class="tab-content">
+            <h2 class="text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter text-indigo-900">FM Comercial Bizkaia (42 Estaciones)</h2>
+            <div class="card-tactical">
+                <div class="card-header bg-indigo-600"><i class="fas fa-radio"></i> Estaciones Local / Regional</div>
+                <table class="table-tactical text-left">
+                    <thead><tr><th>Emisora</th><th>Freq (MHz)</th><th>Zona</th><th>Señal Est.</th></tr></thead>
+                    <tbody id="table-fm"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: HARDWARE -->
+        <div id="tab-hardware" class="tab-content">
+            <h2 class="text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">Espectro Tidradio H8 Gen3</h2>
+            <div class="card-tactical">
+                <div class="card-header bg-black text-sky-400"><i class="fas fa-wave-square"></i> Capacidades del Hardware Unlocked</div>
+                <table class="table-tactical text-left">
+                    <thead><tr><th>Rango (MHz)</th><th>Servicio</th><th>Modo</th><th>Capacidad TX</th><th>Step</th></tr></thead>
+                    <tbody id="table-h8"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: SYNC -->
+        <div id="tab-sync" class="tab-content max-w-4xl mx-auto space-y-8">
+            <h2 class="text-3xl font-black italic uppercase text-center mb-4 text-slate-800 tracking-tighter">Data Hub & Cloud Sync</h2>
+            
+            <div class="bg-black text-green-500 p-4 rounded mono text-xs border-l-4 border-green-500 shadow-xl overflow-x-auto">
+                <div class="font-bold border-b border-green-900 pb-1 mb-2">DEBUG CONSOLE</div>
+                <div id="console-output" class="h-32">> Initializing...</div>
+            </div>
+
+            <!-- MANUAL CONFIG PANEL -->
+            <div class="card-tactical p-6 border-l-4 border-amber-500 bg-amber-50">
+                <div class="flex items-center gap-3 mb-4">
+                    <i class="fas fa-cogs text-amber-600 text-xl"></i>
+                    <h3 class="font-black uppercase text-amber-900">Configuración de Conexión</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-amber-800">Supabase Project URL</label>
+                        <input type="text" id="cfg-url" placeholder="https://svcakitmimdhltwcmadd.supabase.co" class="text-xs bg-white">
+                        <p class="text-[9px] text-amber-700 mt-1">Detectado ID: svcakitmimdhltwcmadd</p>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold uppercase text-amber-800">Supabase API Key</label>
+                        <input type="password" id="cfg-key" placeholder="sb_publishable..." class="text-xs bg-white">
+                        <p class="text-[9px] text-amber-700 mt-1">Usar clave proporcionada (Key)</p>
+                    </div>
+                    <div class="md:col-span-2 text-right">
+                        <button onclick="saveConfig()" class="bg-amber-600 text-white px-4 py-2 rounded text-xs font-black uppercase hover:bg-amber-700">Guardar y Conectar</button>
+                    </div>
                 </div>
             </div>
-        `).join('');
-    }
-    function editLog(id) {
-        const l = logs.find(x => x.id === id);
-        document.getElementById('editId').value = l.id;
-        document.getElementById('callsign').value = l.callsign;
-        document.getElementById('rst').value = l.rst;
-        document.getElementById('band').value = l.band;
-        document.getElementById('mode').value = l.mode;
-        document.getElementById('comment').value = l.comment;
-        document.getElementById('formContainer').classList.add('edit-mode');
-        document.getElementById('saveBtn').innerText = 'ACTUALIZAR';
-        document.getElementById('saveBtn').className = 'btn btn-warning w-100 fw-bold';
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    }
-    function cancelEdit() {
-        document.getElementById('editId').value = '';
-        document.getElementById('formContainer').classList.remove('edit-mode');
-        document.getElementById('saveBtn').innerText = 'REGISTRAR';
-        document.getElementById('saveBtn').className = 'btn btn-primary w-100 fw-bold';
-    }
-    function deleteLog(id) { if(confirm("¿Borrar?")) { logs = logs.filter(x => x.id !== id); localStorage.setItem('hamLogs', JSON.stringify(logs)); render(); } }
-    function exportJSON() { const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs)); a.download = "radio_logs_basauri.json"; a.click(); }
-    function importJSON(e) { const r = new FileReader(); r.onload = ev => { logs = JSON.parse(ev.target.result); localStorage.setItem('hamLogs', JSON.stringify(logs)); render(); }; r.readAsText(e.target.files[0]); }
-    render();
-</script>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card-tactical p-8 text-center space-y-4 border-2 border-transparent hover:border-sky-500 transition-all">
+                    <i class="fas fa-cloud-upload-alt text-sky-600 text-5xl"></i>
+                    <h3 class="text-xl font-black uppercase italic">Estado de Supabase</h3>
+                    <p id="cloud-status-text" class="text-[10px] text-slate-400 font-bold uppercase">Verificando conexión...</p>
+                    <button onclick="fetchLogs()" class="btn-primary w-full text-[10px]">Forzar Sincronización</button>
+                </div>
+                <div class="card-tactical p-8 text-center space-y-4 border-2 border-transparent hover:border-emerald-500 transition-all bg-slate-50">
+                    <i class="fas fa-file-csv text-emerald-600 text-5xl"></i>
+                    <h3 class="text-xl font-black uppercase italic">Export H8 CSV</h3>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase">Formato compatible con Tidradio Bluetooth App.</p>
+                    <button onclick="downloadCSV()" class="bg-emerald-600 text-white font-black py-4 rounded w-full text-[10px] uppercase shadow-lg">Descargar H8_ABS.csv</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function sysLog(msg, color = 'text-green-500') {
+            const out = document.getElementById('console-output');
+            if(out) {
+                out.innerHTML += `<br><span class="${color}">> ${new Date().toLocaleTimeString()}: ${msg}</span>`;
+                out.scrollTop = out.scrollHeight;
+            }
+        }
+
+        // --- SUPABASE CONFIG ---
+        // Configuración por defecto extraída de los datos proporcionados
+        const DEFAULT_URL = 'https://svcakitmimdhltwcmadd.supabase.co';
+        const DEFAULT_KEY = 'sb_publishable_uR_yVZpJ2wOkUD0bihyGBg_E__lJACJ';
+
+        let SB_URL = localStorage.getItem('sb_url') || DEFAULT_URL;
+        let SB_KEY = localStorage.getItem('sb_key') || DEFAULT_KEY;
+        
+        // Cargar en inputs
+        document.getElementById('cfg-url').value = SB_URL;
+        document.getElementById('cfg-key').value = SB_KEY;
+
+        let supabaseClient = null;
+
+        function saveConfig() {
+            const url = document.getElementById('cfg-url').value.trim();
+            const key = document.getElementById('cfg-key').value.trim();
+            if(!url || !key) return alert("URL y Key son obligatorias.");
+            
+            localStorage.setItem('sb_url', url);
+            localStorage.setItem('sb_key', key);
+            SB_URL = url;
+            SB_KEY = key;
+            
+            initSupabase();
+            fetchLogs();
+        }
+
+        function initSupabase() {
+            if(!SB_URL || !SB_KEY) {
+                sysLog("Faltan credenciales.", "text-amber-500");
+                updateStatus("Sin Configuración", "text-amber-500");
+                return;
+            }
+
+            try {
+                if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+                    supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
+                    sysLog(`Supabase init: ${SB_URL}`, "text-sky-400");
+                } else {
+                    sysLog("Error: SDK not loaded.", "text-rose-500");
+                }
+            } catch (e) {
+                sysLog("Init Error: " + e.message, "text-rose-500");
+            }
+        }
+
+        // --- GLOBALS & DATA ---
+        const REPEATERS = [
+            { id: 'R0', loc: 'GANEKOGORTA', rx: '145.600', tx: '145.000', off: '-0.600', t: '123.0' },
+            { id: 'R1', loc: 'SOLLUBE', rx: '145.625', tx: '145.025', off: '-0.600', t: 'NONE' },
+            { id: 'R2', loc: 'LA GARBEA', rx: '145.650', tx: '145.050', off: '-0.600', t: '123.0' },
+            { id: 'R3', loc: 'PAGASARRI', rx: '145.675', tx: '145.075', off: '-0.600', t: '82.5' },
+            { id: 'R4', loc: 'VALLE DE MENA', rx: '145.700', tx: '145.100', off: '-0.600', t: '123.0' },
+            { id: 'R6', loc: 'MONTE OIZ', rx: '145.750', tx: '145.150', off: '-0.600', t: '82.5' },
+            { id: 'R7', loc: 'KARRANTZA', rx: '145.775', tx: '145.175', off: '-0.600', t: '123.0' },
+            { id: 'U78', loc: 'PAGASARRI', rx: '438.850', tx: '431.250', off: '-7.600', t: '123.0' },
+            { id: 'U82', loc: 'GANEKOGORTA', rx: '438.950', tx: '431.350', off: '-7.600', t: '123.0' },
+            { id: 'U84', loc: 'OIZ UHF', rx: '439.000', tx: '431.400', off: '-7.600', t: '82.5' },
+            { id: 'ED2ZAA', loc: 'DMR BILBAO', rx: '438.225', tx: '430.625', off: '-7.600', t: 'CC 1' },
+            { id: 'ED2ZAB', loc: 'DMR SOLLUBE', rx: '438.525', tx: '430.925', off: '-7.600', t: 'CC 1' }
+        ];
+
+        const PMR_DATA = Array.from({length: 16}, (_, i) => {
+            const freqs = ['446.00625', '446.01875', '446.03125', '446.04375', '446.05625', '446.06875', '446.08125', '446.09375', '446.10625', '446.11875', '446.13125', '446.14375', '446.15625', '446.16875', '446.18125', '446.19375'];
+            return { c: i+1, f: freqs[i], m: 'NFM', p: i === 7 ? 'MID' : 'LOW', u: i === 7 ? 'EMERGENCIA' : 'Uso Libre' };
+        });
+
+        const EMERG_DATA = [
+            { s: 'Salvamento Marítimo', f: '156.800', m: 'FM', n: 'Canal 16 Náutico', tx: 'RX' },
+            { s: 'REM (Montaña)', f: '146.175', m: 'FM', n: 'Auxilio Montaña', tx: 'RX' },
+            { s: 'Prot. Civil Basauri', f: '152.325', m: 'FM', n: 'Coordinación Local', tx: 'RX' },
+            { s: 'Cruz Roja Euskadi', f: '164.300', m: 'FM', n: 'Operativos', tx: 'RX' },
+            { s: 'Emergencias Bizkaia', f: '146.500', m: 'FM', n: 'QAP Local', tx: 'RX' }
+        ];
+
+        const AIR_DATA = [
+            { s: 'LEBB Loiu APP', f: '120.700', m: 'AM', n: 'Aproximación' },
+            { s: 'LEBB Loiu Torre', f: '118.500', m: 'AM', n: 'Torre de Control' },
+            { s: 'LEBB Loiu Tierra', f: '121.700', m: 'AM', n: 'Rodadura' },
+            { s: 'LEBB Loiu ATIS', f: '127.350', m: 'AM', n: 'Info Meteorológica' },
+            { s: 'Euskadi Control', f: '132.050', m: 'AM', n: 'Centro Control Norte' }
+        ];
+
+        const FM_DATA = [
+            { e: 'Radio Nervión', f: '88.0', z: 'Bilbao', s: 'MAX' },
+            { e: 'Los 40 Classic', f: '88.5', z: 'Bilbao', s: 'ALTA' },
+            { e: 'Los 40 Bilbao', f: '89.5', z: 'Bilbao', s: 'ALTA' },
+            { e: 'Radio 3 RNE', f: '90.3', z: 'Bizkaia', s: 'ALTA' },
+            { e: 'Radio Euskadi', f: '91.7', z: 'Bizkaia', s: 'MAX' },
+            { e: 'Radio 7', f: '92.7', z: 'Barakaldo', s: 'ALTA' },
+            { e: 'Rock FM', f: '93.6', z: 'Bilbao', s: 'ALTA' },
+            { e: 'Kiss FM', f: '95.2', z: 'Bilbao', s: 'MEDIA' },
+            { e: 'Cadena SER', f: '96.5', z: 'Bilbao', s: 'ALTA' },
+            { e: 'Euskadi Gaztea', f: '97.2', z: 'Bizkaia', s: 'ALTA' },
+            { e: 'RNE 1', f: '99.2', z: 'Bizkaia', s: 'ALTA' },
+            { e: 'Cadena 100', f: '100.0', z: 'Bilbao', s: 'ALTA' },
+            { e: 'Onda Cero', f: '101.5', z: 'Bilbao', s: 'ALTA' },
+            { e: 'Bizkaia Irratia', f: '102.6', z: 'Durangaldea', s: 'MEDIA' },
+            { e: 'COPE Bilbao', f: '103.8', z: 'Bilbao', s: 'ALTA' },
+            { e: 'Melodia FM', f: '104.5', z: 'Bilbao', s: 'MEDIA' },
+            { e: 'Radio Maria', f: '105.8', z: 'Bilbao', s: 'BAJA' },
+            { e: 'Hit FM', f: '106.3', z: 'Bilbao', s: 'MEDIA' },
+            { e: 'Euskadi Irratia', f: '107.4', z: 'Bizkaia', s: 'ALTA' },
+            { e: 'Radio Gorbea', f: '93.1', z: 'Vitoria/Sur', s: 'BAJA' },
+            { e: 'Onda Vasca', f: '90.1', z: 'Bilbao', s: 'ALTA' },
+            { e: 'Europa FM', f: '98.4', z: 'Bilbao', s: 'ALTA' },
+            { e: 'Radio Tropical', f: '102.9', z: 'Bilbao', s: 'MEDIA' },
+            { e: 'Arratia Irratia', f: '104.9', z: 'Igorre', s: 'BAJA' },
+            { e: 'Radio Vitoria', f: '104.1', z: 'Álava/Sur', s: 'BAJA' },
+            { e: 'Radio Popular', f: '92.2', z: 'Bilbao', s: 'ALTA' },
+            { e: 'Kosta Irratia', f: '104.7', z: 'Bakio', s: 'BAJA' },
+            { e: 'Tas-Tas Irratia', f: '97.0', z: 'Bilbao', s: 'BAJA' },
+            { e: 'Irola Irratia', f: '107.5', z: 'Irala', s: 'BAJA' },
+            { e: '97 Irratia', f: '97.0', z: 'Bilbao', s: 'BAJA' },
+            { e: 'Radio Encartaciones', f: '101.9', z: 'Zalla', s: 'BAJA' },
+            { e: 'Bilbo Hiria', f: '96.0', z: 'Bilbao', s: 'BAJA' },
+            { e: 'Loca FM', f: '105.4', z: 'Bilbao', s: 'MEDIA' },
+            { e: 'Antena 3 RNE', f: '103.2', z: 'Bizkaia', s: 'ALTA' },
+            { e: 'Radio Marca', f: '103.4', z: 'Bilbao', s: 'MEDIA' },
+            { e: 'Radio 5 RNE', f: '100.7', z: 'Bizkaia', s: 'ALTA' },
+            { e: 'Hala Bedi', f: '107.4', z: 'Vitoria', s: 'BAJA' },
+            { e: 'Cadena Dial', f: '88.8', z: 'Bilbao', s: 'ALTA' },
+            { e: 'Radio Oro', f: '95.2', z: 'Bilbao', s: 'MEDIA' },
+            { e: 'Radio Candela', f: '98.0', z: 'Bilbao', s: 'BAJA' },
+            { e: 'Very Bilbao', f: '100.9', z: 'Bilbao', s: 'MEDIA' },
+            { e: 'Tropical FM', f: '102.2', z: 'Bilbao', s: 'BAJA' }
+        ];
+
+        const HARDWARE_PLAN = [
+            { r: '65 - 108', s: 'FM Broadcast', m: 'WFM', tx: 'SÓLO RX', st: '100k' },
+            { r: '108 - 136', s: 'Banda Aérea', m: 'AM', tx: 'SÓLO RX', st: '8.33k' },
+            { r: '136 - 174', s: 'VHF Amateur / Public', m: 'FM/NFM', tx: 'TX OK', st: '12.5k' },
+            { r: '174 - 350', s: 'VHF High / Military', m: 'FM/NFM', tx: 'UNLOCKED', st: '12.5k' },
+            { r: '350 - 400', s: 'Military UHF Low', m: 'FM/NFM', tx: 'UNLOCKED', st: '12.5k' },
+            { r: '400 - 470', s: 'UHF Amateur / PMR', m: 'FM/NFM', tx: 'TX OK', st: '5/12.5k' },
+            { r: '470 - 600', s: 'UHF Public S. / High', m: 'FM/NFM', tx: 'UNLOCKED', st: '12.5k' }
+        ];
+
+        // --- SYNC LOGIC ---
+        let logs = [];
+
+        function updateStatus(msg, color) {
+            const indicator = document.getElementById('sync-indicator');
+            const statusText = document.getElementById('cloud-status-text');
+            if(indicator) {
+                indicator.innerText = msg;
+                indicator.className = `mt-3 text-[8px] font-black px-2 py-1 rounded inline-block uppercase tracking-widest ${color.replace('text', 'bg').replace('400', '900')} ${color}`;
+            }
+            if(statusText) statusText.innerText = msg;
+        }
+
+        async function fetchLogs() {
+            if (!supabaseClient) {
+                initSupabase();
+                if(!supabaseClient) {
+                    // Si falla init, cargamos local y salimos
+                    logs = JSON.parse(localStorage.getItem('basauri_logs_backup')) || [];
+                    renderAll();
+                    return;
+                }
+            }
+
+            try {
+                sysLog("Fetching Cloud Data...");
+                const { data, error } = await supabaseClient
+                    .from('logs')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const localOnly = logs.filter(l => l.id && l.id.toString().startsWith('local_'));
+                logs = [...localOnly, ...(data || [])];
+                
+                localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
+                
+                updateStatus("Sync: Cloud Online", "text-emerald-400");
+                sysLog(`Success: ${data.length} logs from cloud.`, "text-emerald-400");
+                
+                renderAll();
+            } catch (err) {
+                console.error("Supabase Error:", err);
+                if(err.message === "Failed to fetch") {
+                    sysLog("Error de Red: URL Incorrecta", "text-rose-400");
+                    updateStatus("Error URL", "text-rose-400");
+                } else {
+                    sysLog("Fetch Error: " + err.message, "text-rose-400");
+                    updateStatus("Offline", "text-amber-400");
+                }
+                
+                logs = JSON.parse(localStorage.getItem('basauri_logs_backup')) || [];
+                renderAll();
+            }
+        }
+
+        async function saveToCloud(qso) {
+            if (!supabaseClient) return false;
+            try {
+                const { id, ...qsoData } = qso; 
+                const { data, error } = await supabaseClient.from('logs').insert([qsoData]).select();
+                if(error) throw error;
+                return data ? data[0] : true;
+            } catch (err) { 
+                sysLog("Save Error: " + err.message, "text-rose-400");
+                return false; 
+            }
+        }
+
+        async function deleteFromCloud(id) {
+            if (!supabaseClient) return false;
+            try {
+                const { error } = await supabaseClient.from('logs').delete().eq('id', id);
+                return !error;
+            } catch (err) { return false; }
+        }
+
+        // --- UI CORE ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function renderAll() {
+            const logCountEl = document.getElementById('log-count');
+            if (logCountEl) logCountEl.innerText = `${logs.length} QSO REGISTRADOS`;
+            
+            const container = document.getElementById('logs-container');
+            if (container) {
+                container.innerHTML = logs.length > 0 ? logs.map((l) => `
+                    <div class="card-tactical p-4 flex justify-between items-center border-l-4 border-l-sky-500 hover:shadow-lg transition-all">
+                        <div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl font-black italic mono tracking-tighter text-slate-900 uppercase">${l.callsign}</span>
+                                <span class="bg-sky-100 text-sky-700 text-[9px] font-black px-2 rounded uppercase">${l.band}</span>
+                                ${l.id && l.id.toString().startsWith('local_') ? '<span class="bg-amber-100 text-amber-700 text-[8px] font-black px-2 rounded uppercase">UNSYNCED</span>' : ''}
+                            </div>
+                            <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase italic">${l.date}</div>
+                            <div class="text-xs text-slate-600 mt-2 font-medium">${l.comment || '-'}</div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="text-center bg-slate-50 px-3 py-1 rounded border">
+                                <div class="text-[8px] font-black text-slate-300">SIGNAL</div>
+                                <div class="text-xl font-black text-blue-900 mono">${l.rst}</div>
+                            </div>
+                            <button onclick="handleDelete('${l.id}')" class="text-rose-600 hover:bg-rose-50 p-2 rounded transition-colors"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `).join('') : '<div class="p-10 text-center text-slate-300 font-bold uppercase italic text-sm">No hay contactos registrados</div>';
+            }
+
+            // Tablas Estáticas (Igual que antes...)
+            const tables = {
+                'table-repeaters': REPEATERS.map(r => `<tr><td class="font-bold">${r.id} ${r.loc}</td><td class="mono font-bold text-sky-600">${r.rx}</td><td class="mono text-slate-400">${r.tx}</td><td class="font-bold text-orange-600">${r.off}</td><td class="mono text-[10px] font-black">${r.t}</td><td><span class="badge-status status-tx">TX OK</span></td></tr>`).join(''),
+                'table-pmr': PMR_DATA.map(p => `<tr><td class="font-black">CH ${p.c}</td><td class="mono font-bold text-emerald-700">${p.f}</td><td class="text-[10px] font-bold text-slate-400">${p.m}</td><td class="font-black text-emerald-600 text-[10px]">${p.p}</td><td class="italic text-[11px] text-slate-500">${p.u}</td></tr>`).join(''),
+                'table-emerg': EMERG_DATA.map(e => `<tr><td class="font-bold text-slate-800 text-[11px]">${e.s}</td><td class="mono font-bold text-rose-600">${e.f}</td><td class="text-slate-400 font-bold text-[10px]">${e.m}</td><td class="text-[10px] text-slate-500">${e.n}</td><td><span class="badge-status status-rx">${e.tx} ONLY</span></td></tr>`).join(''),
+                'table-air': AIR_DATA.map(a => `<tr><td class="font-bold text-[11px] text-slate-700">${a.s}</td><td class="mono font-bold">${a.f}</td><td class="text-[10px] font-black">${a.m}</td><td class="italic text-[10px] text-slate-400">${a.n}</td></tr>`).join(''),
+                'table-fm': FM_DATA.map(f => `<tr><td class="font-bold text-slate-800">${f.e}</td><td class="mono font-bold text-indigo-700">${f.f}</td><td class="text-slate-400 text-[11px]">${f.z}</td><td class="text-[9px] font-black text-indigo-300 uppercase">${f.s}</td></tr>`).join(''),
+                'table-h8': HARDWARE_PLAN.map(h => `<tr class="hover:bg-slate-50"><td class="mono font-bold text-slate-900">${h.r}</td><td class="font-black text-sky-800 uppercase text-[10px]">${h.s}</td><td class="font-bold text-slate-400 text-[9px] uppercase">${h.m}</td><td><span class="badge-status ${h.tx === 'TX OK' ? 'status-tx' : (h.tx === 'UNLOCKED' ? 'status-unlocked' : 'status-rx')}">${h.tx}</span></td><td class="mono text-[10px] font-bold text-slate-400">${h.st}</td></tr>`).join('')
+            };
+
+            Object.entries(tables).forEach(([id, html]) => {
+                const el = document.getElementById(id);
+                if(el) el.innerHTML = html;
+            });
+        }
+
+        // --- HANDLERS ---
+        document.getElementById('qso-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.innerText = "Guardando...";
+
+            const qso = {
+                callsign: document.getElementById('callsign').value.toUpperCase(),
+                rst: document.getElementById('rst').value,
+                band: document.getElementById('band').value,
+                comment: document.getElementById('comment').value,
+                date: new Date().toLocaleString(),
+                created_at: new Date().toISOString()
+            };
+
+            // 1. Optimistic UI
+            const tempId = 'local_' + Date.now();
+            const localQso = { ...qso, id: tempId };
+            logs.unshift(localQso);
+            localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
+            renderAll();
+            
+            // 2. Try Background Sync (solo si hay cliente)
+            if(supabaseClient) {
+                const result = await saveToCloud(qso);
+                if(result) {
+                    const idx = logs.findIndex(l => l.id === tempId);
+                    if(idx !== -1) {
+                        logs[idx] = result;
+                        localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
+                        renderAll();
+                        sysLog(`QSO saved & synced. ID: ${result.id}`, "text-emerald-500");
+                    }
+                } else {
+                    sysLog("Guardado local. Falló Nube.", "text-amber-500");
+                }
+            } else {
+                sysLog("Guardado local (Modo Offline).", "text-amber-500");
+            }
+            
+            this.reset();
+            btn.disabled = false;
+            btn.innerText = "Grabar QSO";
+        };
+
+        async function handleDelete(id) {
+            if(!confirm("¿ELIMINAR CONTACTO?")) return;
+            
+            const backup = [...logs];
+            logs = logs.filter(l => l.id !== id);
+            localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
+            renderAll();
+
+            if(!id.startsWith('local_') && supabaseClient) {
+                const success = await deleteFromCloud(id);
+                if(!success) { 
+                    alert("Error al borrar en nube. Se revertirá la acción."); 
+                    logs = backup;
+                    localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
+                    renderAll();
+                }
+            }
+        }
+
+        document.getElementById('import-json').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            sysLog("Reading file...");
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    const list = Array.isArray(imported) ? imported : [imported];
+                    
+                    sysLog(`Importing ${list.length} records locally...`);
+                    
+                    let importedCount = 0;
+                    for(const item of list.reverse()) { 
+                        const qso = {
+                            callsign: (item.callsign || 'NOCALL').toUpperCase(),
+                            rst: item.rst || '59',
+                            band: item.band || 'Unknown',
+                            comment: item.comment || '',
+                            date: item.date || new Date().toLocaleString(),
+                            created_at: item.created_at || new Date().toISOString(),
+                            id: 'local_imp_' + Date.now() + Math.random().toString(36).substr(2, 9)
+                        };
+                        logs.unshift(qso);
+                        importedCount++;
+                    }
+                    
+                    localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
+                    renderAll();
+                    sysLog("Importación local finalizada.", "text-emerald-500");
+
+                    // Intentar sync solo si hay cliente configurado
+                    if(supabaseClient) {
+                         sysLog("Intentando subir a la nube en background...");
+                         let synced = 0;
+                         const toSync = logs.filter(l => l.id.toString().startsWith('local_imp_'));
+                         
+                         for(const l of toSync) {
+                             const result = await saveToCloud(l);
+                             if(result) {
+                                 const idx = logs.findIndex(x => x.id === l.id);
+                                 if(idx !== -1) logs[idx] = result;
+                                 synced++;
+                             }
+                         }
+                         
+                         if(synced > 0) {
+                             localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
+                             renderAll();
+                             sysLog(`Sync completada: ${synced}/${toSync.length} subidos.`, "text-emerald-500");
+                         }
+                    } else {
+                        alert("Importado SOLO localmente. Configura Supabase para sincronizar.");
+                    }
+
+                } catch (err) { 
+                    console.error(err);
+                    alert("Archivo JSON no válido."); 
+                } finally {
+                    event.target.value = '';
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function exportJSON() {
+            const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `basauri_logs_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+        }
+
+        function downloadCSV() {
+            const headers = "Location,Name,Frequency,Duplex,Offset,Tone,rToneFreq,cToneFreq,DtcsCode,DtcsPolarity,RxDtcsCode,CrossMode,Mode,TStep,Skip,Power,Comment,URCALL,RPT1CALL,RPT2CALL,DVCODE";
+            const rows = REPEATERS.map((r, i) => `${i+1},${r.id},${r.rx},-,${r.off.replace('-','')},Tone,${r.t === 'NONE' ? '88.5' : r.t},88.5,023,NN,023,Tone->Tone,FM,12.5,,High,,,,,`);
+            const blob = new Blob([[headers, ...rows].join('\n')], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'H8_BASAURI_SYNC.csv';
+            a.click();
+        }
+
+        window.onload = () => {
+            initSupabase();
+            fetchLogs();
+            renderAll();
+        };
+    </script>
 </body>
 </html>
