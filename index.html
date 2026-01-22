@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <link rel="manifest" href="./manifest.json">
     <meta charset="UTF-8">
@@ -8,69 +9,248 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700;800&display=swap"
+        rel="stylesheet">
     <style>
-        :root { --main-dark: #0f172a; --accent: #0ea5e9; --tx-ok: #10b981; --rx-only: #ef4444; }
-        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        @media (min-width: 768px) { body { flex-direction: row; } }
-        
-        .mono { font-family: 'JetBrains Mono', monospace; }
-        
+        :root {
+            --main-dark: #0f172a;
+            --accent: #0ea5e9;
+            --tx-ok: #10b981;
+            --rx-only: #ef4444;
+        }
+
+        body {
+            background-color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                flex-direction: row;
+            }
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
         /* Sidebar Transitions */
-        .sidebar { 
+        .sidebar {
             transition: transform 0.3s ease-in-out;
             z-index: 50;
         }
-        
+
         /* Mobile Overlay */
         #mobile-overlay {
             transition: opacity 0.3s ease-in-out;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(2px);
         }
 
-        .logo-area { padding: 30px; background: black; border-bottom: 1px solid #1e293b; }
-        
-        @keyframes radio-ping {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(2.2); opacity: 0; }
+        .logo-area {
+            padding: 30px;
+            background: black;
+            border-bottom: 1px solid #1e293b;
         }
+
+        @keyframes radio-ping {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(2.2);
+                opacity: 0;
+            }
+        }
+
         .radio-wave {
             transform-origin: 50% 30%;
             animation: radio-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
         }
-        .wave-2 { animation-delay: 0.6s; }
-        .wave-3 { animation-delay: 1.2s; }
-        
-        .nav-link { color: #64748b; padding: 15px 30px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; border: none; background: none; width: 100%; text-align: left; display: flex; align-items: center; gap: 12px; }
-        .nav-link:hover { color: white; background: #1e293b; }
-        .nav-link.active { color: white; background: var(--accent); }
 
-        main { flex: 1; overflow-y: auto; padding: 16px; scroll-behavior: smooth; position: relative; }
-        @media (min-width: 768px) { main { padding: 40px; } }
+        .wave-2 {
+            animation-delay: 0.6s;
+        }
 
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: slideUp 0.2s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .wave-3 {
+            animation-delay: 1.2s;
+        }
 
-        .card-tactical { background: white; border-radius: 4px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 2rem; overflow: hidden; }
-        .card-header { padding: 12px 20px; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; color: white; display: flex; align-items: center; gap: 10px; }
-        
-        .badge-status { padding: 2px 8px; border-radius: 3px; font-weight: 900; font-size: 0.65rem; border: 1px solid; text-transform: uppercase; white-space: nowrap; }
-        .status-tx { border-color: var(--tx-ok); color: var(--tx-ok); background: #f0fdf4; }
-        .status-rx { border-color: var(--rx-only); color: var(--rx-only); background: #fef2f2; }
-        .status-unlocked { border-color: #8b5cf6; color: #8b5cf6; background: #f5f3ff; }
+        .nav-link {
+            color: #64748b;
+            padding: 15px 30px;
+            font-weight: 800;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-        input, select, textarea { width: 100%; padding: 12px 15px; border: 2px solid #e2e8f0; border-radius: 4px; font-weight: 700; outline: none; transition: 0.2s; font-size: 0.85rem; }
-        input:focus { border-color: var(--accent); }
-        .btn-primary { background: var(--accent); color: white; font-weight: 900; text-transform: uppercase; padding: 12px; border-radius: 4px; cursor: pointer; transition: 0.2s; }
-        .btn-primary:hover { filter: brightness(1.1); }
-        
-        .table-tactical { width: 100%; font-size: 0.8rem; border-collapse: collapse; }
-        .table-tactical thead th { background: #f1f5f9; padding: 12px 20px; color: #475569; font-weight: 900; text-transform: uppercase; font-size: 0.65rem; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
-        .table-tactical td { padding: 12px 20px; border-bottom: 1px solid #f1f5f9; color: #1e293b; white-space: nowrap; }
+        .nav-link:hover {
+            color: white;
+            background: #1e293b;
+        }
+
+        .nav-link.active {
+            color: white;
+            background: var(--accent);
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            scroll-behavior: smooth;
+            position: relative;
+        }
+
+        @media (min-width: 768px) {
+            main {
+                padding: 40px;
+            }
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: slideUp 0.2s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-tactical {
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 12px 20px;
+            font-weight: 900;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge-status {
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: 900;
+            font-size: 0.65rem;
+            border: 1px solid;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .status-tx {
+            border-color: var(--tx-ok);
+            color: var(--tx-ok);
+            background: #f0fdf4;
+        }
+
+        .status-rx {
+            border-color: var(--rx-only);
+            color: var(--rx-only);
+            background: #fef2f2;
+        }
+
+        .status-unlocked {
+            border-color: #8b5cf6;
+            color: #8b5cf6;
+            background: #f5f3ff;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 4px;
+            font-weight: 700;
+            outline: none;
+            transition: 0.2s;
+            font-size: 0.85rem;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            font-weight: 900;
+            text-transform: uppercase;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .table-tactical {
+            width: 100%;
+            font-size: 0.8rem;
+            border-collapse: collapse;
+        }
+
+        .table-tactical thead th {
+            background: #f1f5f9;
+            padding: 12px 20px;
+            color: #475569;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .table-tactical td {
+            padding: 12px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
+            white-space: nowrap;
+        }
     </style>
-<script type="importmap">
+    <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@^19.2.3",
@@ -79,7 +259,26 @@
 }
 </script>
 </head>
+
 <body>
+
+    <!-- SECURITY OVERLAY -->
+    <div id="login-overlay"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/95 backdrop-blur-sm transition-all duration-500">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center border-b-4 border-sky-500">
+            <h2 class="text-2xl font-black text-slate-800 mb-2 uppercase italic tracking-tighter">Acceso Restringido
+            </h2>
+            <div class="w-12 h-1 bg-sky-500 mx-auto mb-6"></div>
+            <p class="text-slate-500 mb-6 text-xs font-bold uppercase tracking-widest">Autenticación Requerida</p>
+            <input type="password" id="login-pass"
+                class="w-full p-3 border-2 border-slate-200 rounded-lg mb-4 font-black text-center text-slate-800 focus:border-sky-500 outline-none text-xl tracking-widest"
+                placeholder="••••" onkeyup="if(event.key === 'Enter') doLogin()">
+            <button onclick="doLogin()"
+                class="w-full bg-slate-800 text-white font-black py-4 rounded-lg hover:bg-slate-700 transition transform active:scale-95 uppercase tracking-wide text-sm shadow-xl">Desbloquear
+                Terminal</button>
+            <p id="login-msg" class="text-rose-500 text-xs font-black mt-4 h-4 uppercase tracking-wide"></p>
+        </div>
+    </div>
 
     <!-- MOBILE HEADER -->
     <div class="md:hidden flex justify-between items-center p-4 bg-slate-900 text-white z-40 shadow-md">
@@ -96,8 +295,9 @@
     <div id="mobile-overlay" onclick="toggleMenu()" class="fixed inset-0 z-40 hidden md:hidden"></div>
 
     <!-- SIDEBAR -->
-    <aside id="sidebar" class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 md:static md:flex flex-col w-72 bg-[#0f172a] text-white border-r-4 border-sky-500 overflow-y-auto">
-        
+    <aside id="sidebar"
+        class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 md:static md:flex flex-col w-72 bg-[#0f172a] text-white border-r-4 border-sky-500 overflow-y-auto">
+
         <div class="logo-area flex flex-col items-start relative">
             <!-- Mobile Close Button -->
             <button onclick="toggleMenu()" class="md:hidden absolute top-4 right-4 text-slate-500 hover:text-white">
@@ -105,35 +305,49 @@
             </button>
 
             <div class="relative w-16 h-16 mb-2">
-                
+
                 <svg viewBox="0 0 100 100" class="w-full h-full text-sky-500 overflow-visible">
-                    <circle cx="50" cy="30" r="8" class="radio-wave" fill="none" stroke="currentColor" stroke-width="2"/>
-                    <circle cx="50" cy="30" r="8" class="radio-wave wave-2" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                    <circle cx="50" cy="30" r="8" class="radio-wave wave-3" fill="none" stroke="currentColor" stroke-width="1"/>
-                    <path d="M50 30 L50 85" stroke="white" stroke-width="4" stroke-linecap="round"/>
-                    <path d="M35 50 L50 45 L65 50" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M40 65 L50 60 L60 65" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                    <rect x="30" y="80" width="40" height="12" rx="2" fill="currentColor"/>
-                    <circle cx="50" cy="30" r="4" fill="white"/>
+                    <circle cx="50" cy="30" r="8" class="radio-wave" fill="none" stroke="currentColor"
+                        stroke-width="2" />
+                    <circle cx="50" cy="30" r="8" class="radio-wave wave-2" fill="none" stroke="currentColor"
+                        stroke-width="1.5" />
+                    <circle cx="50" cy="30" r="8" class="radio-wave wave-3" fill="none" stroke="currentColor"
+                        stroke-width="1" />
+                    <path d="M50 30 L50 85" stroke="white" stroke-width="4" stroke-linecap="round" />
+                    <path d="M35 50 L50 45 L65 50" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" />
+                    <path d="M40 65 L50 60 L60 65" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" />
+                    <rect x="30" y="80" width="40" height="12" rx="2" fill="currentColor" />
+                    <circle cx="50" cy="30" r="4" fill="white" />
                 </svg>
-                
+
             </div>
-            <h1 class="text-xl font-black tracking-tighter italic uppercase">RADIOLOG <span class="text-sky-500">PRO</span> <span class="text-xl font-black 100">v1.1</span></h1>
+            <h1 class="text-xl font-black tracking-tighter italic uppercase">RADIOLOG <span
+                    class="text-sky-500">PRO</span> <span class="text-xl font-black 100">v1.1</span></h1>
             <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">by Kepa iNKuBo</p>
-            <div id="sync-indicator" class="mt-3 text-[8px] font-black bg-slate-800 px-2 py-1 rounded text-slate-400 inline-block uppercase tracking-widest transition-colors">Sync: Initializing</div>
+            <div id="sync-indicator"
+                class="mt-3 text-[8px] font-black bg-slate-800 px-2 py-1 rounded text-slate-400 inline-block uppercase tracking-widest transition-colors">
+                Sync: Initializing</div>
         </div>
-        
+
         <nav class="mt-4 flex-1">
-            <button onclick="switchTab('logbook')" id="btn-logbook" class="nav-link active"><i class="fas fa-terminal w-6"></i> Logbook</button>
-            <button onclick="switchTab('repeaters')" id="btn-repeaters" class="nav-link"><i class="fas fa-tower-broadcast w-6"></i> Repetidores Bizkaia</button>
-            <button onclick="switchTab('pmr')" id="btn-pmr" class="nav-link"><i class="fas fa-walkie-talkie w-6"></i> Canales PMR446</button>
-            <button onclick="switchTab('emerg')" id="btn-emerg" class="nav-link"><i class="fas fa-life-ring w-6"></i> Emergencias & Aire</button>
-            <button onclick="switchTab('fm')" id="btn-fm" class="nav-link"><i class="fas fa-radio w-6"></i> FM Comercial</button>
-            <button onclick="switchTab('hardware')" id="btn-hardware" class="nav-link"><i class="fas fa-microchip w-6"></i> Espectro Hardware</button>
-            <button onclick="switchTab('sync')" id="btn-sync" class="nav-link"><i class="fas fa-sync w-6"></i> Sincronización</button>
+            <button onclick="switchTab('logbook')" id="btn-logbook" class="nav-link active"><i
+                    class="fas fa-terminal w-6"></i> Logbook</button>
+            <button onclick="switchTab('repeaters')" id="btn-repeaters" class="nav-link"><i
+                    class="fas fa-tower-broadcast w-6"></i> Repetidores Bizkaia</button>
+            <button onclick="switchTab('pmr')" id="btn-pmr" class="nav-link"><i class="fas fa-walkie-talkie w-6"></i>
+                Canales PMR446</button>
+            <button onclick="switchTab('emerg')" id="btn-emerg" class="nav-link"><i class="fas fa-life-ring w-6"></i>
+                Emergencias & Aire</button>
+            <button onclick="switchTab('fm')" id="btn-fm" class="nav-link"><i class="fas fa-radio w-6"></i> FM
+                Comercial</button>
+            <button onclick="switchTab('hardware')" id="btn-hardware" class="nav-link"><i
+                    class="fas fa-microchip w-6"></i> Espectro Hardware</button>
+            <button onclick="switchTab('sync')" id="btn-sync" class="nav-link"><i class="fas fa-sync w-6"></i>
+                Sincronización</button>
         </nav>
-        
-        <div class="p-4 text-[9px] font-bold text-slate-600 border-t border-slate-800 text-center uppercase tracking-tighter pb-8 md:pb-4">
+
+        <div
+            class="p-4 text-[9px] font-bold text-slate-600 border-t border-slate-800 text-center uppercase tracking-tighter pb-8 md:pb-4">
             Hardware Status: 65-600 MHz Absolute
         </div>
     </aside>
@@ -143,18 +357,24 @@
         <div id="tab-logbook" class="tab-content active">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-black italic uppercase text-slate-800 tracking-tighter text-blue-900">Terminal Logbook</h2>
+                    <h2
+                        class="text-2xl md:text-3xl font-black italic uppercase text-slate-800 tracking-tighter text-blue-900">
+                        Terminal Logbook</h2>
                     <div class="flex gap-2 mt-2">
-                        <label class="text-[9px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-black px-3 py-2 rounded uppercase transition-colors cursor-pointer inline-flex items-center">
+                        <label
+                            class="text-[9px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-black px-3 py-2 rounded uppercase transition-colors cursor-pointer inline-flex items-center">
                             <i class="fas fa-file-import mr-1"></i> Importar JSON
                             <input type="file" id="import-json" class="hidden" accept=".json">
                         </label>
-                        <button onclick="exportJSON()" class="text-[9px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-black px-3 py-2 rounded uppercase transition-colors"><i class="fas fa-file-export mr-1"></i> Exportar JSON</button>
+                        <button onclick="exportJSON()"
+                            class="text-[9px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-black px-3 py-2 rounded uppercase transition-colors"><i
+                                class="fas fa-file-export mr-1"></i> Exportar JSON</button>
                     </div>
                 </div>
-                <span id="log-count" class="bg-slate-800 text-white px-3 py-1 rounded text-[10px] font-black uppercase w-full md:w-auto text-center">Cargando...</span>
+                <span id="log-count"
+                    class="bg-slate-800 text-white px-3 py-1 rounded text-[10px] font-black uppercase w-full md:w-auto text-center">Cargando...</span>
             </div>
-            
+
             <div class="card-tactical p-4 md:p-6 border-l-[10px] border-l-sky-500 transition-colors" id="form-card">
                 <form id="qso-form" class="grid grid-cols-1 md:grid-cols-12 gap-4">
                     <div class="md:col-span-4">
@@ -163,34 +383,41 @@
                     </div>
                     <div class="grid grid-cols-2 gap-4 md:col-span-2">
                         <div>
-                           <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Reporte (RST)</label>
-                           <input type="text" id="rst" value="59" class="mono text-center">
+                            <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Reporte
+                                (RST)</label>
+                            <input type="text" id="rst" value="59" class="mono text-center">
                         </div>
                     </div>
                     <div class="md:col-span-3">
                         <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Banda / Modo</label>
                         <select id="band">
                             <option>2m VHF (FM)</option>
-                            <option>70cm UHF (FM)</option>                                               
+                            <option>70cm UHF (FM)</option>
                             <option>HF / DX</option>
                         </select>
                     </div>
                     <div class="md:col-span-3 flex items-end gap-2">
-                        <button type="submit" id="submit-btn" class="btn-primary w-full shadow-lg shadow-sky-200 disabled:opacity-50">Nuevo QRZ</button>
-                        <button type="button" id="cancel-edit-btn" onclick="cancelEdit()" class="hidden bg-slate-300 text-slate-600 px-3 rounded font-bold hover:bg-slate-400"><i class="fas fa-times"></i></button>
+                        <button type="submit" id="submit-btn"
+                            class="btn-primary w-full shadow-lg shadow-sky-200 disabled:opacity-50">Nuevo QRZ</button>
+                        <button type="button" id="cancel-edit-btn" onclick="cancelEdit()"
+                            class="hidden bg-slate-300 text-slate-600 px-3 rounded font-bold hover:bg-slate-400"><i
+                                class="fas fa-times"></i></button>
                     </div>
                     <div class="md:col-span-12">
-                        <textarea id="comment" rows="2" placeholder="Ubicación, Notas del corresponsal, Meteo..."></textarea>
+                        <textarea id="comment" rows="2"
+                            placeholder="Ubicación, Notas del corresponsal, Meteo..."></textarea>
                     </div>
                 </form>
             </div>
-            
+
             <!-- SEARCH BAR -->
             <div class="mb-6 relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fas fa-search text-slate-400"></i>
                 </div>
-                <input type="text" id="search-input" onkeyup="renderAll()" placeholder="Filtrar por Indicativo o Fecha..." class="w-full pl-10 p-3 rounded-lg border-2 border-slate-200 bg-white font-bold text-slate-700 uppercase focus:border-sky-500 focus:outline-none transition-all shadow-sm">
+                <input type="text" id="search-input" onkeyup="renderAll()"
+                    placeholder="Filtrar por Indicativo o Fecha..."
+                    class="w-full pl-10 p-3 rounded-lg border-2 border-slate-200 bg-white font-bold text-slate-700 uppercase focus:border-sky-500 focus:outline-none transition-all shadow-sm">
             </div>
 
             <div id="logs-container" class="space-y-4"></div>
@@ -198,12 +425,22 @@
 
         <!-- TAB: REPETIDORES -->
         <div id="tab-repeaters" class="tab-content">
-            <h2 class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">Repetidores Analógicos Bizkaia</h2>
+            <h2 class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">
+                Repetidores Analógicos Bizkaia</h2>
             <div class="card-tactical">
                 <div class="card-header bg-sky-700"><i class="fas fa-mountain"></i> Infraestructura de Red Local</div>
                 <div class="overflow-x-auto">
                     <table class="table-tactical text-left">
-                        <thead><tr><th>ID / Ubicación</th><th>RX (MHz)</th><th>TX (MHz)</th><th>Offset</th><th>Tono</th><th>Acceso</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>ID / Ubicación</th>
+                                <th>RX (MHz)</th>
+                                <th>TX (MHz)</th>
+                                <th>Offset</th>
+                                <th>Tono</th>
+                                <th>Acceso</th>
+                            </tr>
+                        </thead>
                         <tbody id="table-repeaters"></tbody>
                     </table>
                 </div>
@@ -212,12 +449,22 @@
 
         <!-- TAB: PMR446 -->
         <div id="tab-pmr" class="tab-content">
-            <h2 class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">Canales PMR446 Pro</h2>
+            <h2 class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">Canales
+                PMR446 Pro</h2>
             <div class="card-tactical">
-                <div class="card-header bg-emerald-600"><i class="fas fa-walkie-talkie"></i> Uso Libre - NFM Modulación</div>
+                <div class="card-header bg-emerald-600"><i class="fas fa-walkie-talkie"></i> Uso Libre - NFM Modulación
+                </div>
                 <div class="overflow-x-auto">
                     <table class="table-tactical text-left">
-                        <thead><tr><th>Canal</th><th>Frecuencia (MHz)</th><th>Modo</th><th>Potencia</th><th>Uso</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Canal</th>
+                                <th>Frecuencia (MHz)</th>
+                                <th>Modo</th>
+                                <th>Potencia</th>
+                                <th>Uso</th>
+                            </tr>
+                        </thead>
                         <tbody id="table-pmr"></tbody>
                     </table>
                 </div>
@@ -226,12 +473,21 @@
 
         <!-- TAB: EMERG & AIRE -->
         <div id="tab-emerg" class="tab-content">
-            <h2 class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">Frecuencias Críticas</h2>
+            <h2 class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">
+                Frecuencias Críticas</h2>
             <div class="card-tactical mb-8">
                 <div class="card-header bg-rose-700"><i class="fas fa-life-ring"></i> Red de Emergencias & Auxilio</div>
                 <div class="overflow-x-auto">
                     <table class="table-tactical text-left">
-                        <thead><tr><th>Servicio</th><th>Frecuencia</th><th>Modo</th><th>Notas</th><th>TX</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Servicio</th>
+                                <th>Frecuencia</th>
+                                <th>Modo</th>
+                                <th>Notas</th>
+                                <th>TX</th>
+                            </tr>
+                        </thead>
                         <tbody id="table-emerg"></tbody>
                     </table>
                 </div>
@@ -240,7 +496,14 @@
                 <div class="card-header bg-slate-700"><i class="fas fa-plane"></i> Banda Aérea LEBB Loiu</div>
                 <div class="overflow-x-auto">
                     <table class="table-tactical text-left">
-                        <thead><tr><th>Servicio</th><th>Freq (MHz)</th><th>Modo</th><th>Función</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Servicio</th>
+                                <th>Freq (MHz)</th>
+                                <th>Modo</th>
+                                <th>Función</th>
+                            </tr>
+                        </thead>
                         <tbody id="table-air"></tbody>
                     </table>
                 </div>
@@ -249,12 +512,21 @@
 
         <!-- TAB: FM -->
         <div id="tab-fm" class="tab-content">
-            <h2 class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter text-indigo-900">FM Comercial Bizkaia (42 Estaciones)</h2>
+            <h2
+                class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter text-indigo-900">
+                FM Comercial Bizkaia (42 Estaciones)</h2>
             <div class="card-tactical">
                 <div class="card-header bg-indigo-600"><i class="fas fa-radio"></i> Estaciones Local / Regional</div>
                 <div class="overflow-x-auto">
                     <table class="table-tactical text-left">
-                        <thead><tr><th>Emisora</th><th>Freq (MHz)</th><th>Zona</th><th>Señal Est.</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Emisora</th>
+                                <th>Freq (MHz)</th>
+                                <th>Zona</th>
+                                <th>Señal Est.</th>
+                            </tr>
+                        </thead>
                         <tbody id="table-fm"></tbody>
                     </table>
                 </div>
@@ -263,12 +535,22 @@
 
         <!-- TAB: HARDWARE -->
         <div id="tab-hardware" class="tab-content">
-            <h2 class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">Espectro Tidradio H8 Gen3</h2>
+            <h2 class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">Espectro
+                Tidradio H8 Gen3</h2>
             <div class="card-tactical">
-                <div class="card-header bg-black text-sky-400"><i class="fas fa-wave-square"></i> IARU Región 1 (Basauri Local)</div>
+                <div class="card-header bg-black text-sky-400"><i class="fas fa-wave-square"></i> IARU Región 1 (Basauri
+                    Local)</div>
                 <div class="overflow-x-auto">
                     <table class="table-tactical text-left">
-                        <thead><tr><th>Rango (MHz)</th><th>Sub-Banda</th><th>Uso Exclusivo / Notas</th><th>Modo</th><th>TX</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Rango (MHz)</th>
+                                <th>Sub-Banda</th>
+                                <th>Uso Exclusivo / Notas</th>
+                                <th>Modo</th>
+                                <th>TX</th>
+                            </tr>
+                        </thead>
                         <tbody id="table-h8"></tbody>
                     </table>
                 </div>
@@ -277,9 +559,12 @@
 
         <!-- TAB: SYNC -->
         <div id="tab-sync" class="tab-content max-w-4xl mx-auto space-y-8">
-            <h2 class="text-2xl md:text-3xl font-black italic uppercase text-center mb-4 text-slate-800 tracking-tighter">Data Hub & Cloud Sync</h2>
-            
-            <div class="bg-black text-green-500 p-4 rounded mono text-xs border-l-4 border-green-500 shadow-xl overflow-x-auto">
+            <h2
+                class="text-2xl md:text-3xl font-black italic uppercase text-center mb-4 text-slate-800 tracking-tighter">
+                Data Hub & Cloud Sync</h2>
+
+            <div
+                class="bg-black text-green-500 p-4 rounded mono text-xs border-l-4 border-green-500 shadow-xl overflow-x-auto">
                 <div class="font-bold border-b border-green-900 pb-1 mb-2">DEBUG CONSOLE</div>
                 <div id="console-output" class="h-32">> Initializing...</div>
             </div>
@@ -293,7 +578,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="text-[10px] font-bold uppercase text-amber-800">Supabase Project URL</label>
-                        <input type="text" id="cfg-url" placeholder="https://svcakitmimdhltwcmadd.supabase.co" class="text-xs bg-white">
+                        <input type="text" id="cfg-url" placeholder="https://svcakitmimdhltwcmadd.supabase.co"
+                            class="text-xs bg-white">
                         <p class="text-[9px] text-amber-700 mt-1">Detectado ID: svcakitmimdhltwcmadd</p>
                     </div>
                     <div>
@@ -302,23 +588,31 @@
                         <p class="text-[9px] text-amber-700 mt-1">Usar clave proporcionada (Key)</p>
                     </div>
                     <div class="md:col-span-2 text-right">
-                        <button onclick="saveConfig()" class="bg-amber-600 text-white px-4 py-2 rounded text-xs font-black uppercase hover:bg-amber-700">Guardar y Conectar</button>
+                        <button onclick="saveConfig()"
+                            class="bg-amber-600 text-white px-4 py-2 rounded text-xs font-black uppercase hover:bg-amber-700">Guardar
+                            y Conectar</button>
                     </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="card-tactical p-8 text-center space-y-4 border-2 border-transparent hover:border-sky-500 transition-all">
+                <div
+                    class="card-tactical p-8 text-center space-y-4 border-2 border-transparent hover:border-sky-500 transition-all">
                     <i class="fas fa-cloud-upload-alt text-sky-600 text-5xl"></i>
                     <h3 class="text-xl font-black uppercase italic">Estado de Supabase</h3>
-                    <p id="cloud-status-text" class="text-[10px] text-slate-400 font-bold uppercase">Verificando conexión...</p>
+                    <p id="cloud-status-text" class="text-[10px] text-slate-400 font-bold uppercase">Verificando
+                        conexión...</p>
                     <button onclick="fetchLogs()" class="btn-primary w-full text-[10px]">Forzar Sincronización</button>
                 </div>
-                <div class="card-tactical p-8 text-center space-y-4 border-2 border-transparent hover:border-emerald-500 transition-all bg-slate-50">
+                <div
+                    class="card-tactical p-8 text-center space-y-4 border-2 border-transparent hover:border-emerald-500 transition-all bg-slate-50">
                     <i class="fas fa-file-csv text-emerald-600 text-5xl"></i>
                     <h3 class="text-xl font-black uppercase italic">Export H8 CSV</h3>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase">Base de Datos Completa (Repetidores + PMR + Aire + FM)</p>
-                    <button onclick="downloadCSV()" class="bg-emerald-600 text-white font-black py-4 rounded w-full text-[10px] uppercase shadow-lg">Descargar MASTER_H8.csv</button>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase">Base de Datos Completa (Repetidores + PMR
+                        + Aire + FM)</p>
+                    <button onclick="downloadCSV()"
+                        class="bg-emerald-600 text-white font-black py-4 rounded w-full text-[10px] uppercase shadow-lg">Descargar
+                        MASTER_H8.csv</button>
                 </div>
             </div>
         </div>
@@ -328,7 +622,7 @@
         function toggleMenu() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobile-overlay');
-            
+
             if (sidebar.classList.contains('-translate-x-full')) {
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
@@ -340,7 +634,7 @@
 
         function sysLog(msg, color = 'text-green-500') {
             const out = document.getElementById('console-output');
-            if(out) {
+            if (out) {
                 out.innerHTML += `<br><span class="${color}">> ${new Date().toLocaleTimeString()}: ${msg}</span>`;
                 out.scrollTop = out.scrollHeight;
             }
@@ -352,7 +646,7 @@
 
         let SB_URL = localStorage.getItem('sb_url') || DEFAULT_URL;
         let SB_KEY = localStorage.getItem('sb_key') || DEFAULT_KEY;
-        
+
         document.getElementById('cfg-url').value = SB_URL;
         document.getElementById('cfg-key').value = SB_KEY;
 
@@ -361,19 +655,19 @@
         function saveConfig() {
             const url = document.getElementById('cfg-url').value.trim();
             const key = document.getElementById('cfg-key').value.trim();
-            if(!url || !key) return alert("URL y Key son obligatorias.");
-            
+            if (!url || !key) return alert("URL y Key son obligatorias.");
+
             localStorage.setItem('sb_url', url);
             localStorage.setItem('sb_key', key);
             SB_URL = url;
             SB_KEY = key;
-            
+
             initSupabase();
             fetchLogs();
         }
 
         function initSupabase() {
-            if(!SB_URL || !SB_KEY) {
+            if (!SB_URL || !SB_KEY) {
                 sysLog("Faltan credenciales.", "text-amber-500");
                 updateStatus("Sin Configuración", "text-amber-500");
                 return;
@@ -407,59 +701,59 @@
             { id: 'ED2ZAB', loc: 'DMR SOLLUBE', rx: '438.525', tx: '430.925', off: '-7.600', t: 'CC 1' }
         ];
 
-        const PMR_DATA = Array.from({length: 16}, (_, i) => {
+        const PMR_DATA = Array.from({ length: 16 }, (_, i) => {
             const freqs = ['446.00625', '446.01875', '446.03125', '446.04375', '446.05625', '446.06875', '446.08125', '446.09375', '446.10625', '446.11875', '446.13125', '446.14375', '446.15625', '446.16875', '446.18125', '446.19375'];
-            return { c: i+1, f: freqs[i], m: 'NFM', p: i === 7 ? 'MID' : 'LOW', u: i === 7 ? 'EMERGENCIA' : 'Uso Libre' };
+            return { c: i + 1, f: freqs[i], m: 'NFM', p: i === 7 ? 'MID' : 'LOW', u: i === 7 ? 'EMERGENCIA' : 'Uso Libre' };
         });
 
-       const EMERG_DATA = [
-    // ==================== RED DE EMERGENCIAS & AUXILIO ====================
+        const EMERG_DATA = [
+            // ==================== RED DE EMERGENCIAS & AUXILIO ====================
             { s: 'Salvamento Marítimo', f: '156.800', m: 'FM', n: 'Canal 16 Náutico Internacional', tx: 'RX ONLY' },
             { s: 'REM (Montaña)', f: '146.175', m: 'FM', n: 'Red Emergencia Montaña - Auxilio', tx: 'RX ONLY' },
             { s: 'Prot. Civil Basauri', f: '152.325', m: 'FM', n: 'Coordinación Local Protección Civil', tx: 'RX ONLY' },
             { s: 'Cruz Roja Euskadi', f: '164.308', m: 'FM', n: 'Operativos Cruz Roja', tx: 'RX ONLY' },
             { s: 'Emergencias Bizkaia', f: '146.508', m: 'FM', n: 'QAP Local - Coordinación Emergencias', tx: 'RX ONLY' },
 
-    // ==================== BOMBEROS Y SERVICIOS DE RESCATE ====================
+            // ==================== BOMBEROS Y SERVICIOS DE RESCATE ====================
             { s: 'Bomberos Bizkaia', f: '169.5125', m: 'FM', n: 'Consorcio Bomberos - Operativa Principal', tx: 'RX ONLY' },
             { s: 'Bomberos Bizkaia', f: '169.7625', m: 'FM', n: 'Consorcio Bomberos - Coordinación', tx: 'RX ONLY' },
             { s: 'DYA Euskadi', f: '144.800', m: 'FM', n: 'Asistencia Sanitaria Voluntaria', tx: 'RX ONLY' },
             { s: 'DYA Euskadi', f: '146.200', m: 'FM', n: 'Emergencias DYA', tx: 'RX ONLY' },
 
-    // ==================== SERVICIOS MÉDICOS Y URGENCIAS ====================
+            // ==================== SERVICIOS MÉDICOS Y URGENCIAS ====================
             { s: 'Osakidetza Ambulancias', f: '164.0625', m: 'FM', n: 'Coordinación ambulancias', tx: 'RX ONLY' },
             { s: 'Osakidetza Soporte Avanzado', f: '164.2875', m: 'FM', n: 'Emergencias sanitarias', tx: 'RX ONLY' },
             { s: 'SAMUR País Vasco', f: '155.275', m: 'FM', n: 'Emergencia sanitaria móvil', tx: 'RX ONLY' },
 
-    // ==================== SERVICIOS MARÍTIMOS Y PORTUARIOS ====================
+            // ==================== SERVICIOS MARÍTIMOS Y PORTUARIOS ====================
             { s: 'Puerto de Bilbao', f: '156.600', m: 'FM', n: 'Canal 12 - Operaciones portuarias', tx: 'RX ONLY' },
             { s: 'Puerto de Bilbao', f: '156.700', m: 'FM', n: 'Canal 14 - Control tráfico portuario', tx: 'RX ONLY' },
             { s: 'Puerto de Bilbao', f: '156.450', m: 'FM', n: 'Canal 9 - Comunicaciones internas', tx: 'RX ONLY' },
             { s: 'Capitán Marítima Bilbao', f: '157.850', m: 'FM', n: 'Canal 27 - Coordinación marítima', tx: 'RX ONLY' },
 
-    // ==================== TRANSPORTE PÚBLICO ====================
+            // ==================== TRANSPORTE PÚBLICO ====================
             { s: 'Metro de Bilbao', f: '160.050', m: 'FM', n: 'Comunicaciones trenes/control', tx: 'RX ONLY' },
             { s: 'Metro de Bilbao', f: '161.300', m: 'FM', n: 'Seguridad y mantenimiento', tx: 'RX ONLY' },
             { s: 'EuskoTren', f: '161.625', m: 'FM', n: 'Operaciones ferroviarias', tx: 'RX ONLY' },
             { s: 'Bilbobus', f: '169.2125', m: 'FM', n: 'Coordinación flota transporte urbano', tx: 'RX ONLY' },
 
-    // ==================== PROTECCIÓN CIVIL MUNICIPAL ====================
+            // ==================== PROTECCIÓN CIVIL MUNICIPAL ====================
             { s: 'Protección Civil Bilbao', f: '152.225', m: 'FM', n: 'Coordinación municipal Bilbao', tx: 'RX ONLY' },
             { s: 'Protección Civil Barakaldo', f: '152.425', m: 'FM', n: 'Coordinación municipal Barakaldo', tx: 'RX ONLY' },
-            { s: 'Protección Civil Portugalete', f: '152.525', m: 'FM', n: 'Coordinación municipal Portugalete', tx: 'RX ONLY' }    
-];
+            { s: 'Protección Civil Portugalete', f: '152.525', m: 'FM', n: 'Coordinación municipal Portugalete', tx: 'RX ONLY' }
+        ];
 
-// NOTAS:
-// * RX ONLY = Sólo recepción (no transmitir nunca)
-// * RX* = Repetidor de radioaficionados - Sólo recepción si no tienes licencia de radioaficionado
+        // NOTAS:
+        // * RX ONLY = Sólo recepción (no transmitir nunca)
+        // * RX* = Repetidor de radioaficionados - Sólo recepción si no tienes licencia de radioaficionado
 
         const AIR_DATA = [
-            { s: 'LEBB Loiu APP', f: '120.700', m: 'AM', n: 'Aproximación', tx: 'RX ONLY'},
+            { s: 'LEBB Loiu APP', f: '120.700', m: 'AM', n: 'Aproximación', tx: 'RX ONLY' },
             { s: 'LEBB Loiu Torre', f: '118.500', m: 'AM', n: 'Torre de Control', tx: 'RX ONLY' },
-            { s: 'LEBB Loiu Tierra', f: '121.700', m: 'AM', n: 'Rodadura', tx: 'RX ONLY'},
+            { s: 'LEBB Loiu Tierra', f: '121.700', m: 'AM', n: 'Rodadura', tx: 'RX ONLY' },
             { s: 'LEBB Loiu ATIS', f: '127.350', m: 'AM', n: 'Info Meteorológica', tx: 'RX ONLY' },
             { s: 'Euskadi Control', f: '132.050', m: 'AM', n: 'Centro Control Norte', tx: 'RX ONLY' },
-               // ==================== METEOROLOGÍA Y CONTROL AÉREO REGIONAL ====================
+            // ==================== METEOROLOGÍA Y CONTROL AÉREO REGIONAL ====================
             { s: 'Control Aéreo Barcelona', f: '128.058', m: 'AM', n: 'Control regional accesible desde Bizkaia', tx: 'RX ONLY' },
             { s: 'Información Vuelos', f: '135.975', m: 'AM', n: 'Información tráfico aéreo', tx: 'RX ONLY' }
         ];
@@ -535,17 +829,17 @@
         function updateStatus(msg, color) {
             const indicator = document.getElementById('sync-indicator');
             const statusText = document.getElementById('cloud-status-text');
-            if(indicator) {
+            if (indicator) {
                 indicator.innerText = msg;
                 indicator.className = `mt-3 text-[8px] font-black px-2 py-1 rounded inline-block uppercase tracking-widest ${color.replace('text', 'bg').replace('400', '900')} ${color}`;
             }
-            if(statusText) statusText.innerText = msg;
+            if (statusText) statusText.innerText = msg;
         }
 
         async function fetchLogs() {
             if (!supabaseClient) {
                 initSupabase();
-                if(!supabaseClient) {
+                if (!supabaseClient) {
                     // Si falla init, cargamos local y salimos
                     logs = JSON.parse(localStorage.getItem('basauri_logs_backup')) || [];
                     renderAll();
@@ -564,23 +858,23 @@
 
                 const localOnly = logs.filter(l => l.id && l.id.toString().startsWith('local_'));
                 logs = [...localOnly, ...(data || [])];
-                
+
                 localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
-                
+
                 updateStatus("Sync: Cloud Online", "text-emerald-400");
                 sysLog(`Success: ${data.length} logs from cloud.`, "text-emerald-400");
-                
+
                 renderAll();
             } catch (err) {
                 console.error("Supabase Error:", err);
-                if(err.message === "Failed to fetch") {
+                if (err.message === "Failed to fetch") {
                     sysLog("Error de Red: URL Incorrecta", "text-rose-400");
                     updateStatus("Error URL", "text-rose-400");
                 } else {
                     sysLog("Fetch Error: " + err.message, "text-rose-400");
                     updateStatus("Offline", "text-amber-400");
                 }
-                
+
                 logs = JSON.parse(localStorage.getItem('basauri_logs_backup')) || [];
                 renderAll();
             }
@@ -589,13 +883,13 @@
         async function saveToCloud(qso) {
             if (!supabaseClient) return false;
             try {
-                const { id, ...qsoData } = qso; 
+                const { id, ...qsoData } = qso;
                 const { data, error } = await supabaseClient.from('logs').insert([qsoData]).select();
-                if(error) throw error;
+                if (error) throw error;
                 return data ? data[0] : true;
-            } catch (err) { 
+            } catch (err) {
                 sysLog("Save Error: " + err.message, "text-rose-400");
-                return false; 
+                return false;
             }
         }
 
@@ -604,9 +898,9 @@
             try {
                 const { id, ...data } = qso;
                 const { error } = await supabaseClient.from('logs').update(data).eq('id', id);
-                if(error) throw error;
+                if (error) throw error;
                 sysLog(`Cloud Update OK: ${id}`, "text-blue-400");
-            } catch(e) {
+            } catch (e) {
                 sysLog("Update Failed: " + e.message, "text-rose-400");
             }
         }
@@ -626,7 +920,7 @@
             document.getElementById('tab-' + tabId).classList.add('active');
             document.getElementById('btn-' + tabId).classList.add('active');
             window.scrollTo(0, 0);
-            
+
             // Auto close mobile menu on selection
             const sidebar = document.getElementById('sidebar');
             if (!sidebar.classList.contains('-translate-x-full')) {
@@ -637,20 +931,20 @@
         function renderAll() {
             // Logic de Búsqueda
             const searchVal = document.getElementById('search-input')?.value.toUpperCase() || '';
-            const filteredLogs = logs.filter(l => 
-                l.callsign.includes(searchVal) || 
+            const filteredLogs = logs.filter(l =>
+                l.callsign.includes(searchVal) ||
                 (l.date && l.date.toUpperCase().includes(searchVal))
             );
 
             const logCountEl = document.getElementById('log-count');
             if (logCountEl) {
-                if(searchVal) {
+                if (searchVal) {
                     logCountEl.innerText = `${filteredLogs.length} / ${logs.length} RECOLECCION`;
                 } else {
                     logCountEl.innerText = `${logs.length} QSO REGISTRADOS`;
                 }
             }
-            
+
             const container = document.getElementById('logs-container');
             if (container) {
                 container.innerHTML = filteredLogs.length > 0 ? filteredLogs.map((l) => {
@@ -693,12 +987,12 @@
 
             Object.entries(tables).forEach(([id, html]) => {
                 const el = document.getElementById(id);
-                if(el) el.innerHTML = html;
+                if (el) el.innerHTML = html;
             });
         }
 
         // --- HANDLERS ---
-        document.getElementById('qso-form').onsubmit = async function(e) {
+        document.getElementById('qso-form').onsubmit = async function (e) {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
             btn.disabled = true;
@@ -719,7 +1013,7 @@
                     localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
                     renderAll();
                     sysLog(`Updated Local ID: ${editingId}`, "text-blue-400");
-                    
+
                     if (supabaseClient && !logs[index].id.toString().startsWith('local_')) {
                         await updateCloud(logs[index]);
                     }
@@ -737,14 +1031,14 @@
                 logs.unshift(localQso);
                 localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
                 renderAll();
-                
+
                 this.reset(); // Only reset on create
 
-                if(supabaseClient) {
+                if (supabaseClient) {
                     const result = await saveToCloud(qso);
-                    if(result) {
+                    if (result) {
                         const idx = logs.findIndex(l => l.id === tempId);
-                        if(idx !== -1) {
+                        if (idx !== -1) {
                             logs[idx] = result;
                             localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
                             renderAll();
@@ -759,28 +1053,28 @@
             }
 
             btn.disabled = false;
-            if(!editingId) btn.innerText = "Nuevo QRZ";
+            if (!editingId) btn.innerText = "Nuevo QRZ";
         };
 
         function handleEdit(id) {
             const l = logs.find(x => x.id == id);
-            if(!l) return;
-            
+            if (!l) return;
+
             editingId = id;
             document.getElementById('callsign').value = l.callsign;
             document.getElementById('rst').value = l.rst;
             document.getElementById('band').value = l.band;
             document.getElementById('comment').value = l.comment || '';
-            
+
             const btn = document.getElementById('submit-btn');
             btn.innerText = "ACTUALIZAR DATOS";
             btn.classList.remove('btn-primary');
             btn.classList.add('bg-amber-600', 'text-white', 'hover:bg-amber-700');
-            
+
             document.getElementById('cancel-edit-btn').classList.remove('hidden');
             document.getElementById('form-card').classList.add('border-l-amber-500');
             document.getElementById('form-card').classList.remove('border-l-sky-500');
-            
+
             // Scroll to form
             document.getElementById('tab-logbook').scrollIntoView({ behavior: 'smooth' });
         }
@@ -788,32 +1082,36 @@
         function cancelEdit() {
             editingId = null;
             document.getElementById('qso-form').reset();
-            
+
             const btn = document.getElementById('submit-btn');
             btn.innerText = "Nuevo QRZ";
             btn.classList.add('btn-primary');
             btn.classList.remove('bg-amber-600', 'text-white', 'hover:bg-amber-700');
-            
+
             document.getElementById('cancel-edit-btn').classList.add('hidden');
             document.getElementById('form-card').classList.remove('border-l-amber-500');
             document.getElementById('form-card').classList.add('border-l-sky-500');
         }
 
         async function handleDelete(id) {
-            if(!confirm("¿ELIMINAR CONTACTO?")) return;
-            
+            if (!confirm("¿ELIMINAR CONTACTO?")) return;
+
+            // SECURITY CHECK
+            const p = prompt("SEGURIDAD: Introduce contraseña para borrar:");
+            if (p !== APP_PASS) return alert("❌ Contraseña incorrecta");
+
             // Si estamos editando este mismo, cancelar edición primero
-            if(editingId == id) cancelEdit();
+            if (editingId == id) cancelEdit();
 
             const backup = [...logs];
             logs = logs.filter(l => l.id != id); // Loose equality for string/int IDs
             localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
             renderAll();
 
-            if(!id.toString().startsWith('local_') && supabaseClient) {
+            if (!id.toString().startsWith('local_') && supabaseClient) {
                 const success = await deleteFromCloud(id);
-                if(!success) { 
-                    alert("Error al borrar en nube. Se revertirá la acción."); 
+                if (!success) {
+                    alert("Error al borrar en nube. Se revertirá la acción.");
                     logs = backup;
                     localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
                     renderAll();
@@ -821,21 +1119,21 @@
             }
         }
 
-        document.getElementById('import-json').addEventListener('change', function(event) {
+        document.getElementById('import-json').addEventListener('change', function (event) {
             const file = event.target.files[0];
             if (!file) return;
-            
+
             sysLog("Reading file...");
             const reader = new FileReader();
             reader.onload = async (e) => {
                 try {
                     const imported = JSON.parse(e.target.result);
                     const list = Array.isArray(imported) ? imported : [imported];
-                    
+
                     sysLog(`Importing ${list.length} records locally...`);
-                    
+
                     let importedCount = 0;
-                    for(const item of list.reverse()) { 
+                    for (const item of list.reverse()) {
                         const qso = {
                             callsign: (item.callsign || 'NOCALL').toUpperCase(),
                             rst: item.rst || '59',
@@ -848,37 +1146,37 @@
                         logs.unshift(qso);
                         importedCount++;
                     }
-                    
+
                     localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
                     renderAll();
                     sysLog("Importación local finalizada.", "text-emerald-500");
 
-                    if(supabaseClient) {
-                         sysLog("Intentando subir a la nube en background...");
-                         let synced = 0;
-                         const toSync = logs.filter(l => l.id.toString().startsWith('local_imp_'));
-                         
-                         for(const l of toSync) {
-                             const result = await saveToCloud(l);
-                             if(result) {
-                                 const idx = logs.findIndex(x => x.id === l.id);
-                                 if(idx !== -1) logs[idx] = result;
-                                 synced++;
-                             }
-                         }
-                         
-                         if(synced > 0) {
-                             localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
-                             renderAll();
-                             sysLog(`Sync completada: ${synced}/${toSync.length} subidos.`, "text-emerald-500");
-                         }
+                    if (supabaseClient) {
+                        sysLog("Intentando subir a la nube en background...");
+                        let synced = 0;
+                        const toSync = logs.filter(l => l.id.toString().startsWith('local_imp_'));
+
+                        for (const l of toSync) {
+                            const result = await saveToCloud(l);
+                            if (result) {
+                                const idx = logs.findIndex(x => x.id === l.id);
+                                if (idx !== -1) logs[idx] = result;
+                                synced++;
+                            }
+                        }
+
+                        if (synced > 0) {
+                            localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
+                            renderAll();
+                            sysLog(`Sync completada: ${synced}/${toSync.length} subidos.`, "text-emerald-500");
+                        }
                     } else {
                         alert("Importado SOLO localmente. Configura Supabase para sincronizar.");
                     }
 
-                } catch (err) { 
+                } catch (err) {
                     console.error(err);
-                    alert("Archivo JSON no válido."); 
+                    alert("Archivo JSON no válido.");
                 } finally {
                     event.target.value = '';
                 }
@@ -891,23 +1189,23 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `basauri_logs_${new Date().toISOString().slice(0,10)}.json`;
+            a.download = `basauri_logs_${new Date().toISOString().slice(0, 10)}.json`;
             a.click();
         }
 
         // --- CSV EXPORT LOGIC (Tidradio H8 Compatible) ---
         function downloadCSV() {
             const headers = [
-                "Location","Name","Frequency","Duplex","Offset","Tone",
-                "rToneFreq","cToneFreq","DtcsCode","DtcsPolarity",
-                "RxDtcsCode","CrossMode","Mode","TStep","Skip",
-                "Power","Comment","URCALL","RPT1CALL","RPT2CALL","DVCODE"
+                "Location", "Name", "Frequency", "Duplex", "Offset", "Tone",
+                "rToneFreq", "cToneFreq", "DtcsCode", "DtcsPolarity",
+                "RxDtcsCode", "CrossMode", "Mode", "TStep", "Skip",
+                "Power", "Comment", "URCALL", "RPT1CALL", "RPT2CALL", "DVCODE"
             ].join(",");
 
             let loc = 1;
             const rows = [];
             const fmt = f => parseFloat(f).toFixed(5);
-            const name = s => s.replace(/,/g,'').substring(0,8).toUpperCase();
+            const name = s => s.replace(/,/g, '').substring(0, 8).toUpperCase();
 
             // COLUMNAS FIJAS EXACTAS ODMASTER
             const magicCols = "023,NN,023,Tone->Tone";
@@ -990,7 +1288,7 @@
                     "12.5",
                     "",
                     "10.0W", // Power irrelevante en RX pero formato requerido
-                    e.n || "", 
+                    e.n || "",
                     "", "", "", ""
                 ].join(','));
             });
@@ -1001,7 +1299,7 @@
             AIR_DATA.forEach(a => {
                 rows.push([
                     loc++,
-                    name(a.s.replace('LEBB','BIO')),
+                    name(a.s.replace('LEBB', 'BIO')),
                     fmt(a.f),
                     "off", // RX ONLY
                     "0.00000",
@@ -1012,7 +1310,7 @@
                     "25.0", // Paso estándar aéreo
                     "",
                     "10.0W",
-                    a.n || "", 
+                    a.n || "",
                     "", "", "", ""
                 ].join(','));
             });
@@ -1029,6 +1327,26 @@
         }
 
 
+        // --- SECURITY LOGIC ---
+        const APP_PASS = "Txingurri"; // CAMBIAR ESTO
+
+        function doLogin() {
+            const p = document.getElementById('login-pass').value;
+            if (p === APP_PASS) {
+                sessionStorage.setItem('auth', 'true');
+                document.getElementById('login-overlay').classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => document.getElementById('login-overlay').style.display = 'none', 500);
+            } else {
+                document.getElementById('login-msg').innerText = "ACCESO DENEGADO";
+                document.getElementById('login-pass').value = '';
+            }
+        }
+
+        // AUTO-CHECK
+        if (sessionStorage.getItem('auth') === 'true') {
+            document.getElementById('login-overlay').style.display = 'none';
+        }
+
         window.onload = () => {
             initSupabase();
             fetchLogs();
@@ -1036,14 +1354,15 @@
         };
     </script>
     <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('Service Worker registrado!', reg))
-        .catch(err => console.log('Fallo al registrar SW', err));
-    });
-  }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registrado!', reg))
+                    .catch(err => console.log('Fallo al registrar SW', err));
+            });
+        }
     </script>
-    
+
 </body>
+
 </html>
