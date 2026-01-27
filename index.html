@@ -339,6 +339,10 @@
             border-bottom: 2px solid #e2e8f0;
             white-space: nowrap;
             letter-spacing: 0.05em;
+            /* Sticky Header for vertical scroll */
+            position: sticky;
+            top: 0;
+            z-index: 20;
         }
 
         .table-tactical td {
@@ -406,11 +410,13 @@
 
         /* SDR Widget Styles */
         .sdr-placeholder {
-            width: 260px; /* Much wider */
-            height: 64px; /* Taller (approx 2x text height) */
+            width: 100%; 
+            max-width: 260px;
+            min-width: 180px;
+            height: 64px; 
             display: inline-block;
             vertical-align: middle;
-            margin-left: 1rem;
+            margin-left: 0;
             border: 2px solid #334155;
             border-radius: 6px;
             background: #000;
@@ -563,7 +569,7 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
                 <div>
                     <h2
-                        class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter relative z-10 flex items-center gap-3">
+                        class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter relative z-10 flex items-center gap-3 flex-wrap">
                         <span><span class="text-sky-500">Terminal</span> Logbook</span>
                         <div class="sdr-placeholder"></div>
                         <span class="absolute -bottom-2 left-0 w-12 h-1.5 bg-sky-500 rounded-full"></span>
@@ -648,7 +654,7 @@
 
         <!-- TAB: REPETIDORES -->
         <div id="tab-repeaters" class="tab-content">
-            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3">
+            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3 flex-wrap">
                 <span>Repetidores <span class="text-sky-600">Bizkaia</span></span>
                 <div class="sdr-placeholder"></div>
             </h2>
@@ -657,7 +663,7 @@
                     <div class="flex items-center gap-3"><i class="fas fa-mountain text-sky-200"></i> Infraestructura de Red Local</div>
                     <button onclick="openResourceModal('repeaters')" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md text-[10px] uppercase font-bold backdrop-blur-sm transition-all border border-white/10"><i class="fas fa-plus mr-1"></i> Añadir</button>
                 </div>
-                <div class="overflow-x-auto">
+                <div class="overflow-auto max-h-[60vh] border-t border-slate-200">
                     <table class="table-tactical text-left">
                         <thead>
                             <tr>
@@ -678,7 +684,7 @@
 
         <!-- TAB: PMR446 -->
         <div id="tab-pmr" class="tab-content">
-            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3">
+            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3 flex-wrap">
                 <span>Canales <span class="text-emerald-600">PMR446</span></span>
                 <div class="sdr-placeholder"></div>
             </h2>
@@ -687,7 +693,7 @@
                     <div class="flex items-center gap-3"><i class="fas fa-walkie-talkie text-emerald-200"></i> Uso Libre - NFM Modulación</div>
                     <button onclick="openResourceModal('pmr')" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md text-[10px] uppercase font-bold backdrop-blur-sm transition-all border border-white/10"><i class="fas fa-plus mr-1"></i> Añadir</button>
                 </div>
-                <div class="overflow-x-auto">
+                <div class="overflow-auto max-h-[60vh] border-t border-slate-200">
                     <table class="table-tactical text-left">
                         <thead>
                             <tr>
@@ -707,7 +713,7 @@
 
         <!-- TAB: EMERG & AIRE -->
         <div id="tab-emerg" class="tab-content">
-            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3">
+            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3 flex-wrap">
                 <span>Frecuencias <span class="text-rose-500">Críticas</span></span>
                 <div class="sdr-placeholder"></div>
             </h2>
@@ -716,7 +722,7 @@
                     <div class="flex items-center gap-3"><i class="fas fa-life-ring text-rose-200"></i> Red de Emergencias & Auxilio</div>
                     <button onclick="openResourceModal('emerg')" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md text-[10px] uppercase font-bold backdrop-blur-sm transition-all border border-white/10"><i class="fas fa-plus mr-1"></i> Añadir</button>
                 </div>
-                <div class="overflow-x-auto">
+                <div class="overflow-auto max-h-[60vh] border-t border-slate-200">
                     <table class="table-tactical text-left">
                         <thead>
                             <tr>
@@ -738,7 +744,7 @@
                      <div class="flex items-center gap-3"><i class="fas fa-plane text-slate-300"></i> Banda Aérea</div>
                      <button onclick="openResourceModal('emerg', 'AIR')" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md text-[10px] uppercase font-bold backdrop-blur-sm transition-all border border-white/10"><i class="fas fa-plus mr-1"></i> Añadir</button>
                 </div>
-                <div class="overflow-x-auto">
+                <div class="overflow-auto max-h-[60vh] border-t border-slate-200">
                     <table class="table-tactical text-left">
                         <thead>
                             <tr>
@@ -757,7 +763,7 @@
 
         <!-- TAB: FM -->
         <div id="tab-fm" class="tab-content">
-            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3">
+            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3 flex-wrap">
                 <span>FM <span class="text-indigo-600">Comercial</span></span>
                 <div class="sdr-placeholder"></div>
             </h2>
@@ -766,7 +772,7 @@
                     <div class="flex items-center gap-3"><i class="fas fa-radio text-indigo-200"></i> Estaciones Local / Regional</div>
                     <button onclick="openResourceModal('fm')" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md text-[10px] uppercase font-bold backdrop-blur-sm transition-all border border-white/10"><i class="fas fa-plus mr-1"></i> Añadir</button>
                 </div>
-                <div class="overflow-x-auto">
+                <div class="overflow-auto max-h-[60vh] border-t border-slate-200">
                     <table class="table-tactical text-left">
                         <thead>
                             <tr>
@@ -785,7 +791,7 @@
 
         <!-- TAB: HARDWARE -->
         <div id="tab-hardware" class="tab-content">
-            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3">
+            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3 flex-wrap">
                 <span>Espectro <span class="text-slate-900">Tidradio H8</span></span>
                 <div class="sdr-placeholder"></div>
             </h2>
@@ -794,7 +800,7 @@
                     <div class="flex items-center gap-3"><i class="fas fa-wave-square"></i> IARU Región 1</div>
                     <button onclick="openResourceModal('hardware')" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md text-[10px] uppercase font-bold backdrop-blur-sm transition-all border border-white/10"><i class="fas fa-plus mr-1"></i> Añadir</button>
                 </div>
-                <div class="overflow-x-auto">
+                <div class="overflow-auto max-h-[60vh] border-t border-slate-200">
                     <table class="table-tactical text-left">
                         <thead>
                             <tr>
@@ -814,7 +820,7 @@
 
         <!-- TAB: SYNC -->
         <div id="tab-sync" class="tab-content max-w-4xl mx-auto space-y-8">
-            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-center mb-8 text-slate-800 tracking-tighter flex items-center justify-center gap-3">
+            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-center mb-8 text-slate-800 tracking-tighter flex items-center justify-center gap-3 flex-wrap">
                 <span>Data Hub & <span class="text-sky-500">Cloud Sync</span></span>
                 <div class="sdr-placeholder"></div>
             </h2>
