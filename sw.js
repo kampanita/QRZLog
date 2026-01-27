@@ -1,4 +1,4 @@
-const CACHE_NAME = 'qrzlog-tactical-v2.5';
+const CACHE_NAME = 'qrzlog-tactical-v2.5.1';
 // Cacheamos SOLO lo local para asegurar la instalación
 const ASSETS = [
   './',
