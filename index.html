@@ -425,6 +425,33 @@
             overflow: hidden;
         }
 
+        /* MOBILE READABILITY OPTIMIZATIONS */
+        @media (max-width: 768px) {
+            .table-tactical {
+                font-size: 1rem;
+            }
+            .table-tactical td {
+                padding: 16px 12px;
+                font-size: 0.95rem;
+            }
+            /* First column (Name/Location) BOLD and Larger */
+            .table-tactical td:first-child {
+                font-weight: 900;
+                font-size: 1.05rem;
+                color: #0f172a;
+            }
+            /* Second column (Frequency) Slightly larger */
+            .table-tactical td:nth-child(2) {
+                font-weight: 700;
+                font-size: 1rem;
+            }
+            /* Make action buttons bigger touch targets */
+            .btn-action {
+                padding: 10px;
+                font-size: 1rem;
+            }
+        }
+
     </style>
     <script type="importmap">
 {
@@ -2074,6 +2101,12 @@ create table if not exists db_hardware (
         }
 
         window.onload = () => {
+             // AUTH CHECK - Skip overlay if already logged in via LocalStorage
+            if (window.isSessionActive && window.isSessionActive()) {
+                const overlay = document.getElementById('login-overlay');
+                if(overlay) overlay.classList.add('opacity-0', 'pointer-events-none');
+            }
+
             initSupabase();
             fetchLogs();
             renderSDRWidgets(); // Init visual widget
