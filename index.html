@@ -5,9 +5,10 @@
     <link rel="manifest" href="./manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RadioLog Pro v109 | EA2Lxx</title>
+    <title>RadioLog Pro v2.4 | Secure & Merge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./auth.js"></script> <!-- EXTERNAL AUTH -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700;800&display=swap"
@@ -21,7 +22,12 @@
         }
 
         body {
-            background-color: #f8fafc;
+            background-color: #f0f4f8;
+            /* Technical Grid Pattern Background */
+            background-image: 
+                linear-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
             font-family: 'Inter', sans-serif;
             display: flex;
             flex-direction: column;
@@ -54,8 +60,21 @@
 
         .logo-area {
             padding: 30px;
-            background: black;
-            border-bottom: 1px solid #1e293b;
+            background: #ffffff; 
+            border-bottom: 1px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Subtle shine effect on logo area */
+        .logo-area::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
         }
 
         @keyframes radio-ping {
@@ -84,12 +103,12 @@
         }
 
         .nav-link {
-            color: #64748b;
+            color: #475569; /* Slate 600 - Darker text for light bg */
             padding: 15px 30px;
             font-weight: 800;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             cursor: pointer;
             transition: 0.2s;
             border: none;
@@ -99,16 +118,24 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            border-right: 3px solid transparent;
         }
 
         .nav-link:hover {
-            color: white;
-            background: #1e293b;
+            color: var(--accent);
+            background: #f0f9ff; /* Sky 50 */
         }
 
         .nav-link.active {
-            color: white;
-            background: var(--accent);
+            color: var(--accent);
+            background: #e0f2fe; /* Sky 100 */
+            border-right-color: var(--accent);
+        }
+
+        .nav-link i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.1em;
         }
 
         main {
@@ -148,28 +175,80 @@
 
         .card-tactical {
             background: white;
-            border-radius: 4px;
+            border-radius: 8px;
             border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
             margin-bottom: 2rem;
             overflow: hidden;
         }
 
+        /* --- NEW DARK TACTICAL CARD (For QSO Form) --- */
+        .card-tactical-dark {
+            background: linear-gradient(160deg, #1e293b, #0f172a); /* Dark Slate Gradient */
+            border-radius: 12px;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Decorative screw heads for tactical look */
+        .card-tactical-dark::before, .card-tactical-dark::after {
+            content: '+';
+            position: absolute;
+            color: #475569;
+            font-family: monospace;
+            font-size: 20px;
+            pointer-events: none;
+        }
+        .card-tactical-dark::before { top: 10px; left: 15px; }
+        .card-tactical-dark::after { top: 10px; right: 15px; }
+
+        .card-tactical-dark label {
+            color: #94a3b8; /* Slate 400 */
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .card-tactical-dark input,
+        .card-tactical-dark select,
+        .card-tactical-dark textarea {
+            background-color: #334155; /* Slate 700 */
+            border: 2px solid #475569;
+            color: #f8fafc; /* White text */
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .card-tactical-dark input::placeholder,
+        .card-tactical-dark textarea::placeholder {
+            color: #64748b;
+        }
+
+        .card-tactical-dark input:focus,
+        .card-tactical-dark select:focus,
+        .card-tactical-dark textarea:focus {
+            border-color: var(--accent);
+            background-color: #1e293b; /* Slate 800 */
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+        }
+
         .card-header {
-            padding: 12px 20px;
-            font-weight: 900;
-            font-size: 0.75rem;
+            padding: 14px 24px;
+            font-weight: 800;
+            font-size: 0.8rem;
             text-transform: uppercase;
             color: white;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 10px;
+            letter-spacing: 0.05em;
         }
 
         .badge-status {
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 800;
             font-size: 0.65rem;
             border: 1px solid;
             text-transform: uppercase;
@@ -194,61 +273,152 @@
             background: #f5f3ff;
         }
 
+        /* Default Light Inputs (for other areas) */
         input,
         select,
         textarea {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #e2e8f0;
-            border-radius: 4px;
-            font-weight: 700;
+            border-radius: 6px;
+            font-weight: 600;
             outline: none;
             transition: 0.2s;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            color: #334155;
+            background-color: #f8fafc;
         }
 
-        input:focus {
+        input:focus, select:focus, textarea:focus {
             border-color: var(--accent);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
         }
 
         .btn-primary {
             background: var(--accent);
             color: white;
-            font-weight: 900;
+            font-weight: 800;
             text-transform: uppercase;
             padding: 12px;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             transition: 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.3);
         }
 
         .btn-primary:hover {
             filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .btn-action {
+             padding: 8px;
+             border-radius: 6px;
+             transition: 0.2s;
+             cursor: pointer;
+             font-size: 0.85rem;
+        }
+        .btn-action:hover {
+            background-color: #f1f5f9;
         }
 
         .table-tactical {
             width: 100%;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             border-collapse: collapse;
         }
 
         .table-tactical thead th {
-            background: #f1f5f9;
-            padding: 12px 20px;
-            color: #475569;
-            font-weight: 900;
+            background: #f8fafc;
+            padding: 14px 24px;
+            color: #64748b;
+            font-weight: 800;
             text-transform: uppercase;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             border-bottom: 2px solid #e2e8f0;
             white-space: nowrap;
+            letter-spacing: 0.05em;
         }
 
         .table-tactical td {
-            padding: 12px 20px;
+            padding: 14px 24px;
             border-bottom: 1px solid #f1f5f9;
-            color: #1e293b;
+            color: #334155;
             white-space: nowrap;
+            font-weight: 500;
         }
+        
+        .table-tactical tr:hover td {
+            background-color: #f8fafc;
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        /* --- ANIMATIONS & GRAPHICS --- */
+        
+        /* Spectrum Analyzer Bars (Old) -> Replaced by SVG widget but kept for legacy just in case */
+        .spectrum-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 20px;
+            opacity: 0.8;
+        }
+        
+        .spectrum-bar {
+            width: 4px;
+            background-color: #0ea5e9;
+            border-radius: 2px 2px 0 0;
+            animation: spectrum-bounce 1s infinite ease-in-out;
+        }
+        
+        @keyframes spectrum-bounce {
+            0%, 100% { height: 20%; opacity: 0.5; }
+            50% { height: 100%; opacity: 1; }
+        }
+        
+        /* Oscilloscope Line in Logo Area */
+        .scope-line {
+            width: 100%;
+            height: 2px;
+            background: #cbd5e1;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .scope-dot {
+            position: absolute;
+            width: 40px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, #0ea5e9, transparent);
+            left: -40px;
+            animation: scope-scan 2s linear infinite;
+        }
+        @keyframes scope-scan {
+            0% { left: -40px; }
+            100% { left: 100%; }
+        }
+
+        /* SDR Widget Styles */
+        .sdr-placeholder {
+            width: 260px; /* Much wider */
+            height: 64px; /* Taller (approx 2x text height) */
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 1rem;
+            border: 2px solid #334155;
+            border-radius: 6px;
+            background: #000;
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
     </style>
     <script type="importmap">
 {
@@ -264,29 +434,55 @@
 
     <!-- SECURITY OVERLAY -->
     <div id="login-overlay"
-        class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/95 backdrop-blur-sm transition-all duration-500">
-        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full text-center border-b-4 border-sky-500">
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-white/90 backdrop-blur-md transition-all duration-500">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center border border-slate-100">
+            <div class="mb-6 flex justify-center text-sky-500 text-5xl">
+                <i class="fas fa-fingerprint"></i>
+            </div>
             <h2 class="text-2xl font-black text-slate-800 mb-2 uppercase italic tracking-tighter">Acceso Restringido
             </h2>
-            <div class="w-12 h-1 bg-sky-500 mx-auto mb-6"></div>
+            <div class="w-12 h-1 bg-sky-500 mx-auto mb-6 rounded-full"></div>
             <p class="text-slate-500 mb-6 text-xs font-bold uppercase tracking-widest">Autenticación Requerida</p>
             <input type="password" id="login-pass"
-                class="w-full p-3 border-2 border-slate-200 rounded-lg mb-4 font-black text-center text-slate-800 focus:border-sky-500 outline-none text-xl tracking-widest"
-                placeholder="••••" onkeyup="if(event.key === 'Enter') doLogin()">
+                class="w-full p-4 border-2 border-slate-200 rounded-xl mb-4 font-black text-center text-slate-800 focus:border-sky-500 outline-none text-xl tracking-widest placeholder:text-slate-300 transition-all"
+                placeholder="••••••••" onkeyup="if(event.key === 'Enter') doLogin()">
             <button onclick="doLogin()"
-                class="w-full bg-slate-800 text-white font-black py-4 rounded-lg hover:bg-slate-700 transition transform active:scale-95 uppercase tracking-wide text-sm shadow-xl">Desbloquear
+                class="w-full bg-slate-900 text-white font-black py-4 rounded-xl hover:bg-sky-600 transition transform active:scale-95 uppercase tracking-wide text-sm shadow-xl shadow-slate-200">Desbloquear
                 Terminal</button>
             <p id="login-msg" class="text-rose-500 text-xs font-black mt-4 h-4 uppercase tracking-wide"></p>
         </div>
     </div>
 
-    <!-- MOBILE HEADER -->
-    <div class="md:hidden flex justify-between items-center p-4 bg-slate-900 text-white z-40 shadow-md">
-        <div class="flex items-center gap-2">
-            <i class="fas fa-broadcast-tower text-sky-500"></i>
-            <span class="font-black italic tracking-tighter">RADIOLOG PRO</span>
+    <!-- RESOURCE EDIT MODAL -->
+    <div id="resource-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden border-t-4 border-sky-500 ring-1 ring-black/5">
+            <div class="bg-slate-50 px-6 py-4 flex justify-between items-center border-b border-slate-100">
+                <h3 id="modal-title" class="font-black text-slate-800 uppercase italic tracking-tight text-lg">Editar Recurso</h3>
+                <button onclick="closeResourceModal()" class="text-slate-400 hover:text-rose-500 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-50">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <form id="resource-form" class="p-6 space-y-5">
+                <input type="hidden" id="res-id">
+                <input type="hidden" id="res-type">
+                <div id="modal-fields" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Dynamic Fields Injected Here -->
+                </div>
+                <div class="flex gap-3 pt-4 border-t border-slate-50 mt-4">
+                    <button type="button" onclick="closeResourceModal()" class="flex-1 bg-white border-2 border-slate-200 text-slate-600 font-bold py-3 rounded-lg uppercase text-xs hover:bg-slate-50 hover:border-slate-300 transition-all">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-sky-500 text-white font-bold py-3 rounded-lg uppercase text-xs hover:bg-sky-600 shadow-lg shadow-sky-100 transition-all">Guardar Cambios</button>
+                </div>
+            </form>
         </div>
-        <button onclick="toggleMenu()" class="text-white focus:outline-none">
+    </div>
+
+    <!-- MOBILE HEADER -->
+    <div class="md:hidden flex justify-between items-center p-4 bg-white text-slate-800 z-40 shadow-sm border-b border-slate-200">
+        <div class="flex items-center gap-2">
+            <i class="fas fa-broadcast-tower text-sky-500 text-xl"></i>
+            <span class="font-black italic tracking-tighter text-lg">RADIOLOG <span class="text-sky-500">PRO</span></span>
+        </div>
+        <button onclick="toggleMenu()" class="text-slate-600 hover:text-sky-500 focus:outline-none transition-colors">
             <i class="fas fa-bars text-xl"></i>
         </button>
     </div>
@@ -296,16 +492,16 @@
 
     <!-- SIDEBAR -->
     <aside id="sidebar"
-        class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 md:static md:flex flex-col w-72 bg-[#0f172a] text-white border-r-4 border-sky-500 overflow-y-auto">
+        class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 md:static md:flex flex-col w-72 bg-white text-slate-800 border-r border-slate-200 shadow-xl shadow-slate-200/50 overflow-y-auto z-50">
 
         <div class="logo-area flex flex-col items-start relative">
             <!-- Mobile Close Button -->
-            <button onclick="toggleMenu()" class="md:hidden absolute top-4 right-4 text-slate-500 hover:text-white">
+            <button onclick="toggleMenu()" class="md:hidden absolute top-4 right-4 text-slate-400 hover:text-rose-500">
                 <i class="fas fa-times text-xl"></i>
             </button>
 
             <div class="relative w-16 h-16 mb-2">
-
+                <!-- Updated SVG colors for Light Theme -->
                 <svg viewBox="0 0 100 100" class="w-full h-full text-sky-500 overflow-visible">
                     <circle cx="50" cy="30" r="8" class="radio-wave" fill="none" stroke="currentColor"
                         stroke-width="2" />
@@ -313,84 +509,111 @@
                         stroke-width="1.5" />
                     <circle cx="50" cy="30" r="8" class="radio-wave wave-3" fill="none" stroke="currentColor"
                         stroke-width="1" />
-                    <path d="M50 30 L50 85" stroke="white" stroke-width="4" stroke-linecap="round" />
-                    <path d="M35 50 L50 45 L65 50" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" />
-                    <path d="M40 65 L50 60 L60 65" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" />
+                    <!-- Changed stroke from white to slate-800 (#1e293b) -->
+                    <path d="M50 30 L50 85" stroke="#1e293b" stroke-width="4" stroke-linecap="round" />
+                    <path d="M35 50 L50 45 L65 50" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round" />
+                    <path d="M40 65 L50 60 L60 65" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round" />
                     <rect x="30" y="80" width="40" height="12" rx="2" fill="currentColor" />
-                    <circle cx="50" cy="30" r="4" fill="white" />
+                    <!-- Changed circle fill from white to slate-800 -->
+                    <circle cx="50" cy="30" r="4" fill="#1e293b" />
                 </svg>
 
             </div>
-            <h1 class="text-xl font-black tracking-tighter italic uppercase">RADIOLOG <span
-                    class="text-sky-500">PRO</span> <span class="text-xl font-black 100">v1.1</span></h1>
-            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">by Kepa iNKuBo</p>
+            <h1 class="text-xl font-black tracking-tighter italic uppercase text-slate-900">RADIOLOG <span
+                    class="text-sky-500">PRO</span> <span class="text-xl font-black 100 text-slate-400">v2.4</span></h1>
+            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">by Kepa iNKuBo</p>
+            
+            <!-- Oscilloscope Line -->
+            <div class="scope-line">
+                <div class="scope-dot"></div>
+            </div>
+
             <div id="sync-indicator"
-                class="mt-3 text-[8px] font-black bg-slate-800 px-2 py-1 rounded text-slate-400 inline-block uppercase tracking-widest transition-colors">
+                class="mt-4 text-[9px] font-black bg-slate-100 text-slate-500 px-3 py-1 rounded-full inline-block uppercase tracking-widest transition-colors border border-slate-200">
                 Sync: Initializing</div>
         </div>
 
-        <nav class="mt-4 flex-1">
-            <button onclick="switchTab('logbook')" id="btn-logbook" class="nav-link active"><i
-                    class="fas fa-terminal w-6"></i> Logbook</button>
-            <button onclick="switchTab('repeaters')" id="btn-repeaters" class="nav-link"><i
-                    class="fas fa-tower-broadcast w-6"></i> Repetidores Bizkaia</button>
-            <button onclick="switchTab('pmr')" id="btn-pmr" class="nav-link"><i class="fas fa-walkie-talkie w-6"></i>
+        <nav class="mt-6 flex-1 px-4 space-y-1">
+            <button onclick="switchTab('logbook')" id="btn-logbook" class="nav-link rounded-lg active"><i
+                    class="fas fa-terminal"></i> Logbook</button>
+            <button onclick="switchTab('repeaters')" id="btn-repeaters" class="nav-link rounded-lg"><i
+                    class="fas fa-tower-broadcast"></i> Repetidores</button>
+            <button onclick="switchTab('pmr')" id="btn-pmr" class="nav-link rounded-lg"><i class="fas fa-walkie-talkie"></i>
                 Canales PMR446</button>
-            <button onclick="switchTab('emerg')" id="btn-emerg" class="nav-link"><i class="fas fa-life-ring w-6"></i>
-                Emergencias & Aire</button>
-            <button onclick="switchTab('fm')" id="btn-fm" class="nav-link"><i class="fas fa-radio w-6"></i> FM
+            <button onclick="switchTab('emerg')" id="btn-emerg" class="nav-link rounded-lg"><i class="fas fa-life-ring"></i>
+                Emergencias</button>
+            <button onclick="switchTab('fm')" id="btn-fm" class="nav-link rounded-lg"><i class="fas fa-radio"></i> FM
                 Comercial</button>
-            <button onclick="switchTab('hardware')" id="btn-hardware" class="nav-link"><i
-                    class="fas fa-microchip w-6"></i> Espectro Hardware</button>
-            <button onclick="switchTab('sync')" id="btn-sync" class="nav-link"><i class="fas fa-sync w-6"></i>
+            <button onclick="switchTab('hardware')" id="btn-hardware" class="nav-link rounded-lg"><i
+                    class="fas fa-microchip"></i> Espectro H8</button>
+            <button onclick="switchTab('sync')" id="btn-sync" class="nav-link rounded-lg"><i class="fas fa-cloud-arrow-up"></i>
                 Sincronización</button>
         </nav>
 
         <div
-            class="p-4 text-[9px] font-bold text-slate-600 border-t border-slate-800 text-center uppercase tracking-tighter pb-8 md:pb-4">
-            Hardware Status: 65-600 MHz Absolute
+            class="p-6 text-[9px] font-bold text-slate-400 border-t border-slate-100 text-center uppercase tracking-tighter pb-8 md:pb-6 bg-slate-50">
+            <div class="mb-1"><i class="fas fa-satellite-dish text-sky-400"></i></div>
+            Hardware Status: 65-600 MHz
         </div>
     </aside>
 
     <main>
         <!-- TAB: LOGBOOK -->
         <div id="tab-logbook" class="tab-content active">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
                 <div>
                     <h2
-                        class="text-2xl md:text-3xl font-black italic uppercase text-slate-800 tracking-tighter text-blue-900">
-                        Terminal Logbook</h2>
-                    <div class="flex gap-2 mt-2">
+                        class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter relative z-10 flex items-center gap-3">
+                        <span><span class="text-sky-500">Terminal</span> Logbook</span>
+                        <div class="sdr-placeholder"></div>
+                        <span class="absolute -bottom-2 left-0 w-12 h-1.5 bg-sky-500 rounded-full"></span>
+                    </h2>
+                    <div class="flex gap-2 mt-4">
                         <label
-                            class="text-[9px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-black px-3 py-2 rounded uppercase transition-colors cursor-pointer inline-flex items-center">
-                            <i class="fas fa-file-import mr-1"></i> Importar JSON
+                            class="text-[10px] bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-black px-4 py-2 rounded-lg uppercase transition-all cursor-pointer inline-flex items-center shadow-sm">
+                            <i class="fas fa-file-import mr-2 text-sky-500"></i> Importar
                             <input type="file" id="import-json" class="hidden" accept=".json">
                         </label>
                         <button onclick="exportJSON()"
-                            class="text-[9px] bg-slate-200 hover:bg-slate-300 text-slate-700 font-black px-3 py-2 rounded uppercase transition-colors"><i
-                                class="fas fa-file-export mr-1"></i> Exportar JSON</button>
+                            class="text-[10px] bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-black px-4 py-2 rounded-lg uppercase transition-all shadow-sm"><i
+                                class="fas fa-file-export mr-2 text-emerald-500"></i> Exportar</button>
                     </div>
                 </div>
-                <span id="log-count"
-                    class="bg-slate-800 text-white px-3 py-1 rounded text-[10px] font-black uppercase w-full md:w-auto text-center">Cargando...</span>
+                <div class="flex flex-col items-end">
+                    <!-- SPECTRUM ANIMATION -->
+                    <div class="spectrum-container mb-2">
+                        <div class="spectrum-bar" style="height: 40%; animation-delay: 0s;"></div>
+                        <div class="spectrum-bar" style="height: 70%; animation-delay: 0.1s;"></div>
+                        <div class="spectrum-bar" style="height: 100%; animation-delay: 0.2s;"></div>
+                        <div class="spectrum-bar" style="height: 60%; animation-delay: 0.3s;"></div>
+                        <div class="spectrum-bar" style="height: 30%; animation-delay: 0.4s;"></div>
+                        <div class="spectrum-bar" style="height: 80%; animation-delay: 0.5s;"></div>
+                        <div class="spectrum-bar" style="height: 50%; animation-delay: 0.6s;"></div>
+                    </div>
+                    <span id="log-count"
+                        class="bg-slate-900 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase w-full md:w-auto text-center shadow-lg shadow-slate-200 tracking-wider">Cargando...</span>
+                </div>
             </div>
 
-            <div class="card-tactical p-4 md:p-6 border-l-[10px] border-l-sky-500 transition-colors" id="form-card">
-                <form id="qso-form" class="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <!-- DARK TACTICAL FORM CARD -->
+            <div class="card-tactical-dark p-6 md:p-8 transition-colors" id="form-card">
+                <div class="absolute top-0 right-0 p-2 opacity-10">
+                    <i class="fas fa-broadcast-tower text-6xl text-white"></i>
+                </div>
+                <form id="qso-form" class="grid grid-cols-1 md:grid-cols-12 gap-5 relative z-10">
                     <div class="md:col-span-4">
-                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Indicativo</label>
-                        <input type="text" id="callsign" placeholder="EA2XXX" class="uppercase mono" required>
+                        <label class="text-[10px] font-extrabold uppercase mb-2 block tracking-wide"><i class="fas fa-id-card mr-1"></i> Indicativo (Callsign)</label>
+                        <input type="text" id="callsign" placeholder="EA2XXX" class="uppercase mono text-lg" required>
                     </div>
-                    <div class="grid grid-cols-2 gap-4 md:col-span-2">
+                    <div class="grid grid-cols-2 gap-5 md:col-span-2">
                         <div>
-                            <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Reporte
-                                (RST)</label>
-                            <input type="text" id="rst" value="59" class="mono text-center">
+                            <label class="text-[10px] font-extrabold uppercase mb-2 block tracking-wide"><i class="fas fa-signal mr-1"></i> RST</label>
+                            <input type="text" id="rst" value="59" class="mono text-center text-lg">
                         </div>
                     </div>
                     <div class="md:col-span-3">
-                        <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Banda / Modo</label>
-                        <select id="band">
+                        <label class="text-[10px] font-extrabold uppercase mb-2 block tracking-wide"><i class="fas fa-list-ul mr-1"></i> Banda / Modo</label>
+                        <select id="band" class="h-[50px]">
                             <option>2m VHF (FM)</option>
                             <option>70cm UHF (FM)</option>
                             <option>HF / DX</option>
@@ -398,26 +621,26 @@
                     </div>
                     <div class="md:col-span-3 flex items-end gap-2">
                         <button type="submit" id="submit-btn"
-                            class="btn-primary w-full shadow-lg shadow-sky-200 disabled:opacity-50">Nuevo QRZ</button>
+                            class="btn-primary w-full shadow-lg shadow-sky-900/50 disabled:opacity-50 h-[50px] text-sm tracking-widest border border-sky-400">Registrar QSO</button>
                         <button type="button" id="cancel-edit-btn" onclick="cancelEdit()"
-                            class="hidden bg-slate-300 text-slate-600 px-3 rounded font-bold hover:bg-slate-400"><i
-                                class="fas fa-times"></i></button>
+                            class="hidden bg-slate-700 border border-slate-600 text-slate-300 px-4 h-[50px] rounded-lg font-bold hover:bg-rose-900/50 hover:text-rose-400 hover:border-rose-500 transition-colors"><i
+                                class="fas fa-times text-lg"></i></button>
                     </div>
                     <div class="md:col-span-12">
                         <textarea id="comment" rows="2"
-                            placeholder="Ubicación, Notas del corresponsal, Meteo..."></textarea>
+                            placeholder="Notas adicionales: Ubicación, Operador, Clima..."></textarea>
                     </div>
                 </form>
             </div>
 
             <!-- SEARCH BAR -->
-            <div class="mb-6 relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-search text-slate-400"></i>
+            <div class="mb-8 relative group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-slate-400 group-focus-within:text-sky-500 transition-colors"></i>
                 </div>
                 <input type="text" id="search-input" onkeyup="renderAll()"
-                    placeholder="Filtrar por Indicativo o Fecha..."
-                    class="w-full pl-10 p-3 rounded-lg border-2 border-slate-200 bg-white font-bold text-slate-700 uppercase focus:border-sky-500 focus:outline-none transition-all shadow-sm">
+                    placeholder="BUSCAR EN LOGBOOK (INDICATIVO, FECHA...)"
+                    class="w-full pl-12 p-4 rounded-xl border-2 border-slate-200 bg-white font-bold text-slate-700 uppercase focus:border-sky-500 focus:outline-none transition-all shadow-sm placeholder:text-slate-300">
             </div>
 
             <div id="logs-container" class="space-y-4"></div>
@@ -425,10 +648,15 @@
 
         <!-- TAB: REPETIDORES -->
         <div id="tab-repeaters" class="tab-content">
-            <h2 class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">
-                Repetidores Analógicos Bizkaia</h2>
-            <div class="card-tactical">
-                <div class="card-header bg-sky-700"><i class="fas fa-mountain"></i> Infraestructura de Red Local</div>
+            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3">
+                <span>Repetidores <span class="text-sky-600">Bizkaia</span></span>
+                <div class="sdr-placeholder"></div>
+            </h2>
+            <div class="card-tactical border-0">
+                <div class="card-header bg-sky-600 shadow-md">
+                    <div class="flex items-center gap-3"><i class="fas fa-mountain text-sky-200"></i> Infraestructura de Red Local</div>
+                    <button onclick="openResourceModal('repeaters')" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md text-[10px] uppercase font-bold backdrop-blur-sm transition-all border border-white/10"><i class="fas fa-plus mr-1"></i> Añadir</button>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="table-tactical text-left">
                         <thead>
@@ -439,6 +667,7 @@
                                 <th>Offset</th>
                                 <th>Tono</th>
                                 <th>Acceso</th>
+                                <th class="text-right">ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody id="table-repeaters"></tbody>
@@ -449,10 +678,14 @@
 
         <!-- TAB: PMR446 -->
         <div id="tab-pmr" class="tab-content">
-            <h2 class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">Canales
-                PMR446 Pro</h2>
-            <div class="card-tactical">
-                <div class="card-header bg-emerald-600"><i class="fas fa-walkie-talkie"></i> Uso Libre - NFM Modulación
+            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3">
+                <span>Canales <span class="text-emerald-600">PMR446</span></span>
+                <div class="sdr-placeholder"></div>
+            </h2>
+            <div class="card-tactical border-0">
+                <div class="card-header bg-emerald-600 shadow-md">
+                    <div class="flex items-center gap-3"><i class="fas fa-walkie-talkie text-emerald-200"></i> Uso Libre - NFM Modulación</div>
+                    <button onclick="openResourceModal('pmr')" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md text-[10px] uppercase font-bold backdrop-blur-sm transition-all border border-white/10"><i class="fas fa-plus mr-1"></i> Añadir</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="table-tactical text-left">
@@ -463,6 +696,7 @@
                                 <th>Modo</th>
                                 <th>Potencia</th>
                                 <th>Uso</th>
+                                <th class="text-right">ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody id="table-pmr"></tbody>
@@ -473,10 +707,15 @@
 
         <!-- TAB: EMERG & AIRE -->
         <div id="tab-emerg" class="tab-content">
-            <h2 class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">
-                Frecuencias Críticas</h2>
-            <div class="card-tactical mb-8">
-                <div class="card-header bg-rose-700"><i class="fas fa-life-ring"></i> Red de Emergencias & Auxilio</div>
+            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3">
+                <span>Frecuencias <span class="text-rose-500">Críticas</span></span>
+                <div class="sdr-placeholder"></div>
+            </h2>
+            <div class="card-tactical mb-8 border-0">
+                <div class="card-header bg-rose-600 shadow-md">
+                    <div class="flex items-center gap-3"><i class="fas fa-life-ring text-rose-200"></i> Red de Emergencias & Auxilio</div>
+                    <button onclick="openResourceModal('emerg')" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md text-[10px] uppercase font-bold backdrop-blur-sm transition-all border border-white/10"><i class="fas fa-plus mr-1"></i> Añadir</button>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="table-tactical text-left">
                         <thead>
@@ -486,14 +725,19 @@
                                 <th>Modo</th>
                                 <th>Notas</th>
                                 <th>TX</th>
+                                <th class="text-right">ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody id="table-emerg"></tbody>
                     </table>
                 </div>
             </div>
-            <div class="card-tactical">
-                <div class="card-header bg-slate-700"><i class="fas fa-plane"></i> Banda Aérea LEBB Loiu</div>
+            
+            <div class="card-tactical border-0">
+                <div class="card-header bg-slate-700 shadow-md">
+                     <div class="flex items-center gap-3"><i class="fas fa-plane text-slate-300"></i> Banda Aérea</div>
+                     <button onclick="openResourceModal('emerg', 'AIR')" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md text-[10px] uppercase font-bold backdrop-blur-sm transition-all border border-white/10"><i class="fas fa-plus mr-1"></i> Añadir</button>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="table-tactical text-left">
                         <thead>
@@ -502,6 +746,7 @@
                                 <th>Freq (MHz)</th>
                                 <th>Modo</th>
                                 <th>Función</th>
+                                <th class="text-right">ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody id="table-air"></tbody>
@@ -512,11 +757,15 @@
 
         <!-- TAB: FM -->
         <div id="tab-fm" class="tab-content">
-            <h2
-                class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter text-indigo-900">
-                FM Comercial Bizkaia (42 Estaciones)</h2>
-            <div class="card-tactical">
-                <div class="card-header bg-indigo-600"><i class="fas fa-radio"></i> Estaciones Local / Regional</div>
+            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3">
+                <span>FM <span class="text-indigo-600">Comercial</span></span>
+                <div class="sdr-placeholder"></div>
+            </h2>
+            <div class="card-tactical border-0">
+                <div class="card-header bg-indigo-600 shadow-md">
+                    <div class="flex items-center gap-3"><i class="fas fa-radio text-indigo-200"></i> Estaciones Local / Regional</div>
+                    <button onclick="openResourceModal('fm')" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md text-[10px] uppercase font-bold backdrop-blur-sm transition-all border border-white/10"><i class="fas fa-plus mr-1"></i> Añadir</button>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="table-tactical text-left">
                         <thead>
@@ -525,6 +774,7 @@
                                 <th>Freq (MHz)</th>
                                 <th>Zona</th>
                                 <th>Señal Est.</th>
+                                <th class="text-right">ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody id="table-fm"></tbody>
@@ -535,11 +785,15 @@
 
         <!-- TAB: HARDWARE -->
         <div id="tab-hardware" class="tab-content">
-            <h2 class="text-2xl md:text-3xl font-black italic uppercase mb-6 text-slate-800 tracking-tighter">Espectro
-                Tidradio H8 Gen3</h2>
-            <div class="card-tactical">
-                <div class="card-header bg-black text-sky-400"><i class="fas fa-wave-square"></i> IARU Región 1 (Basauri
-                    Local)</div>
+            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3">
+                <span>Espectro <span class="text-slate-900">Tidradio H8</span></span>
+                <div class="sdr-placeholder"></div>
+            </h2>
+            <div class="card-tactical border-0">
+                <div class="card-header bg-slate-900 text-sky-400 shadow-md">
+                    <div class="flex items-center gap-3"><i class="fas fa-wave-square"></i> IARU Región 1</div>
+                    <button onclick="openResourceModal('hardware')" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md text-[10px] uppercase font-bold backdrop-blur-sm transition-all border border-white/10"><i class="fas fa-plus mr-1"></i> Añadir</button>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="table-tactical text-left">
                         <thead>
@@ -549,6 +803,7 @@
                                 <th>Uso Exclusivo / Notas</th>
                                 <th>Modo</th>
                                 <th>TX</th>
+                                <th class="text-right">ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody id="table-h8"></tbody>
@@ -559,59 +814,95 @@
 
         <!-- TAB: SYNC -->
         <div id="tab-sync" class="tab-content max-w-4xl mx-auto space-y-8">
-            <h2
-                class="text-2xl md:text-3xl font-black italic uppercase text-center mb-4 text-slate-800 tracking-tighter">
-                Data Hub & Cloud Sync</h2>
+            <h2 class="text-3xl md:text-4xl font-black italic uppercase text-center mb-8 text-slate-800 tracking-tighter flex items-center justify-center gap-3">
+                <span>Data Hub & <span class="text-sky-500">Cloud Sync</span></span>
+                <div class="sdr-placeholder"></div>
+            </h2>
 
             <div
-                class="bg-black text-green-500 p-4 rounded mono text-xs border-l-4 border-green-500 shadow-xl overflow-x-auto">
-                <div class="font-bold border-b border-green-900 pb-1 mb-2">DEBUG CONSOLE</div>
-                <div id="console-output" class="h-32">> Initializing...</div>
+                class="bg-slate-900 text-green-400 p-5 rounded-xl mono text-xs border-l-4 border-green-500 shadow-2xl overflow-x-auto ring-4 ring-slate-100">
+                <div class="font-bold border-b border-slate-700 pb-2 mb-3 flex justify-between">
+                    <span>DEBUG CONSOLE</span>
+                    <span class="animate-pulse">●</span>
+                </div>
+                <div id="console-output" class="h-32 opacity-90">> System Ready. Waiting for input...</div>
             </div>
 
             <!-- MANUAL CONFIG PANEL -->
-            <div class="card-tactical p-6 border-l-4 border-amber-500 bg-amber-50">
-                <div class="flex items-center gap-3 mb-4">
-                    <i class="fas fa-cogs text-amber-600 text-xl"></i>
-                    <h3 class="font-black uppercase text-amber-900">Configuración de Conexión</h3>
+            <div class="card-tactical p-8 border-l-4 border-amber-500 bg-amber-50/50">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+                        <i class="fas fa-cogs text-xl"></i>
+                    </div>
+                    <h3 class="font-black uppercase text-amber-900 text-lg">Configuración de Conexión</h3>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="text-[10px] font-bold uppercase text-amber-800">Supabase Project URL</label>
+                        <label class="text-[10px] font-bold uppercase text-amber-800 mb-2 block">Supabase Project URL</label>
                         <input type="text" id="cfg-url" placeholder="https://svcakitmimdhltwcmadd.supabase.co"
-                            class="text-xs bg-white">
-                        <p class="text-[9px] text-amber-700 mt-1">Detectado ID: svcakitmimdhltwcmadd</p>
+                            class="text-xs bg-white border-amber-200 focus:border-amber-500 focus:ring-amber-200">
+                        <p class="text-[9px] text-amber-700 mt-2 font-medium">Detectado ID: svcakitmimdhltwcmadd</p>
                     </div>
                     <div>
-                        <label class="text-[10px] font-bold uppercase text-amber-800">Supabase API Key</label>
-                        <input type="password" id="cfg-key" placeholder="sb_publishable..." class="text-xs bg-white">
-                        <p class="text-[9px] text-amber-700 mt-1">Usar clave proporcionada (Key)</p>
+                        <label class="text-[10px] font-bold uppercase text-amber-800 mb-2 block">Supabase API Key</label>
+                        <input type="password" id="cfg-key" placeholder="sb_publishable..." class="text-xs bg-white border-amber-200 focus:border-amber-500 focus:ring-amber-200">
+                        <p class="text-[9px] text-amber-700 mt-2 font-medium">Usar clave proporcionada (Key)</p>
                     </div>
-                    <div class="md:col-span-2 text-right">
+                    <div class="md:col-span-2 text-right pt-2">
                         <button onclick="saveConfig()"
-                            class="bg-amber-600 text-white px-4 py-2 rounded text-xs font-black uppercase hover:bg-amber-700">Guardar
+                            class="bg-amber-500 text-white px-6 py-3 rounded-lg text-xs font-black uppercase hover:bg-amber-600 shadow-lg shadow-amber-200 transition-all transform active:scale-95">Guardar
                             y Conectar</button>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="card-tactical p-8 bg-indigo-50/50 border-l-4 border-indigo-500">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                        <i class="fas fa-sync text-xl"></i>
+                    </div>
+                    <h3 class="font-black uppercase text-indigo-900 text-lg">Restauración Inteligente</h3>
+                </div>
+                <p class="text-sm text-indigo-700/80 mb-6 font-medium leading-relaxed">Usa este botón para rellenar la base de datos en la nube con los datos originales (Repeaters, FM, etc.) si faltan. <strong class="text-indigo-900">No borrará tus datos actuales</strong>, solo añadirá los que no existan.</p>
+                <button onclick="uploadMissingSeedData()" class="bg-indigo-600 text-white px-6 py-4 rounded-lg text-xs font-black uppercase hover:bg-indigo-700 w-full shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2"><i class="fas fa-cloud-upload-alt text-lg"></i> Fusionar Datos Semilla (Smart Merge)</button>
+            </div>
+
+            <!-- SQL INSTALL HELPER -->
+            <div class="card-tactical p-8 bg-slate-50 border-l-4 border-slate-400">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600">
+                        <i class="fas fa-database text-xl"></i>
+                    </div>
+                    <h3 class="font-black uppercase text-slate-800 text-lg">Instalación de Base de Datos</h3>
+                </div>
+                <p class="text-xs text-slate-500 mb-6 font-medium">Si las tablas no existen en Supabase, pulsa el botón para copiar los comandos SQL.</p>
+                <button onclick="showInstallSQL()" class="bg-slate-700 text-white px-6 py-3 rounded-lg text-xs font-black uppercase hover:bg-slate-800 w-full shadow-lg shadow-slate-200 transition-all"><i class="fas fa-copy mr-2"></i> Ver Comandos SQL de Instalación</button>
+                <div id="sql-box" class="hidden mt-6">
+                    <textarea readonly id="sql-area" class="w-full h-48 bg-slate-900 text-emerald-400 text-[10px] mono p-4 rounded-lg shadow-inner border border-slate-700 focus:outline-none" onclick="this.select()"></textarea>
+                    <p class="text-[9px] text-center text-slate-400 mt-2 uppercase font-bold">Copia, pega en Supabase SQL Editor y ejecuta.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div
-                    class="card-tactical p-8 text-center space-y-4 border-2 border-transparent hover:border-sky-500 transition-all">
-                    <i class="fas fa-cloud-upload-alt text-sky-600 text-5xl"></i>
-                    <h3 class="text-xl font-black uppercase italic">Estado de Supabase</h3>
-                    <p id="cloud-status-text" class="text-[10px] text-slate-400 font-bold uppercase">Verificando
+                    class="card-tactical p-8 text-center space-y-4 border-2 border-transparent hover:border-sky-200 hover:shadow-xl transition-all group cursor-default">
+                    <div class="w-16 h-16 bg-sky-50 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <i class="fas fa-cloud text-sky-500 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-black uppercase italic text-slate-800">Estado de Supabase</h3>
+                    <p id="cloud-status-text" class="text-[10px] text-slate-400 font-bold uppercase bg-slate-100 py-1 px-3 rounded-full inline-block">Verificando
                         conexión...</p>
-                    <button onclick="fetchLogs()" class="btn-primary w-full text-[10px]">Forzar Sincronización</button>
+                    <button onclick="fetchLogs()" class="btn-primary w-full text-[10px] mt-4">Forzar Sincronización</button>
                 </div>
                 <div
-                    class="card-tactical p-8 text-center space-y-4 border-2 border-transparent hover:border-emerald-500 transition-all bg-slate-50">
-                    <i class="fas fa-file-csv text-emerald-600 text-5xl"></i>
-                    <h3 class="text-xl font-black uppercase italic">Export H8 CSV</h3>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase">Base de Datos Completa (Repetidores + PMR
-                        + Aire + FM)</p>
+                    class="card-tactical p-8 text-center space-y-4 border-2 border-transparent hover:border-emerald-200 hover:shadow-xl transition-all group cursor-default bg-white">
+                    <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <i class="fas fa-file-csv text-emerald-500 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-black uppercase italic text-slate-800">Export H8 CSV</h3>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase">Base de Datos Completa</p>
                     <button onclick="downloadCSV()"
-                        class="bg-emerald-600 text-white font-black py-4 rounded w-full text-[10px] uppercase shadow-lg">Descargar
+                        class="bg-emerald-500 text-white font-black py-4 rounded-lg w-full text-[10px] uppercase shadow-lg shadow-emerald-100 hover:bg-emerald-600 transition-all">Descargar
                         MASTER_H8.csv</button>
                 </div>
             </div>
@@ -619,6 +910,20 @@
     </main>
 
     <script>
+        // --- UI CORE ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.add('active');
+            window.scrollTo(0, 0);
+
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+                toggleMenu();
+            }
+        }
+
         function toggleMenu() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobile-overlay');
@@ -640,6 +945,39 @@
             }
         }
 
+        // --- AUTHENTICATION (SECURE WRAPPER) ---
+        function doLogin() {
+            const passField = document.getElementById('login-pass');
+            const pass = passField.value.trim(); // Trim added
+            
+            // Check if auth system loaded
+            if (typeof window.checkPassword !== 'function') {
+                document.getElementById('login-msg').innerText = "ERROR: auth.js no cargado";
+                return;
+            }
+
+            if (window.checkPassword(pass)) {
+                document.getElementById('login-overlay').classList.add('opacity-0', 'pointer-events-none');
+                if(window.setSessionActive) window.setSessionActive();
+            } else {
+                document.getElementById('login-msg').innerText = "ACCESO DENEGADO";
+                passField.value = ''; // Clear input
+                passField.focus();
+            }
+        }
+
+        function checkAuthSync(action) {
+            if (window.isSessionActive && window.isSessionActive()) return true;
+            
+            const p = prompt(`SEGURIDAD: Contraseña para ${action}:`);
+            if (window.checkPassword && window.checkPassword(p)) {
+                 if(window.setSessionActive) window.setSessionActive();
+                 return true;
+            }
+            alert("❌ Contraseña incorrecta");
+            return false;
+        }
+
         // --- SUPABASE CONFIG ---
         const DEFAULT_URL = 'https://svcakitmimdhltwcmadd.supabase.co';
         const DEFAULT_KEY = 'sb_publishable_uR_yVZpJ2wOkUD0bihyGBg_E__lJACJ';
@@ -651,6 +989,21 @@
         document.getElementById('cfg-key').value = SB_KEY;
 
         let supabaseClient = null;
+
+        // --- GLOBAL STATE ---
+        let logs = [];
+        let editingId = null;
+
+        // --- HELPER FUNCTIONS ---
+        function updateStatus(msg, color) {
+            const indicator = document.getElementById('sync-indicator');
+            const statusText = document.getElementById('cloud-status-text');
+            if (indicator) {
+                indicator.innerText = msg;
+                indicator.className = `mt-4 text-[9px] font-black px-3 py-1 rounded-full inline-block uppercase tracking-widest border border-slate-200 ${color.replace('text', 'text').replace('400', '600')} bg-slate-100`;
+            }
+            if (statusText) statusText.innerText = msg;
+        }
 
         function saveConfig() {
             const url = document.getElementById('cfg-url').value.trim();
@@ -685,170 +1038,320 @@
             }
         }
 
-        // --- GLOBALS & DATA ---
-        const REPEATERS = [
-            { id: 'R0', loc: 'GANEKOGORTA', rx: '145.600', tx: '145.000', off: '-0.600', t: '123.0' },
-            { id: 'R1', loc: 'SOLLUBE', rx: '145.625', tx: '145.025', off: '-0.600', t: 'NONE' },
-            { id: 'R2', loc: 'LA GARBEA', rx: '145.650', tx: '145.050', off: '-0.600', t: '123.0' },
-            { id: 'R3', loc: 'PAGASARRI', rx: '145.675', tx: '145.075', off: '-0.600', t: '82.5' },
-            { id: 'R4', loc: 'VALLE DE MENA', rx: '145.700', tx: '145.100', off: '-0.600', t: '123.0' },
-            { id: 'R6', loc: 'MONTE OIZ', rx: '145.750', tx: '145.150', off: '-0.600', t: '82.5' },
-            { id: 'R7', loc: 'KARRANTZA', rx: '145.775', tx: '145.175', off: '-0.600', t: '123.0' },
-            { id: 'U78', loc: 'PAGASARRI', rx: '438.850', tx: '431.250', off: '-7.600', t: '123.0' },
-            { id: 'U82', loc: 'GANEKOGORTA', rx: '438.950', tx: '431.350', off: '-7.600', t: '123.0' },
-            { id: 'U84', loc: 'OIZ UHF', rx: '439.000', tx: '431.400', off: '-7.600', t: '82.5' },
-            { id: 'ED2ZAA', loc: 'DMR BILBAO', rx: '438.225', tx: '430.625', off: '-7.600', t: 'CC 1' },
-            { id: 'ED2ZAB', loc: 'DMR SOLLUBE', rx: '438.525', tx: '430.925', off: '-7.600', t: 'CC 1' }
-        ];
+        // --- DYNAMIC DATA STORAGE ---
+        const uuid = () => 'id_' + Math.random().toString(36).substr(2, 9);
 
-        const PMR_DATA = Array.from({ length: 16 }, (_, i) => {
-            const freqs = ['446.00625', '446.01875', '446.03125', '446.04375', '446.05625', '446.06875', '446.08125', '446.09375', '446.10625', '446.11875', '446.13125', '446.14375', '446.15625', '446.16875', '446.18125', '446.19375'];
-            return { c: i + 1, f: freqs[i], m: 'NFM', p: i === 7 ? 'MID' : 'LOW', u: i === 7 ? 'EMERGENCIA' : 'Uso Libre' };
-        });
+        // RESTORED FULL SEED DATA
+        const SEED_DATA = {
+            repeaters: [
+                { id: uuid(), loc: 'R0 GANEKOGORTA', rx: '145.600', tx: '145.000', off: '-0.600', t: '123.0' },
+                { id: uuid(), loc: 'R1 SOLLUBE', rx: '145.625', tx: '145.025', off: '-0.600', t: 'NONE' },
+                { id: uuid(), loc: 'R2 LA GARBEA', rx: '145.650', tx: '145.050', off: '-0.600', t: '123.0' },
+                { id: uuid(), loc: 'R3 PAGASARRI', rx: '145.675', tx: '145.075', off: '-0.600', t: '82.5' },
+                { id: uuid(), loc: 'R4 VALLE DE MENA', rx: '145.700', tx: '145.100', off: '-0.600', t: '123.0' },
+                { id: uuid(), loc: 'R5 EIBAR', rx: '145.725', tx: '145.125', off: '-0.600', t: '77.0' },
+                { id: uuid(), loc: 'R6 MONTE OIZ', rx: '145.750', tx: '145.150', off: '-0.600', t: '82.5' },
+                { id: uuid(), loc: 'R7 KARRANTZA', rx: '145.775', tx: '145.175', off: '-0.600', t: '123.0' },
+                { id: uuid(), loc: 'U78 PAGASARRI', rx: '438.850', tx: '431.250', off: '-7.600', t: '123.0' },
+                { id: uuid(), loc: 'U82 GANEKOGORTA', rx: '438.950', tx: '431.350', off: '-7.600', t: '123.0' },
+                { id: uuid(), loc: 'U84 OIZ UHF', rx: '439.000', tx: '431.400', off: '-7.600', t: '82.5' },
+                { id: uuid(), loc: 'U86 SOLLUBE UHF', rx: '439.050', tx: '431.450', off: '-7.600', t: '123.0' },
+                { id: uuid(), loc: 'ED2ZAA DMR BILBAO', rx: '438.225', tx: '430.625', off: '-7.600', t: 'CC 1' },
+                { id: uuid(), loc: 'ED2ZAB DMR SOLLUBE', rx: '438.525', tx: '430.925', off: '-7.600', t: 'CC 1' }
+            ],
+            pmr: Array.from({ length: 16 }, (_, i) => {
+                const freqs = ['446.00625', '446.01875', '446.03125', '446.04375', '446.05625', '446.06875', '446.08125', '446.09375', '446.10625', '446.11875', '446.13125', '446.14375', '446.15625', '446.16875', '446.18125', '446.19375'];
+                return { id: uuid(), c: (i + 1).toString(), f: freqs[i], m: 'NFM', p: i === 7 ? 'MID' : 'LOW', u: i === 7 ? 'EMERGENCIA' : 'Uso Libre' };
+            }),
+            emerg: [
+                {id: uuid(), s: 'Salvamento Marítimo', f: '156.800', m: 'FM', n: 'Canal 16 Náutico Internacional', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'REM (Montaña)', f: '146.175', m: 'FM', n: 'Red Emergencia Montaña - Auxilio', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'Prot. Civil Basauri', f: '152.325', m: 'FM', n: 'Coordinación Local Protección Civil', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'Cruz Roja Euskadi', f: '164.308', m: 'FM', n: 'Operativos Cruz Roja', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'Emergencias Bizkaia', f: '146.508', m: 'FM', n: 'QAP Local - Coordinación Emergencias', tx: 'RX ONLY', type: 'EMERG' },
 
-        const EMERG_DATA = [
-            // ==================== RED DE EMERGENCIAS & AUXILIO ====================
-            { s: 'Salvamento Marítimo', f: '156.800', m: 'FM', n: 'Canal 16 Náutico Internacional', tx: 'RX ONLY' },
-            { s: 'REM (Montaña)', f: '146.175', m: 'FM', n: 'Red Emergencia Montaña - Auxilio', tx: 'RX ONLY' },
-            { s: 'Prot. Civil Basauri', f: '152.325', m: 'FM', n: 'Coordinación Local Protección Civil', tx: 'RX ONLY' },
-            { s: 'Cruz Roja Euskadi', f: '164.308', m: 'FM', n: 'Operativos Cruz Roja', tx: 'RX ONLY' },
-            { s: 'Emergencias Bizkaia', f: '146.508', m: 'FM', n: 'QAP Local - Coordinación Emergencias', tx: 'RX ONLY' },
+            {id: uuid(), s: 'Bomberos Bizkaia', f: '169.5125', m: 'FM', n: 'Consorcio Bomberos - Operativa Principal', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'Bomberos Bizkaia', f: '169.7625', m: 'FM', n: 'Consorcio Bomberos - Coordinación', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'DYA Euskadi', f: '144.800', m: 'FM', n: 'Asistencia Sanitaria Voluntaria', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'DYA Euskadi', f: '146.200', m: 'FM', n: 'Emergencias DYA', tx: 'RX ONLY', type: 'EMERG' },
 
-            // ==================== BOMBEROS Y SERVICIOS DE RESCATE ====================
-            { s: 'Bomberos Bizkaia', f: '169.5125', m: 'FM', n: 'Consorcio Bomberos - Operativa Principal', tx: 'RX ONLY' },
-            { s: 'Bomberos Bizkaia', f: '169.7625', m: 'FM', n: 'Consorcio Bomberos - Coordinación', tx: 'RX ONLY' },
-            { s: 'DYA Euskadi', f: '144.800', m: 'FM', n: 'Asistencia Sanitaria Voluntaria', tx: 'RX ONLY' },
-            { s: 'DYA Euskadi', f: '146.200', m: 'FM', n: 'Emergencias DYA', tx: 'RX ONLY' },
+            {id: uuid(), s: 'Osakidetza Ambulancias', f: '164.0625', m: 'FM', n: 'Coordinación ambulancias', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'Osakidetza Soporte Avanzado', f: '164.2875', m: 'FM', n: 'Emergencias sanitarias', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'SAMUR País Vasco', f: '155.275', m: 'FM', n: 'Emergencia sanitaria móvil', tx: 'RX ONLY', type: 'EMERG' },
 
-            // ==================== SERVICIOS MÉDICOS Y URGENCIAS ====================
-            { s: 'Osakidetza Ambulancias', f: '164.0625', m: 'FM', n: 'Coordinación ambulancias', tx: 'RX ONLY' },
-            { s: 'Osakidetza Soporte Avanzado', f: '164.2875', m: 'FM', n: 'Emergencias sanitarias', tx: 'RX ONLY' },
-            { s: 'SAMUR País Vasco', f: '155.275', m: 'FM', n: 'Emergencia sanitaria móvil', tx: 'RX ONLY' },
+            {id: uuid(), s: 'Puerto de Bilbao', f: '156.600', m: 'FM', n: 'Canal 12 - Operaciones portuarias', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'Puerto de Bilbao', f: '156.700', m: 'FM', n: 'Canal 14 - Control tráfico portuario', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'Puerto de Bilbao', f: '156.450', m: 'FM', n: 'Canal 9 - Comunicaciones internas', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'Capitán Marítima Bilbao', f: '157.850', m: 'FM', n: 'Canal 27 - Coordinación marítima', tx: 'RX ONLY', type: 'EMERG' },
 
-            // ==================== SERVICIOS MARÍTIMOS Y PORTUARIOS ====================
-            { s: 'Puerto de Bilbao', f: '156.600', m: 'FM', n: 'Canal 12 - Operaciones portuarias', tx: 'RX ONLY' },
-            { s: 'Puerto de Bilbao', f: '156.700', m: 'FM', n: 'Canal 14 - Control tráfico portuario', tx: 'RX ONLY' },
-            { s: 'Puerto de Bilbao', f: '156.450', m: 'FM', n: 'Canal 9 - Comunicaciones internas', tx: 'RX ONLY' },
-            { s: 'Capitán Marítima Bilbao', f: '157.850', m: 'FM', n: 'Canal 27 - Coordinación marítima', tx: 'RX ONLY' },
+            {id: uuid(), s: 'Metro de Bilbao', f: '160.050', m: 'FM', n: 'Comunicaciones trenes/control', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'Metro de Bilbao', f: '161.300', m: 'FM', n: 'Seguridad y mantenimiento', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'EuskoTren', f: '161.625', m: 'FM', n: 'Operaciones ferroviarias', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'Bilbobus', f: '169.2125', m: 'FM', n: 'Coordinación flota transporte urbano', tx: 'RX ONLY', type: 'EMERG' },
 
-            // ==================== TRANSPORTE PÚBLICO ====================
-            { s: 'Metro de Bilbao', f: '160.050', m: 'FM', n: 'Comunicaciones trenes/control', tx: 'RX ONLY' },
-            { s: 'Metro de Bilbao', f: '161.300', m: 'FM', n: 'Seguridad y mantenimiento', tx: 'RX ONLY' },
-            { s: 'EuskoTren', f: '161.625', m: 'FM', n: 'Operaciones ferroviarias', tx: 'RX ONLY' },
-            { s: 'Bilbobus', f: '169.2125', m: 'FM', n: 'Coordinación flota transporte urbano', tx: 'RX ONLY' },
+            {id: uuid(), s: 'Protección Civil Bilbao', f: '152.225', m: 'FM', n: 'Coordinación municipal Bilbao', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'Protección Civil Barakaldo', f: '152.425', m: 'FM', n: 'Coordinación municipal Barakaldo', tx: 'RX ONLY', type: 'EMERG' },
+            {id: uuid(), s: 'Protección Civil Portugalete', f: '152.525', m: 'FM', n: 'Coordinación municipal Portugalete', tx: 'RX ONLY', type: 'EMERG' },
+            
+            { id: uuid(), s: 'LEBB Loiu APP', f: '120.700', m: 'AM', n: 'Aproximación', tx: 'RX ONLY', type: 'AIR' },
+            { id: uuid(), s: 'LEBB Loiu Torre', f: '118.500', m: 'AM', n: 'Torre Control', tx: 'RX ONLY', type: 'AIR' },
+            { id: uuid(), s: 'LEBB Loiu Tierra', f: '121.700', m: 'AM', n: 'Rodadura', tx: 'RX ONLY', type: 'AIR' }
 
-            // ==================== PROTECCIÓN CIVIL MUNICIPAL ====================
-            { s: 'Protección Civil Bilbao', f: '152.225', m: 'FM', n: 'Coordinación municipal Bilbao', tx: 'RX ONLY' },
-            { s: 'Protección Civil Barakaldo', f: '152.425', m: 'FM', n: 'Coordinación municipal Barakaldo', tx: 'RX ONLY' },
-            { s: 'Protección Civil Portugalete', f: '152.525', m: 'FM', n: 'Coordinación municipal Portugalete', tx: 'RX ONLY' }
-        ];
+            ],
+            fm: [
+                { id: uuid(), e: 'Radio Nervión', f: '88.0', z: 'Bilbao', s: 'MAX' },
+                { id: uuid(), e: 'Los 40 Classic', f: '88.5', z: 'Bilbao', s: 'ALTA' },
+                { id: uuid(), e: 'Los 40 Bilbao', f: '89.5', z: 'Bilbao', s: 'ALTA' },
+                { id: uuid(), e: 'Radio 3 RNE', f: '90.3', z: 'Bizkaia', s: 'ALTA' },
+                { id: uuid(), e: 'Radio Euskadi', f: '91.7', z: 'Bizkaia', s: 'MAX' },
+                { id: uuid(), e: 'Radio 7', f: '92.7', z: 'Barakaldo', s: 'ALTA' },
+                { id: uuid(), e: 'Rock FM', f: '93.6', z: 'Bilbao', s: 'ALTA' },
+                { id: uuid(), e: 'Kiss FM', f: '95.2', z: 'Bilbao', s: 'MEDIA' },
+                { id: uuid(), e: 'Cadena SER', f: '96.5', z: 'Bilbao', s: 'ALTA' },
+                { id: uuid(), e: 'Euskadi Gaztea', f: '97.2', z: 'Bizkaia', s: 'ALTA' },
+                { id: uuid(), e: 'RNE 1', f: '99.2', z: 'Bizkaia', s: 'ALTA' },
+                { id: uuid(), e: 'Cadena 100', f: '100.0', z: 'Bilbao', s: 'ALTA' },
+                { id: uuid(), e: 'Onda Cero', f: '101.5', z: 'Bilbao', s: 'ALTA' },
+                { id: uuid(), e: 'Bizkaia Irratia', f: '102.6', z: 'Durangaldea', s: 'MEDIA' },
+                { id: uuid(), e: 'COPE Bilbao', f: '103.8', z: 'Bilbao', s: 'ALTA' },
+                { id: uuid(), e: 'Melodia FM', f: '104.5', z: 'Bilbao', s: 'MEDIA' },
+                { id: uuid(), e: 'Radio Maria', f: '105.8', z: 'Bilbao', s: 'BAJA' },
+                { id: uuid(), e: 'Hit FM', f: '106.3', z: 'Bilbao', s: 'MEDIA' },
+                { id: uuid(), e: 'Euskadi Irratia', f: '107.4', z: 'Bizkaia', s: 'ALTA' },
+                { id: uuid(), e: 'Radio Gorbea', f: '93.1', z: 'Vitoria/Sur', s: 'BAJA' },
+                { id: uuid(), e: 'Onda Vasca', f: '90.1', z: 'Bilbao', s: 'ALTA' },
+                { id: uuid(), e: 'Europa FM', f: '98.4', z: 'Bilbao', s: 'ALTA' },
+                { id: uuid(), e: 'Radio Tropical', f: '102.9', z: 'Bilbao', s: 'MEDIA' },
+                { id: uuid(), e: 'Arratia Irratia', f: '104.9', z: 'Igorre', s: 'BAJA' },
+                { id: uuid(), e: 'Radio Vitoria', f: '104.1', z: 'Álava/Sur', s: 'BAJA' },
+                { id: uuid(), e: 'Radio Popular', f: '92.2', z: 'Bilbao', s: 'ALTA' },
+                { id: uuid(), e: 'Kosta Irratia', f: '104.7', z: 'Bakio', s: 'BAJA' },
+                { id: uuid(), e: 'Tas-Tas Irratia', f: '97.0', z: 'Bilbao', s: 'BAJA' },
+                { id: uuid(), e: 'Irola Irratia', f: '107.5', z: 'Irala', s: 'BAJA' },
+                { id: uuid(), e: '97 Irratia', f: '97.0', z: 'Bilbao', s: 'BAJA' },
+                { id: uuid(), e: 'Radio Encartaciones', f: '101.9', z: 'Zalla', s: 'BAJA' },
+                { id: uuid(), e: 'Bilbo Hiria', f: '96.0', z: 'Bilbao', s: 'BAJA' },
+                { id: uuid(), e: 'Loca FM', f: '105.4', z: 'Bilbao', s: 'MEDIA' },
+                { id: uuid(), e: 'Antena 3 RNE', f: '103.2', z: 'Bizkaia', s: 'ALTA' },
+                { id: uuid(), e: 'Radio Marca', f: '103.4', z: 'Bilbao', s: 'MEDIA' },
+                { id: uuid(), e: 'Radio 5 RNE', f: '100.7', z: 'Bizkaia', s: 'ALTA' },
+                { id: uuid(), e: 'Hala Bedi', f: '107.4', z: 'Vitoria', s: 'BAJA' },
+                { id: uuid(), e: 'Cadena Dial', f: '88.8', z: 'Bilbao', s: 'ALTA' },
+                { id: uuid(), e: 'Radio Oro', f: '95.2', z: 'Bilbao', s: 'MEDIA' },
+                { id: uuid(), e: 'Radio Candela', f: '98.0', z: 'Bilbao', s: 'BAJA' },
+                { id: uuid(), e: 'Very Bilbao', f: '100.9', z: 'Bilbao', s: 'MEDIA' },
+                { id: uuid(), e: 'Tropical FM', f: '102.2', z: 'Bilbao', s: 'BAJA' }
+            ],
 
-        // NOTAS:
-        // * RX ONLY = Sólo recepción (no transmitir nunca)
-        // * RX* = Repetidor de radioaficionados - Sólo recepción si no tienes licencia de radioaficionado
+            hardware: [
+                { id: uuid(), r: '65.0 - 108.0', s: 'FM Comercial', u: 'Radiodifusión FM (WFM)', m: 'WFM', tx: 'RX' },
+                { id: uuid(), r: '108.0 - 117.9', s: 'Banda Aérea', u: 'VOR / Navegación (Solo Balizas)', m: 'AM', tx: 'RX' },
+                { id: uuid(), r: '118.0 - 136.9', s: 'Banda Aérea', u: 'Comunicaciones Voz Aérea (AM)', m: 'AM', tx: 'RX' },
+                { id: uuid(), r: '144.0 - 144.150', s: '2M Amateur', u: 'CW (Telegrafía) - Uso Exclusivo', m: 'CW', tx: 'TX OK' },
+                { id: uuid(), r: '144.150 - 144.4', s: '2M Amateur', u: 'SSB (Banda Lateral) / DX', m: 'USB', tx: 'TX OK' },
+                { id: uuid(), r: '144.5 - 144.9', s: '2M Amateur', u: 'Todos los Modos / Digital / SSTV', m: 'FM', tx: 'TX OK' },
+                { id: uuid(), r: '145.0 - 145.175', s: '2M Amateur', u: 'Entrada Repetidores (R0-R7)', m: 'FM', tx: 'TX OK' },
+                { id: uuid(), r: '145.2 - 145.575', s: '2M Amateur', u: 'FM Simplex (145.500 Llamada)', m: 'FM', tx: 'TX OK' },
+                { id: uuid(), r: '145.6 - 145.775', s: '2M Amateur', u: 'Salida Repetidores (R0-R7)', m: 'FM', tx: 'TX OK' },
+                { id: uuid(), r: '145.8 - 146.0', s: '2M Amateur', u: 'Satélites (ISS Downlink)', m: 'FM', tx: 'TX OK' },
+                { id: uuid(), r: '146.0 - 174.0', s: 'VHF Pro', u: 'Servicios Profesionales / Caza / Emerg', m: 'FM', tx: 'TX OK' },
+                { id: uuid(), r: '430.0 - 432.0', s: '70cm Amateur', u: 'CW / SSB / Digital', m: 'USB', tx: 'TX OK' },
+                { id: uuid(), r: '433.0 - 433.575', s: '70cm Amateur', u: 'FM Simplex (433.500 Llamada)', m: 'FM', tx: 'TX OK' },
+                { id: uuid(), r: '438.650 - 439.425', s: '70cm Amateur', u: 'Salida Repetidores UHF', m: 'FM', tx: 'TX OK' },
+                { id: uuid(), r: '446.0 - 446.2', s: 'PMR446', u: 'Uso Libre sin licencia', m: 'NFM', tx: 'TX OK' }
+            ]
+        };
 
-        const AIR_DATA = [
-            { s: 'LEBB Loiu APP', f: '120.700', m: 'AM', n: 'Aproximación', tx: 'RX ONLY' },
-            { s: 'LEBB Loiu Torre', f: '118.500', m: 'AM', n: 'Torre de Control', tx: 'RX ONLY' },
-            { s: 'LEBB Loiu Tierra', f: '121.700', m: 'AM', n: 'Rodadura', tx: 'RX ONLY' },
-            { s: 'LEBB Loiu ATIS', f: '127.350', m: 'AM', n: 'Info Meteorológica', tx: 'RX ONLY' },
-            { s: 'Euskadi Control', f: '132.050', m: 'AM', n: 'Centro Control Norte', tx: 'RX ONLY' },
-            // ==================== METEOROLOGÍA Y CONTROL AÉREO REGIONAL ====================
-            { s: 'Control Aéreo Barcelona', f: '128.058', m: 'AM', n: 'Control regional accesible desde Bizkaia', tx: 'RX ONLY' },
-            { s: 'Información Vuelos', f: '135.975', m: 'AM', n: 'Información tráfico aéreo', tx: 'RX ONLY' }
-        ];
+        // GLOBAL DATA STATE
+        let db = {
+            repeaters: [],
+            pmr: [],
+            emerg: [],
+            fm: [],
+            hardware: []
+        };
 
-        const FM_DATA = [
-            { e: 'Radio Nervión', f: '88.0', z: 'Bilbao', s: 'MAX' },
-            { e: 'Los 40 Classic', f: '88.5', z: 'Bilbao', s: 'ALTA' },
-            { e: 'Los 40 Bilbao', f: '89.5', z: 'Bilbao', s: 'ALTA' },
-            { e: 'Radio 3 RNE', f: '90.3', z: 'Bizkaia', s: 'ALTA' },
-            { e: 'Radio Euskadi', f: '91.7', z: 'Bizkaia', s: 'MAX' },
-            { e: 'Radio 7', f: '92.7', z: 'Barakaldo', s: 'ALTA' },
-            { e: 'Rock FM', f: '93.6', z: 'Bilbao', s: 'ALTA' },
-            { e: 'Kiss FM', f: '95.2', z: 'Bilbao', s: 'MEDIA' },
-            { e: 'Cadena SER', f: '96.5', z: 'Bilbao', s: 'ALTA' },
-            { e: 'Euskadi Gaztea', f: '97.2', z: 'Bizkaia', s: 'ALTA' },
-            { e: 'RNE 1', f: '99.2', z: 'Bizkaia', s: 'ALTA' },
-            { e: 'Cadena 100', f: '100.0', z: 'Bilbao', s: 'ALTA' },
-            { e: 'Onda Cero', f: '101.5', z: 'Bilbao', s: 'ALTA' },
-            { e: 'Bizkaia Irratia', f: '102.6', z: 'Durangaldea', s: 'MEDIA' },
-            { e: 'COPE Bilbao', f: '103.8', z: 'Bilbao', s: 'ALTA' },
-            { e: 'Melodia FM', f: '104.5', z: 'Bilbao', s: 'MEDIA' },
-            { e: 'Radio Maria', f: '105.8', z: 'Bilbao', s: 'BAJA' },
-            { e: 'Hit FM', f: '106.3', z: 'Bilbao', s: 'MEDIA' },
-            { e: 'Euskadi Irratia', f: '107.4', z: 'Bizkaia', s: 'ALTA' },
-            { e: 'Radio Gorbea', f: '93.1', z: 'Vitoria/Sur', s: 'BAJA' },
-            { e: 'Onda Vasca', f: '90.1', z: 'Bilbao', s: 'ALTA' },
-            { e: 'Europa FM', f: '98.4', z: 'Bilbao', s: 'ALTA' },
-            { e: 'Radio Tropical', f: '102.9', z: 'Bilbao', s: 'MEDIA' },
-            { e: 'Arratia Irratia', f: '104.9', z: 'Igorre', s: 'BAJA' },
-            { e: 'Radio Vitoria', f: '104.1', z: 'Álava/Sur', s: 'BAJA' },
-            { e: 'Radio Popular', f: '92.2', z: 'Bilbao', s: 'ALTA' },
-            { e: 'Kosta Irratia', f: '104.7', z: 'Bakio', s: 'BAJA' },
-            { e: 'Tas-Tas Irratia', f: '97.0', z: 'Bilbao', s: 'BAJA' },
-            { e: 'Irola Irratia', f: '107.5', z: 'Irala', s: 'BAJA' },
-            { e: '97 Irratia', f: '97.0', z: 'Bilbao', s: 'BAJA' },
-            { e: 'Radio Encartaciones', f: '101.9', z: 'Zalla', s: 'BAJA' },
-            { e: 'Bilbo Hiria', f: '96.0', z: 'Bilbao', s: 'BAJA' },
-            { e: 'Loca FM', f: '105.4', z: 'Bilbao', s: 'MEDIA' },
-            { e: 'Antena 3 RNE', f: '103.2', z: 'Bizkaia', s: 'ALTA' },
-            { e: 'Radio Marca', f: '103.4', z: 'Bilbao', s: 'MEDIA' },
-            { e: 'Radio 5 RNE', f: '100.7', z: 'Bizkaia', s: 'ALTA' },
-            { e: 'Hala Bedi', f: '107.4', z: 'Vitoria', s: 'BAJA' },
-            { e: 'Cadena Dial', f: '88.8', z: 'Bilbao', s: 'ALTA' },
-            { e: 'Radio Oro', f: '95.2', z: 'Bilbao', s: 'MEDIA' },
-            { e: 'Radio Candela', f: '98.0', z: 'Bilbao', s: 'BAJA' },
-            { e: 'Very Bilbao', f: '100.9', z: 'Bilbao', s: 'MEDIA' },
-            { e: 'Tropical FM', f: '102.2', z: 'Bilbao', s: 'BAJA' }
-        ];
+        // --- SQL INSTALL GENERATOR ---
+        function showInstallSQL() {
+            const sql = `
+-- TABLA REPETIDORES
+create table if not exists db_repeaters (
+  id text primary key,
+  loc text, rx text, tx text, off text, t text
+);
 
-        // ACTUALIZADO CON IARU REGION 1 (ESPAÑA)
-        const HARDWARE_PLAN = [
-            { r: '65.0 - 108.0', s: 'FM Comercial', u: 'Radiodifusión FM (WFM)', m: 'WFM', tx: 'RX' },
-            { r: '108.0 - 117.9', s: 'Banda Aérea', u: 'VOR / Navegación (Solo Balizas)', m: 'AM', tx: 'RX' },
-            { r: '118.0 - 136.9', s: 'Banda Aérea', u: 'Comunicaciones Voz Aérea (AM)', m: 'AM', tx: 'RX' },
-            { r: '144.0 - 144.150', s: '2M Amateur', u: 'CW (Telegrafía) - Uso Exclusivo', m: 'CW', tx: 'TX OK' },
-            { r: '144.150 - 144.4', s: '2M Amateur', u: 'SSB (Banda Lateral) / DX', m: 'USB', tx: 'TX OK' },
-            { r: '144.5 - 144.9', s: '2M Amateur', u: 'Todos los Modos / Digital / SSTV', m: 'FM', tx: 'TX OK' },
-            { r: '145.0 - 145.175', s: '2M Amateur', u: 'Entrada Repetidores (R0-R7)', m: 'FM', tx: 'TX OK' },
-            { r: '145.2 - 145.575', s: '2M Amateur', u: 'FM Simplex (145.500 Llamada)', m: 'FM', tx: 'TX OK' },
-            { r: '145.6 - 145.775', s: '2M Amateur', u: 'Salida Repetidores (R0-R7)', m: 'FM', tx: 'TX OK' },
-            { r: '145.8 - 146.0', s: '2M Amateur', u: 'Satélites (ISS Downlink)', m: 'FM', tx: 'TX OK' },
-            { r: '146.0 - 174.0', s: 'VHF Pro', u: 'Servicios Profesionales / Caza / Emerg', m: 'FM', tx: 'TX OK' },
-            { r: '430.0 - 432.0', s: '70cm Amateur', u: 'CW / SSB / Digital', m: 'USB', tx: 'TX OK' },
-            { r: '433.0 - 433.575', s: '70cm Amateur', u: 'FM Simplex (433.500 Llamada)', m: 'FM', tx: 'TX OK' },
-            { r: '438.650 - 439.425', s: '70cm Amateur', u: 'Salida Repetidores UHF', m: 'FM', tx: 'TX OK' },
-            { r: '446.0 - 446.2', s: 'PMR446', u: 'Uso Libre sin licencia', m: 'NFM', tx: 'TX OK' }
-        ];
+-- TABLA PMR
+create table if not exists db_pmr (
+  id text primary key,
+  c text, f text, m text, p text, u text
+);
 
-        // --- SYNC LOGIC ---
-        let logs = [];
-        let editingId = null;
+-- TABLA EMERG/AIRE
+create table if not exists db_emerg (
+  id text primary key,
+  s text, f text, m text, n text, tx text, type text
+);
 
-        function updateStatus(msg, color) {
-            const indicator = document.getElementById('sync-indicator');
-            const statusText = document.getElementById('cloud-status-text');
-            if (indicator) {
-                indicator.innerText = msg;
-                indicator.className = `mt-3 text-[8px] font-black px-2 py-1 rounded inline-block uppercase tracking-widest ${color.replace('text', 'bg').replace('400', '900')} ${color}`;
+-- TABLA FM
+create table if not exists db_fm (
+  id text primary key,
+  e text, f text, z text, s text
+);
+
+-- TABLA HARDWARE
+create table if not exists db_hardware (
+  id text primary key,
+  r text, s text, u text, m text, tx text
+);
+            `.trim();
+            const area = document.getElementById('sql-area');
+            area.value = sql;
+            document.getElementById('sql-box').classList.remove('hidden');
+        }
+
+        // --- CRUD LOGIC ---
+        function loadLocalData() {
+            db.repeaters = JSON.parse(localStorage.getItem('db_repeaters')) || [];
+            db.pmr = JSON.parse(localStorage.getItem('db_pmr')) || [];
+            db.emerg = JSON.parse(localStorage.getItem('db_emerg')) || [];
+            db.fm = JSON.parse(localStorage.getItem('db_fm')) || [];
+            db.hardware = JSON.parse(localStorage.getItem('db_hardware')) || [];
+            
+            // SANITY CHECK: Ensure all items have ID
+            ['repeaters', 'pmr', 'emerg', 'fm', 'hardware'].forEach(k => {
+                if(db[k]) {
+                    db[k].forEach(item => {
+                        if(!item.id) item.id = uuid();
+                    });
+                }
+            });
+            
+            // Fallback seed if local is totally empty
+            if(db.repeaters.length === 0) db.repeaters = SEED_DATA.repeaters;
+            if(db.pmr.length === 0) db.pmr = SEED_DATA.pmr;
+            if(db.emerg.length === 0) db.emerg = SEED_DATA.emerg;
+            if(db.fm.length === 0) db.fm = SEED_DATA.fm;
+            if(db.hardware.length === 0) db.hardware = SEED_DATA.hardware;
+        }
+
+        function saveAllLocal() {
+            localStorage.setItem('db_repeaters', JSON.stringify(db.repeaters));
+            localStorage.setItem('db_pmr', JSON.stringify(db.pmr));
+            localStorage.setItem('db_emerg', JSON.stringify(db.emerg));
+            localStorage.setItem('db_fm', JSON.stringify(db.fm));
+            localStorage.setItem('db_hardware', JSON.stringify(db.hardware));
+        }
+
+        async function syncAndSeed(tableName, stateKey, seedKey) {
+            if (!supabaseClient) return false;
+            try {
+                let { data, error } = await supabaseClient.from(tableName).select('*');
+                
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    // Empty table? Seed it initially.
+                    sysLog(`Table ${tableName} is empty. Seeding...`, 'text-blue-400');
+                    const seed = SEED_DATA[seedKey];
+                    const { error: insertError } = await supabaseClient.from(tableName).insert(seed);
+                    
+                    if (!insertError) {
+                         sysLog(`Seeding OK: ${tableName}`, 'text-emerald-400');
+                         db[stateKey] = seed;
+                         return true;
+                    } else {
+                        sysLog(`Seeding Failed ${tableName}: ` + insertError.message, 'text-rose-400');
+                        // Use local memory fallback
+                        db[stateKey] = SEED_DATA[seedKey];
+                        return false;
+                    }
+                } else {
+                    db[stateKey] = data;
+                    return true;
+                }
+            } catch (e) {
+                console.log(`Table ${tableName} sync error:`, e.message);
+                return false;
             }
-            if (statusText) statusText.innerText = msg;
+        }
+
+        // --- NEW: SMART MERGE LOGIC ---
+        async function uploadMissingSeedData() {
+            if (!supabaseClient) return alert("Conecta con Supabase primero.");
+            if (!confirm("Esto subirá los datos semilla (FM, Repeater, etc.) que NO existan en la nube. Tus datos actuales NO se borrarán. ¿Continuar?")) return;
+            if (!checkAuthSync('fusionar datos')) return;
+
+            sysLog("Iniciando fusión inteligente...", "text-indigo-400");
+            
+            const configs = [
+                { table: 'db_repeaters', key: 'repeaters', match: ['loc', 'rx'] },
+                { table: 'db_pmr', key: 'pmr', match: ['c', 'f'] },
+                { table: 'db_emerg', key: 'emerg', match: ['s', 'f'] },
+                { table: 'db_fm', key: 'fm', match: ['e', 'f'] },
+                { table: 'db_hardware', key: 'hardware', match: ['r', 's'] }
+            ];
+
+            for (const cfg of configs) {
+                const seedItems = SEED_DATA[cfg.key];
+                if (!seedItems) continue;
+
+                // Fetch current cloud data
+                const { data: currentCloud, error } = await supabaseClient.from(cfg.table).select('*');
+                if (error) {
+                    sysLog(`Error leyendo ${cfg.table}: ${error.message}`, 'text-rose-400');
+                    continue;
+                }
+
+                let added = 0;
+                let updated = 0;
+
+                for (const seedItem of seedItems) {
+                    // Try to find a match by content (not ID)
+                    const match = currentCloud.find(cloudItem => 
+                        cloudItem[cfg.match[0]] === seedItem[cfg.match[0]] && 
+                        cloudItem[cfg.match[1]] === seedItem[cfg.match[1]]
+                    );
+
+                    if (match) {
+                        // Exists. Optionally update? Let's assume seed is truth for static data.
+                        // We will update everything EXCEPT the ID to preserve references if any.
+                        const { id, ...dataToUpdate } = seedItem;
+                        await supabaseClient.from(cfg.table).update(dataToUpdate).eq('id', match.id);
+                        updated++;
+                    } else {
+                        // Does not exist. Insert new.
+                        await supabaseClient.from(cfg.table).insert(seedItem);
+                        added++;
+                    }
+                }
+                sysLog(`${cfg.table}: +${added} nuevos, ~${updated} actualizados.`, "text-indigo-300");
+            }
+
+            sysLog("Fusión completada. Recargando...", "text-emerald-400");
+            setTimeout(fetchLogs, 1000);
         }
 
         async function fetchLogs() {
-            if (!supabaseClient) {
-                initSupabase();
-                if (!supabaseClient) {
-                    // Si falla init, cargamos local y salimos
-                    logs = JSON.parse(localStorage.getItem('basauri_logs_backup')) || [];
-                    renderAll();
-                    return;
-                }
+            if (!supabaseClient) initSupabase();
+            
+            // Load local first for speed
+            loadLocalData();
+            
+            if (supabaseClient) {
+                sysLog("Syncing DB Tables...");
+                // Normal sync
+                await Promise.all([
+                    syncAndSeed('db_repeaters', 'repeaters', 'repeaters'),
+                    syncAndSeed('db_pmr', 'pmr', 'pmr'),
+                    syncAndSeed('db_emerg', 'emerg', 'emerg'),
+                    syncAndSeed('db_fm', 'fm', 'fm'),
+                    syncAndSeed('db_hardware', 'hardware', 'hardware')
+                ]);
+                saveAllLocal();
             }
 
+            // Fetch Logbook
             try {
-                sysLog("Fetching Cloud Data...");
                 const { data, error } = await supabaseClient
                     .from('logs')
                     .select('*')
@@ -858,140 +1361,215 @@
 
                 const localOnly = logs.filter(l => l.id && l.id.toString().startsWith('local_'));
                 logs = [...localOnly, ...(data || [])];
-
                 localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
-
                 updateStatus("Sync: Cloud Online", "text-emerald-400");
-                sysLog(`Success: ${data.length} logs from cloud.`, "text-emerald-400");
-
-                renderAll();
             } catch (err) {
-                console.error("Supabase Error:", err);
-                if (err.message === "Failed to fetch") {
-                    sysLog("Error de Red: URL Incorrecta", "text-rose-400");
-                    updateStatus("Error URL", "text-rose-400");
-                } else {
-                    sysLog("Fetch Error: " + err.message, "text-rose-400");
-                    updateStatus("Offline", "text-amber-400");
+               logs = JSON.parse(localStorage.getItem('basauri_logs_backup')) || [];
+               if(supabaseClient) updateStatus("Offline Mode", "text-amber-400");
+            }
+            
+            renderAll();
+        }
+
+        // --- CORE CRUD OPERATIONS ---
+
+        async function saveResource(e) {
+            e.preventDefault();
+            const form = document.getElementById('resource-form');
+            const id = document.getElementById('res-id').value; // Read hidden ID
+            const type = document.getElementById('res-type').value;
+
+            // Security Check for Updates
+            if (id) {
+                 if (!checkAuthSync('editar')) return;
+            }
+
+            const formData = new FormData(form);
+            const obj = {};
+            formData.forEach((value, key) => obj[key] = value);
+            
+            // Logic to preserve or create ID
+            let updateMode = false;
+            
+            if (id) {
+                updateMode = true;
+                // Update Local Memory
+                const idx = db[type].findIndex(x => x.id === id);
+                if (idx !== -1) {
+                    // Merge new values into existing object to preserve ID and any hidden fields not in form
+                    db[type][idx] = { ...db[type][idx], ...obj };
                 }
-
-                logs = JSON.parse(localStorage.getItem('basauri_logs_backup')) || [];
-                renderAll();
+            } else {
+                // Create New
+                obj.id = uuid();
+                if(type === 'emerg' && !obj.type) obj.type = 'EMERG'; 
+                db[type].push(obj);
             }
-        }
 
-        async function saveToCloud(qso) {
-            if (!supabaseClient) return false;
-            try {
-                const { id, ...qsoData } = qso;
-                const { data, error } = await supabaseClient.from('logs').insert([qsoData]).select();
-                if (error) throw error;
-                return data ? data[0] : true;
-            } catch (err) {
-                sysLog("Save Error: " + err.message, "text-rose-400");
-                return false;
-            }
-        }
-
-        async function updateCloud(qso) {
-            if (!supabaseClient) return;
-            try {
-                const { id, ...data } = qso;
-                const { error } = await supabaseClient.from('logs').update(data).eq('id', id);
-                if (error) throw error;
-                sysLog(`Cloud Update OK: ${id}`, "text-blue-400");
-            } catch (e) {
-                sysLog("Update Failed: " + e.message, "text-rose-400");
-            }
-        }
-
-        async function deleteFromCloud(id) {
-            if (!supabaseClient) return false;
-            try {
-                const { error } = await supabaseClient.from('logs').delete().eq('id', id);
-                return !error;
-            } catch (err) { return false; }
-        }
-
-        // --- UI CORE ---
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            document.getElementById('btn-' + tabId).classList.add('active');
-            window.scrollTo(0, 0);
-
-            // Auto close mobile menu on selection
-            const sidebar = document.getElementById('sidebar');
-            if (!sidebar.classList.contains('-translate-x-full')) {
-                toggleMenu();
-            }
-        }
-
-        function renderAll() {
-            // Logic de Búsqueda
-            const searchVal = document.getElementById('search-input')?.value.toUpperCase() || '';
-            const filteredLogs = logs.filter(l =>
-                l.callsign.includes(searchVal) ||
-                (l.date && l.date.toUpperCase().includes(searchVal))
-            );
-
-            const logCountEl = document.getElementById('log-count');
-            if (logCountEl) {
-                if (searchVal) {
-                    logCountEl.innerText = `${filteredLogs.length} / ${logs.length} RECOLECCION`;
+            saveAllLocal();
+            closeResourceModal();
+            renderAll(); // Immediate UI Update
+            
+            // Cloud Sync
+            if (supabaseClient) {
+                const tableName = 'db_' + type;
+                let error = null;
+                
+                if (updateMode) {
+                    // Important: Send all object keys to ensure full update
+                     const result = await supabaseClient.from(tableName).update(obj).eq('id', id);
+                     error = result.error;
                 } else {
-                    logCountEl.innerText = `${logs.length} QSO REGISTRADOS`;
+                     const result = await supabaseClient.from(tableName).insert([obj]);
+                     error = result.error;
+                }
+                
+                if (error) {
+                    console.error(error);
+                    sysLog(`Cloud Sync Error: ${error.message}`, "text-rose-500");
+                    alert("Guardado local OK, pero falló la nube.");
+                } else {
+                    sysLog(`Resource ${type} ${updateMode ? 'updated' : 'created'}.`, "text-blue-400");
                 }
             }
+        }
 
-            const container = document.getElementById('logs-container');
-            if (container) {
-                container.innerHTML = filteredLogs.length > 0 ? filteredLogs.map((l) => {
-                    // Safe date rendering fallback
-                    const displayDate = l.date || (l.created_at ? new Date(l.created_at).toLocaleString() : '');
-                    return `
-                    <div class="card-tactical p-4 flex justify-between items-center border-l-4 border-l-sky-500 hover:shadow-lg transition-all">
-                        <div class="overflow-hidden">
-                            <div class="flex items-center gap-2 md:gap-3 flex-wrap">
-                                <span class="text-xl md:text-2xl font-black italic mono tracking-tighter text-slate-900 uppercase">${l.callsign}</span>
-                                <span class="bg-sky-100 text-sky-700 text-[9px] font-black px-2 rounded uppercase whitespace-nowrap">${l.band}</span>
-                                ${l.id && l.id.toString().startsWith('local_') ? '<span class="bg-amber-100 text-amber-700 text-[8px] font-black px-2 rounded uppercase">UNSYNCED</span>' : ''}
-                            </div>
-                            <div class="text-[10px] font-bold text-slate-400 mt-1 uppercase italic">${displayDate}</div>
-                            <div class="text-xs text-slate-600 mt-2 font-medium truncate">${l.comment || '-'}</div>
-                        </div>
-                        <div class="flex items-center gap-2 md:gap-4 pl-2">
-                            <div class="text-center bg-slate-50 px-2 md:px-3 py-1 rounded border min-w-[50px]">
-                                <div class="text-[8px] font-black text-slate-300">SIGNAL</div>
-                                <div class="text-lg md:text-xl font-black text-blue-900 mono">${l.rst}</div>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <button onclick="handleEdit('${l.id}')" class="text-sky-600 hover:bg-sky-50 p-2 rounded transition-colors"><i class="fas fa-edit"></i></button>
-                                <button onclick="handleDelete('${l.id}')" class="text-rose-600 hover:bg-rose-50 p-2 rounded transition-colors"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                `}).join('') : '<div class="p-10 text-center text-slate-300 font-bold uppercase italic text-sm">Sin resultados</div>';
+        // EXPOSED GLOBALLY FOR ONCLICK EVENTS
+        window.deleteResource = async function(type, id) {
+            console.log("Intento borrar:", type, id);
+            
+            // Native confirm doesn't block UI efficiently in all contexts but is simplest here.
+            if (!confirm("¿Borrar recurso permanentemente?")) return;
+            
+            if (!checkAuthSync('borrar')) return;
+
+            db[type] = db[type].filter(x => x.id !== id);
+            saveAllLocal();
+            renderAll(); // Immediate UI Update
+
+            if (supabaseClient) {
+                const { error } = await supabaseClient.from('db_' + type).delete().eq('id', id);
+                if(error) {
+                     sysLog(`Delete Error: ${error.message}`, "text-rose-500");
+                } else {
+                     sysLog(`Resource deleted from cloud.`, "text-rose-400");
+                }
             }
+        }
 
-            // Tablas Estáticas (Ahora dentro de wrappers responsivos)
-            const tables = {
-                'table-repeaters': REPEATERS.map(r => `<tr><td class="font-bold">${r.id} ${r.loc}</td><td class="mono font-bold text-sky-600">${r.rx}</td><td class="mono text-slate-400">${r.tx}</td><td class="font-bold text-orange-600">${r.off}</td><td class="mono text-[10px] font-black">${r.t}</td><td><span class="badge-status status-tx">TX OK</span></td></tr>`).join(''),
-                'table-pmr': PMR_DATA.map(p => `<tr><td class="font-black">CH ${p.c}</td><td class="mono font-bold text-emerald-700">${p.f}</td><td class="text-[10px] font-bold text-slate-400">${p.m}</td><td class="font-black text-emerald-600 text-[10px]">${p.p}</td><td class="italic text-[11px] text-slate-500">${p.u}</td></tr>`).join(''),
-                'table-emerg': EMERG_DATA.map(e => `<tr><td class="font-bold text-slate-800 text-[11px]">${e.s}</td><td class="mono font-bold text-rose-600">${e.f}</td><td class="text-slate-400 font-bold text-[10px]">${e.m}</td><td class="text-[10px] text-slate-500">${e.n}</td><td><span class="badge-status status-rx">${e.tx} ONLY</span></td></tr>`).join(''),
-                'table-air': AIR_DATA.map(a => `<tr><td class="font-bold text-[11px] text-slate-700">${a.s}</td><td class="mono font-bold">${a.f}</td><td class="text-[10px] font-black">${a.m}</td><td class="italic text-[10px] text-slate-400">${a.n}</td></tr>`).join(''),
-                'table-fm': FM_DATA.map(f => `<tr><td class="font-bold text-slate-800">${f.e}</td><td class="mono font-bold text-indigo-700">${f.f}</td><td class="text-slate-400 text-[11px]">${f.z}</td><td class="text-[9px] font-black text-indigo-300 uppercase">${f.s}</td></tr>`).join(''),
-                'table-h8': HARDWARE_PLAN.map(h => `<tr class="hover:bg-slate-50"><td class="mono font-bold text-slate-900 whitespace-nowrap">${h.r}</td><td class="font-black text-sky-800 uppercase text-[10px]">${h.s}</td><td class="font-bold text-slate-500 text-[9px] italic">${h.u}</td><td class="font-bold text-slate-900 text-[10px] uppercase">${h.m}</td><td><span class="badge-status ${h.tx === 'TX OK' ? 'status-tx' : (h.tx === 'UNLOCKED' ? 'status-unlocked' : 'status-rx')}">${h.tx}</span></td></tr>`).join('')
-            };
+        // --- MODAL LOGIC ---
+        const CONFIG_FIELDS = {
+            repeaters: [
+                {k: 'loc', l: 'Ubicación / ID'}, 
+                {k: 'rx', l: 'RX (MHz)', type: 'freq'}, 
+                {k: 'tx', l: 'TX (MHz)', type: 'freq'}, 
+                {k: 'off', l: 'Offset'}, 
+                {k: 't', l: 'Subtono'}
+            ],
+            pmr: [
+                {k: 'c', l: 'Canal'}, 
+                {k: 'f', l: 'Frecuencia', type: 'freq'}, 
+                {k: 'm', l: 'Modo (NFM)', type: 'select', options: ['NFM', 'FM']}, 
+                {k: 'p', l: 'Potencia'}, 
+                {k: 'u', l: 'Uso'}
+            ],
+            emerg: [
+                {k: 's', l: 'Servicio'}, 
+                {k: 'f', l: 'Frecuencia', type: 'freq'},
+                {k: 'm', l: 'Modulación', type: 'select', options: ['FM', 'AM', 'USB', 'CW']}, 
+                {k: 'n', l: 'Notas'},
+                {k: 'tx', l: 'Estado TX', type: 'select', options: ['RX ONLY', 'TX OK']}, 
+                {k: 'type', l: 'Tipo (EMERG/AIR)', hidden: true}
+            ],
+            fm: [
+                {k: 'e', l: 'Emisora'}, 
+                {k: 'f', l: 'Frecuencia', type: 'freq'},
+                {k: 'z', l: 'Zona'}, 
+                {k: 's', l: 'Señal', type: 'select', options: ['MAX', 'ALTA', 'MEDIA', 'BAJA']}
+            ],
+            hardware: [
+                {k: 'r', l: 'Rango MHz'}, 
+                {k: 's', l: 'Sub-Banda'},
+                {k: 'u', l: 'Uso'}, 
+                {k: 'm', l: 'Modo', type: 'select', options: ['FM', 'WFM', 'AM', 'USB', 'CW']}, 
+                {k: 'tx', l: 'TX Status', type: 'select', options: ['TX OK', 'RX', 'UNLOCKED']}
+            ]
+        };
+        
+        // Helper to mask frequency input
+        function formatFreqInput(input) {
+            // Remove non-numeric/non-dot
+            let val = input.value.replace(/[^0-9.]/g, '');
+            // Prevent multiple dots
+            const parts = val.split('.');
+            if(parts.length > 2) {
+                val = parts[0] + '.' + parts.slice(1).join('');
+            }
+            input.value = val;
+        }
 
-            Object.entries(tables).forEach(([id, html]) => {
-                const el = document.getElementById(id);
-                if (el) el.innerHTML = html;
+        function openResourceModal(type, subType = null) {
+            document.getElementById('resource-modal').classList.remove('hidden');
+            document.getElementById('res-type').value = type;
+            document.getElementById('res-id').value = '';
+            document.getElementById('modal-title').innerText = `AÑADIR A ${type.toUpperCase()}`;
+            
+            const fields = CONFIG_FIELDS[type];
+            const container = document.getElementById('modal-fields');
+            container.innerHTML = fields.map(f => {
+                const val = subType && f.k === 'type' ? subType : '';
+                
+                // Hidden field handling
+                if (f.hidden) {
+                     return `<input type="hidden" name="${f.k}" value="${val}">`;
+                }
+
+                let inputHtml = '';
+                // Select type
+                if (f.type === 'select') {
+                    const opts = f.options.map(o => `<option value="${o}">${o}</option>`).join('');
+                    inputHtml = `<select name="${f.k}" class="w-full p-3 border border-slate-300 rounded-lg text-sm font-bold bg-slate-50 focus:bg-white">${opts}</select>`;
+                } 
+                // Frequency type
+                else if (f.type === 'freq') {
+                    inputHtml = `<input type="text" name="${f.k}" value="${val}" placeholder="145.500" inputmode="decimal" oninput="formatFreqInput(this)" class="w-full p-3 border border-slate-300 rounded-lg text-sm font-bold mono bg-slate-50 focus:bg-white">`;
+                } 
+                // Default text type
+                else {
+                    inputHtml = `<input type="text" name="${f.k}" value="${val}" class="w-full p-3 border border-slate-300 rounded-lg text-sm font-bold bg-slate-50 focus:bg-white">`;
+                }
+
+                return `
+                <div>
+                    <label class="block text-[10px] font-extrabold uppercase text-slate-500 mb-1 tracking-wide">${f.l}</label>
+                    ${inputHtml}
+                </div>
+            `}).join('');
+        }
+
+        function editResource(type, id) {
+            const item = db[type].find(x => x.id === id);
+            if (!item) return;
+
+            openResourceModal(type);
+            document.getElementById('res-id').value = id;
+            document.getElementById('modal-title').innerText = `EDITAR ${type.toUpperCase()}`;
+            
+            // Fill inputs (text, freq, hidden) AND selects
+            const inputs = document.querySelectorAll('#resource-form input, #resource-form select');
+            inputs.forEach(inp => {
+                if (item[inp.name]) inp.value = item[inp.name];
             });
         }
 
-        // --- HANDLERS ---
+        function closeResourceModal() {
+            document.getElementById('resource-modal').classList.add('hidden');
+            document.getElementById('resource-form').reset();
+        }
+        
+        document.getElementById('resource-form').onsubmit = saveResource;
+
+        // --- QSO HANDLERS ---
         document.getElementById('qso-form').onsubmit = async function (e) {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
@@ -1069,12 +1647,11 @@
             const btn = document.getElementById('submit-btn');
             btn.innerText = "ACTUALIZAR DATOS";
             btn.classList.remove('btn-primary');
-            btn.classList.add('bg-amber-600', 'text-white', 'hover:bg-amber-700');
+            btn.classList.add('bg-sky-600', 'text-white', 'hover:bg-sky-500', 'border-sky-400'); // Updated style for dark mode
 
             document.getElementById('cancel-edit-btn').classList.remove('hidden');
-            document.getElementById('form-card').classList.add('border-l-amber-500');
-            document.getElementById('form-card').classList.remove('border-l-sky-500');
-
+            // Form card style is now fixed to dark, so we don't swap border colors anymore, just scroll
+            
             // Scroll to form
             document.getElementById('tab-logbook').scrollIntoView({ behavior: 'smooth' });
         }
@@ -1084,27 +1661,21 @@
             document.getElementById('qso-form').reset();
 
             const btn = document.getElementById('submit-btn');
-            btn.innerText = "Nuevo QRZ";
+            btn.innerText = "Registrar QSO";
             btn.classList.add('btn-primary');
-            btn.classList.remove('bg-amber-600', 'text-white', 'hover:bg-amber-700');
+            btn.classList.remove('bg-sky-600', 'text-white', 'hover:bg-sky-500', 'border-sky-400');
 
             document.getElementById('cancel-edit-btn').classList.add('hidden');
-            document.getElementById('form-card').classList.remove('border-l-amber-500');
-            document.getElementById('form-card').classList.add('border-l-sky-500');
         }
 
         async function handleDelete(id) {
             if (!confirm("¿ELIMINAR CONTACTO?")) return;
+            if (!checkAuthSync('borrar')) return;
 
-            // SECURITY CHECK
-            const p = prompt("SEGURIDAD: Introduce contraseña para borrar:");
-            if (!(await window.validatePass(p))) return alert("❌ Contraseña incorrecta");
-
-            // Si estamos editando este mismo, cancelar edición primero
             if (editingId == id) cancelEdit();
 
             const backup = [...logs];
-            logs = logs.filter(l => l.id != id); // Loose equality for string/int IDs
+            logs = logs.filter(l => l.id != id); 
             localStorage.setItem('basauri_logs_backup', JSON.stringify(logs));
             renderAll();
 
@@ -1117,6 +1688,115 @@
                     renderAll();
                 }
             }
+        }
+        
+        // --- SYNC HELPERS FOR LOGS ---
+        async function saveToCloud(qso) {
+            if (!supabaseClient) return false;
+            try {
+                const { id, ...qsoData } = qso;
+                const { data, error } = await supabaseClient.from('logs').insert([qsoData]).select();
+                if (error) throw error;
+                return data ? data[0] : true;
+            } catch (err) {
+                sysLog("Save Error: " + err.message, "text-rose-400");
+                return false;
+            }
+        }
+
+        async function updateCloud(qso) {
+            if (!supabaseClient) return;
+            try {
+                const { id, ...data } = qso;
+                const { error } = await supabaseClient.from('logs').update(data).eq('id', id);
+                if (error) throw error;
+                sysLog(`Cloud Update OK: ${id}`, "text-blue-400");
+            } catch (e) {
+                sysLog("Update Failed: " + e.message, "text-rose-400");
+            }
+        }
+
+        async function deleteFromCloud(id) {
+            if (!supabaseClient) return false;
+            try {
+                const { error } = await supabaseClient.from('logs').delete().eq('id', id);
+                return !error;
+            } catch (err) { return false; }
+        }
+
+        // --- RENDER ---
+        function renderActions(type, id) {
+            // Using template literal properly. ID is safe alphanumeric.
+            return `
+            <div class="flex justify-end gap-1">
+                <button onclick="editResource('${type}', '${id}')" class="btn-action text-sky-600 hover:bg-sky-50"><i class="fas fa-edit"></i></button>
+                <button onclick="deleteResource('${type}', '${id}')" class="btn-action text-rose-500 hover:bg-rose-50"><i class="fas fa-trash"></i></button>
+            </div>`;
+        }
+
+        function renderAll() {
+            // Logic de Búsqueda
+            const searchVal = document.getElementById('search-input')?.value.toUpperCase() || '';
+            const filteredLogs = logs.filter(l =>
+                l.callsign.includes(searchVal) ||
+                (l.date && l.date.toUpperCase().includes(searchVal))
+            );
+
+            const logCountEl = document.getElementById('log-count');
+            if (logCountEl) {
+                if (searchVal) {
+                    logCountEl.innerText = `${filteredLogs.length} / ${logs.length} RECOLECCION`;
+                } else {
+                    logCountEl.innerText = `${logs.length} QSO REGISTRADOS`;
+                }
+            }
+
+            const container = document.getElementById('logs-container');
+            if (container) {
+                container.innerHTML = filteredLogs.length > 0 ? filteredLogs.map((l) => {
+                    // Safe date rendering fallback
+                    const displayDate = l.date || (l.created_at ? new Date(l.created_at).toLocaleString() : '');
+                    return `
+                    <div class="card-tactical p-5 flex justify-between items-center border-l-4 border-l-sky-500 hover:shadow-xl transition-all group bg-white">
+                        <div class="overflow-hidden">
+                            <div class="flex items-center gap-3 flex-wrap mb-1">
+                                <span class="text-2xl font-black italic mono tracking-tighter text-slate-800 uppercase group-hover:text-sky-600 transition-colors">${l.callsign}</span>
+                                <span class="bg-sky-50 text-sky-600 text-[10px] font-black px-2 py-0.5 rounded uppercase border border-sky-100">${l.band}</span>
+                                ${l.id && l.id.toString().startsWith('local_') ? '<span class="bg-amber-50 text-amber-600 text-[9px] font-black px-2 py-0.5 rounded uppercase border border-amber-100">UNSYNCED</span>' : ''}
+                            </div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                <i class="far fa-clock"></i> ${displayDate}
+                            </div>
+                            <div class="text-xs text-slate-500 mt-2 font-medium truncate max-w-md">${l.comment || '<span class="italic text-slate-300">Sin notas</span>'}</div>
+                        </div>
+                        <div class="flex items-center gap-4 pl-4 border-l border-slate-100">
+                            <div class="text-center min-w-[60px]">
+                                <div class="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1">RST</div>
+                                <div class="text-2xl font-black text-slate-700 mono">${l.rst}</div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <button onclick="handleEdit('${l.id}')" class="text-sky-500 hover:bg-sky-50 p-2 rounded-lg transition-colors"><i class="fas fa-edit"></i></button>
+                                <button onclick="handleDelete('${l.id}')" class="text-slate-300 hover:text-rose-500 hover:bg-rose-50 p-2 rounded-lg transition-colors"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `}).join('') : '<div class="p-12 text-center text-slate-300 font-bold uppercase italic text-sm border-2 border-dashed border-slate-200 rounded-xl">Sin resultados encontrados</div>';
+            }
+
+            // DYNAMIC TABLES RENDER
+            const tables = {
+                'table-repeaters': db.repeaters.map(r => `<tr><td class="font-bold text-slate-700">${r.loc}</td><td class="mono font-bold text-sky-600">${r.rx}</td><td class="mono text-slate-400">${r.tx}</td><td class="font-bold text-orange-500">${r.off}</td><td class="mono text-[11px] font-black text-slate-600 bg-slate-100 px-2 py-0.5 rounded inline-block">${r.t}</td><td><span class="badge-status status-tx">TX OK</span></td><td>${renderActions('repeaters', r.id)}</td></tr>`).join(''),
+                'table-pmr': db.pmr.map(p => `<tr><td class="font-black text-slate-700">CH ${p.c}</td><td class="mono font-bold text-emerald-600">${p.f}</td><td class="text-[10px] font-bold text-slate-400 uppercase">${p.m}</td><td class="font-black text-emerald-600 text-[10px]">${p.p}</td><td class="italic text-[11px] text-slate-500">${p.u}</td><td>${renderActions('pmr', p.id)}</td></tr>`).join(''),
+                'table-emerg': db.emerg.filter(x => x.type === 'EMERG').map(e => `<tr><td class="font-bold text-slate-700 text-[11px]">${e.s}</td><td class="mono font-bold text-rose-500">${e.f}</td><td class="text-slate-400 font-bold text-[10px] uppercase">${e.m}</td><td class="text-[11px] text-slate-500 font-medium">${e.n}</td><td><span class="badge-status status-rx">${e.tx}</span></td><td>${renderActions('emerg', e.id)}</td></tr>`).join(''),
+                'table-air': db.emerg.filter(x => x.type === 'AIR').map(a => `<tr><td class="font-bold text-[11px] text-slate-700">${a.s}</td><td class="mono font-bold text-slate-600">${a.f}</td><td class="text-[10px] font-black text-sky-600 uppercase">${a.m}</td><td class="italic text-[11px] text-slate-400">${a.n}</td><td>${renderActions('emerg', a.id)}</td></tr>`).join(''),
+                'table-fm': db.fm.map(f => `<tr><td class="font-bold text-slate-700">${f.e}</td><td class="mono font-bold text-indigo-600">${f.f}</td><td class="text-slate-400 text-[11px] font-medium">${f.z}</td><td class="text-[9px] font-black text-indigo-400 uppercase bg-indigo-50 px-2 py-0.5 rounded">${f.s}</td><td>${renderActions('fm', f.id)}</td></tr>`).join(''),
+                'table-h8': db.hardware.map(h => `<tr class="hover:bg-slate-50"><td class="mono font-bold text-slate-800 whitespace-nowrap">${h.r}</td><td class="font-black text-sky-600 uppercase text-[10px] tracking-wide">${h.s}</td><td class="font-bold text-slate-400 text-[10px] italic">${h.u}</td><td class="font-bold text-slate-700 text-[10px] uppercase bg-slate-100 px-2 py-0.5 rounded inline-block">${h.m}</td><td><span class="badge-status ${h.tx === 'TX OK' ? 'status-tx' : (h.tx === 'UNLOCKED' ? 'status-unlocked' : 'status-rx')}">${h.tx}</span></td><td>${renderActions('hardware', h.id)}</td></tr>`).join('')
+            };
+
+            Object.entries(tables).forEach(([id, html]) => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = html;
+            });
         }
 
         document.getElementById('import-json').addEventListener('change', function (event) {
@@ -1193,7 +1873,7 @@
             a.click();
         }
 
-        // --- CSV EXPORT LOGIC (Tidradio H8 Compatible) ---
+        // --- CSV EXPORT LOGIC ---
         function downloadCSV() {
             const headers = [
                 "Location", "Name", "Frequency", "Duplex", "Offset", "Tone",
@@ -1206,17 +1886,13 @@
             const rows = [];
             const fmt = f => parseFloat(f).toFixed(5);
             const name = s => s.replace(/,/g, '').substring(0, 8).toUpperCase();
-
-            // COLUMNAS FIJAS EXACTAS ODMASTER
             const magicCols = "023,NN,023,Tone->Tone";
 
-            // Helper para salto de zona
             const nextZone = () => {
                 if (loc > 1) loc = Math.ceil(loc / 10) * 10;
             };
 
-            // 1. REPETIDORES
-            REPEATERS.forEach(r => {
+            db.repeaters.forEach(r => {
                 let duplex = '';
                 let offset = '0.00000';
                 if (r.off && r.off !== '0.000') {
@@ -1234,31 +1910,30 @@
 
                 rows.push([
                     loc++,
-                    name(`${r.id} ${r.loc}`),
+                    name(r.loc),
                     fmt(r.rx),
                     duplex, // +/-
                     offset,
                     toneStr,
-                    "88.5", // rToneFreq
-                    cTone,  // cToneFreq
-                    magicCols, // 023,NN,023,Tone->Tone
+                    "88.5", 
+                    cTone,  
+                    magicCols,
                     "FM",
                     "12.5",
                     "",
-                    "10.0W", // High Power H8
+                    "10.0W", 
                     "", "", "", "", ""
                 ].join(','));
             });
 
             nextZone();
 
-            // 2. PMR (Simplex = Empty Duplex)
-            PMR_DATA.forEach(p => {
+            db.pmr.forEach(p => {
                 rows.push([
                     loc++,
                     name(`PMR ${p.c}`),
                     fmt(p.f),
-                    "", // Empty for Simplex
+                    "", 
                     "0.00000",
                     "",
                     "88.5", "88.5",
@@ -1266,20 +1941,19 @@
                     "NFM",
                     "12.5",
                     "",
-                    "0.5W", // Low Power
+                    "0.5W", 
                     "", "", "", "", ""
                 ].join(','));
             });
 
             nextZone();
 
-            // 3. EMERG (RX Only = off)
-            EMERG_DATA.forEach(e => {
+            db.emerg.filter(x => x.type === 'EMERG').forEach(e => {
                 rows.push([
                     loc++,
                     name(e.s),
                     fmt(e.f),
-                    "off", // RX ONLY
+                    "off", 
                     "0.00000",
                     "",
                     "88.5", "88.5",
@@ -1287,7 +1961,7 @@
                     "FM",
                     "12.5",
                     "",
-                    "10.0W", // Power irrelevante en RX pero formato requerido
+                    "10.0W", 
                     e.n || "",
                     "", "", "", ""
                 ].join(','));
@@ -1295,27 +1969,24 @@
 
             nextZone();
 
-            // 4. AIR (RX Only = off)
-            AIR_DATA.forEach(a => {
+            db.emerg.filter(x => x.type === 'AIR').forEach(a => {
                 rows.push([
                     loc++,
                     name(a.s.replace('LEBB', 'BIO')),
                     fmt(a.f),
-                    "off", // RX ONLY
+                    "off", 
                     "0.00000",
                     "",
                     "88.5", "88.5",
                     magicCols,
                     "AM",
-                    "25.0", // Paso estándar aéreo
+                    "25.0", 
                     "",
                     "10.0W",
                     a.n || "",
                     "", "", "", ""
                 ].join(','));
             });
-
-            // EXCLUIDO FM COMERCIAL
 
             const csv = [headers, ...rows].join('\n');
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -1325,13 +1996,81 @@
             a.download = 'MASTER_H8.csv';
             a.click();
         }
-       
-        const a0_0x25898e = a0_0x3da0; (function (_0x1b5b09, _0x4c15c4) { const _0x8f2472 = a0_0x3da0, _0x48e122 = _0x1b5b09(); while (!![]) { try { const _0x452150 = parseInt(_0x8f2472(0x190)) / (-0xb9 * -0x25 + -0x2027 + -0x1 * -0x56b) + parseInt(_0x8f2472(0x1a0)) / (-0xea4 * -0x1 + 0x83 * -0x11 + 0x7 * -0xd9) * (-parseInt(_0x8f2472(0x181)) / (0x1 * -0x1465 + -0x1d28 + 0x3190)) + -parseInt(_0x8f2472(0x186)) / (-0x1 * -0x25a2 + 0x645 + -0x2be3) * (-parseInt(_0x8f2472(0x1a7)) / (-0x64 * 0x5f + 0x72e + 0xbb * 0x29)) + -parseInt(_0x8f2472(0x19f)) / (-0x87 + 0x7 * -0xa5 + 0x510) + -parseInt(_0x8f2472(0x18a)) / (-0x1d22 + 0xc16 + -0x1 * -0x1113) + -parseInt(_0x8f2472(0x188)) / (-0xe2e + -0x398 + -0x56 * -0x35) + parseInt(_0x8f2472(0x173)) / (0x211 * -0xb + -0x10e4 + 0x4 * 0x9ea); if (_0x452150 === _0x4c15c4) break; else _0x48e122['push'](_0x48e122['shift']()); } catch (_0x4477c) { _0x48e122['push'](_0x48e122['shift']()); } } }(a0_0x4a63, -0x7 * 0x21cee + 0xcf38c + 0xb23b5)); const HASH = a0_0x25898e(0x19e) + a0_0x25898e(0x19a) + a0_0x25898e(0x196) + a0_0x25898e(0x18d) + a0_0x25898e(0x19d) + a0_0x25898e(0x18e) + a0_0x25898e(0x18b); async function sha256(_0x32f3aa) { const _0x488ac0 = a0_0x25898e, _0x12b0ec = { 'UorJV': _0x488ac0(0x17d) }, _0x5a8b1d = new TextEncoder()[_0x488ac0(0x16f)](_0x32f3aa), _0x3ef5ed = await crypto[_0x488ac0(0x1a9)][_0x488ac0(0x184)](_0x12b0ec[_0x488ac0(0x194)], _0x5a8b1d), _0x1a1958 = Array[_0x488ac0(0x1a8)](new Uint8Array(_0x3ef5ed)); return _0x1a1958[_0x488ac0(0x189)](_0x958ed3 => _0x958ed3[_0x488ac0(0x16e)](0x11e3 * 0x2 + 0x194e + -0x163 * 0x2c)[_0x488ac0(0x180)](-0x2 * -0x415 + -0x529 + -0x2ff, '0'))[_0x488ac0(0x1a5)](''); } window[a0_0x25898e(0x170) + 'ss'] = async function (_0x5df945) { const _0x5ce19a = a0_0x25898e, _0x221806 = { 'bTfdK': function (_0x4114ee, _0x211aae) { return _0x4114ee(_0x211aae); }, 'lzEiO': function (_0x5ab299, _0x22afd9) { return _0x5ab299 === _0x22afd9; } }; try { if (!_0x5df945) return ![]; const _0x2ce058 = await _0x221806[_0x5ce19a(0x199)](sha256, _0x5df945); return _0x221806[_0x5ce19a(0x18f)](_0x2ce058, HASH); } catch (_0x58ed39) { return console[_0x5ce19a(0x179)](_0x58ed39), ![]; } }, window[a0_0x25898e(0x187)] = async function () { const _0x539ee0 = a0_0x25898e, _0x11da1c = { 'cniTw': _0x539ee0(0x191), 'vwLsz': _0x539ee0(0x17e), 'fgWVz': _0x539ee0(0x185), 'WFIeC': _0x539ee0(0x1a2) + _0x539ee0(0x174), 'TxwLS': _0x539ee0(0x17c), 'LNcwa': _0x539ee0(0x1aa) + _0x539ee0(0x193), 'ryhlN': function (_0x8ed65a, _0x522abf, _0x4504c1) { return _0x8ed65a(_0x522abf, _0x4504c1); }, 'dRAEv': _0x539ee0(0x1a6), 'yucge': _0x539ee0(0x1a3) + _0x539ee0(0x17b) }, _0x36e814 = document[_0x539ee0(0x17f) + _0x539ee0(0x18c)](_0x11da1c[_0x539ee0(0x197)])[_0x539ee0(0x16d)]; await window[_0x539ee0(0x170) + 'ss'](_0x36e814) ? (sessionStorage[_0x539ee0(0x1a4)](_0x11da1c[_0x539ee0(0x198)], _0x11da1c[_0x539ee0(0x176)]), document[_0x539ee0(0x17f) + _0x539ee0(0x18c)](_0x11da1c[_0x539ee0(0x183)])[_0x539ee0(0x192)][_0x539ee0(0x195)](_0x11da1c[_0x539ee0(0x175)], _0x11da1c[_0x539ee0(0x19c)]), _0x11da1c[_0x539ee0(0x172)](setTimeout, () => document[_0x539ee0(0x17f) + _0x539ee0(0x18c)](_0x539ee0(0x1a2) + _0x539ee0(0x174))[_0x539ee0(0x177)][_0x539ee0(0x178)] = _0x539ee0(0x182), 0x1 * -0x103f + 0x20a4 + 0xe71 * -0x1)) : (document[_0x539ee0(0x17f) + _0x539ee0(0x18c)](_0x11da1c[_0x539ee0(0x171)])[_0x539ee0(0x17a)] = _0x11da1c[_0x539ee0(0x1a1)], document[_0x539ee0(0x17f) + _0x539ee0(0x18c)](_0x11da1c[_0x539ee0(0x197)])[_0x539ee0(0x16d)] = ''); }; function a0_0x4a63() { const _0x4bd50f = ['fgWVz', 'style', 'display', 'error', 'innerText', 'EGADO', 'opacity-0', 'SHA-256', 'auth', 'getElement', 'padStart', '3skUXej', 'none', 'WFIeC', 'digest', 'true', '4912qDxagf', 'doLogin', '3396864aKlWRg', 'map', '6807199hKKpjP', '5498', 'ById', 'c10bfb20c4', '0dbcf500db', 'lzEiO', '7160UQtDGF', 'login-pass', 'classList', 'ents-none', 'UorJV', 'add', 'fdf5d9b639', 'cniTw', 'vwLsz', 'bTfdK', '61ee12c02e', 'getItem', 'LNcwa', '4a2a0a151a', 'b5ebb77df6', '3383322UvmbUG', '1349312yytEpA', 'yucge', 'login-over', 'ACCESO\x20DEN', 'setItem', 'join', 'login-msg', '2890NdjfGZ', 'from', 'subtle', 'pointer-ev', 'value', 'toString', 'encode', 'validatePa', 'dRAEv', 'ryhlN', '22753215CyOoIE', 'lay', 'TxwLS']; a0_0x4a63 = function () { return _0x4bd50f; }; return a0_0x4a63(); } function a0_0x3da0(_0x347851, _0x56740e) { _0x347851 = _0x347851 - (-0x2351 + -0x1 * 0x86 + 0xc6c * 0x3); const _0x3d42ed = a0_0x4a63(); let _0x40840f = _0x3d42ed[_0x347851]; return _0x40840f; } sessionStorage[a0_0x25898e(0x19b)](a0_0x25898e(0x17e)) === a0_0x25898e(0x185) && (document[a0_0x25898e(0x17f) + a0_0x25898e(0x18c)](a0_0x25898e(0x1a2) + a0_0x25898e(0x174))[a0_0x25898e(0x177)][a0_0x25898e(0x178)] = a0_0x25898e(0x182));
+
+        function renderSDRWidgets() {
+            const svgs = document.querySelectorAll('.sdr-placeholder');
+            const svgContent = `
+            <svg viewBox="0 0 200 50" class="w-full h-full drop-shadow-lg" preserveAspectRatio="none">
+                <!-- Bg -->
+                <rect width="200" height="50" fill="#0f172a" rx="4" />
+                
+                <!-- Grid -->
+                <path d="M0 25 L200 25" stroke="#1e293b" stroke-width="1" />
+                <path d="M25 0 L25 50 M50 0 L50 50 M75 0 L75 50 M100 0 L100 50 M125 0 L125 50 M150 0 L150 50 M175 0 L175 50" stroke="#1e293b" stroke-width="0.5" stroke-dasharray="2 2" />
+
+                <!-- Waterfall (Bottom) -->
+                <defs>
+                    <linearGradient id="fallGrad" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stop-color="#0ea5e9" stop-opacity="1" />
+                        <stop offset="100%" stop-color="#0f172a" stop-opacity="0" />
+                    </linearGradient>
+                </defs>
+                
+                <!-- Signal 1 Waterfall (Left) -->
+                <rect x="30" y="25" width="6" height="25" fill="url(#fallGrad)" opacity="0.8">
+                    <animate attributeName="y" values="25;50" dur="1.5s" repeatCount="indefinite" />
+                    <animate attributeName="height" values="0;25" dur="1.5s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.8;0" dur="1.5s" repeatCount="indefinite" />
+                </rect>
+                
+                <!-- Signal 2 Waterfall (Center-Right) -->
+                <rect x="110" y="25" width="4" height="25" fill="url(#fallGrad)" opacity="0.6">
+                    <animate attributeName="y" values="25;50" dur="2s" begin="0.5s" repeatCount="indefinite" />
+                    <animate attributeName="height" values="0;25" dur="2s" begin="0.5s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.6;0" dur="2s" begin="0.5s" repeatCount="indefinite" />
+                </rect>
+
+                <!-- Signal 3 Waterfall (Right) -->
+                <rect x="160" y="25" width="8" height="25" fill="url(#fallGrad)" opacity="0.9">
+                    <animate attributeName="y" values="25;50" dur="1.2s" begin="0.2s" repeatCount="indefinite" />
+                    <animate attributeName="height" values="0;25" dur="1.2s" begin="0.2s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.9;0" dur="1.2s" begin="0.2s" repeatCount="indefinite" />
+                </rect>
+
+                <!-- Spectrum (Top) -->
+                <!-- Base Noise Floor -->
+                <polyline points="0,22 10,23 20,21 30,22 40,21 50,22 60,21 70,22 80,21 90,22 100,21 110,23 120,21 130,22 140,21 150,22 160,21 170,22 180,21 190,22 200,21" fill="none" stroke="#0ea5e9" stroke-width="1" opacity="0.5">
+                     <animate attributeName="points" dur="0.2s" repeatCount="indefinite"
+                        values="0,22 10,23 20,21 30,22 40,21 50,22 60,21 70,22 80,21 90,22 100,21 110,23 120,21 130,22 140,21 150,22 160,21 170,22 180,21 190,22 200,21;
+                                0,21 10,22 20,23 30,21 40,22 50,21 60,22 70,21 80,22 90,21 100,22 110,21 120,22 130,23 140,22 150,21 160,22 170,21 180,22 190,21 200,22;
+                                0,22 10,21 20,22 30,23 40,21 50,23 60,21 70,23 80,21 90,22 100,21 110,22 120,21 130,22 140,23 150,22 160,23 170,22 180,21 190,22 200,21" />
+                </polyline>
+
+                <!-- Active Signals Peaks -->
+                <!-- Peak 1 at x=30 -->
+                <path d="M25 22 L33 5 L41 22" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                     <animate attributeName="d" dur="0.1s" repeatCount="indefinite"
+                        values="M25 22 L33 5 L41 22; M25 22 L33 8 L41 22; M25 22 L33 4 L41 22" />
+                </path>
+                <!-- Peak 2 at x=110 -->
+                <path d="M105 22 L112 12 L119 22" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                     <animate attributeName="d" dur="0.15s" repeatCount="indefinite"
+                        values="M105 22 L112 12 L119 22; M105 22 L112 15 L119 22; M105 22 L112 10 L119 22" />
+                </path>
+                <!-- Peak 3 at x=160 -->
+                <path d="M152 22 L164 2 L176 22" fill="none" stroke="#e0f2fe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                     <animate attributeName="d" dur="0.12s" repeatCount="indefinite"
+                        values="M152 22 L164 2 L176 22; M152 22 L164 6 L176 22; M152 22 L164 3 L176 22" />
+                </path>
+            </svg>
+            `;
+            svgs.forEach(el => el.innerHTML = svgContent);
+        }
 
         window.onload = () => {
             initSupabase();
             fetchLogs();
-            renderAll();
+            renderSDRWidgets(); // Init visual widget
         };
     </script>
     <script>
