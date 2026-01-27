@@ -16,9 +16,9 @@ window.checkPassword = function(input) {
 };
 
 window.isSessionActive = function() {
-    return sessionStorage.getItem('radiolog_auth_token') === _0x5a1;
+    return localStorage.getItem('radiolog_auth_token') === _0x5a1;
 };
 
 window.setSessionActive = function() {
-    sessionStorage.setItem('radiolog_auth_token', _0x5a1);
+    localStorage.setItem('radiolog_auth_token', _0x5a1);
 };
