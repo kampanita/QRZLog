@@ -33,11 +33,22 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   e.respondWith(
-    caches.match(e.request).then((res) => {
-      // Si está en caché, lo devuelve. Si no, va a la red.
-      return res || fetch(e.request).catch(() => {
-        // Fallback por si no hay red y no está cacheado
-        console.log('Offline y sin asset cacheado');
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.match(e.request).then((cachedResponse) => {
+        // 1. Disparamos la petición a la red
+        const fetchedResponse = fetch(e.request).then((networkResponse) => {
+          // 2. Si la red responde bien, guardamos la copia fresca en la caché
+          if (networkResponse.status === 200) {
+            cache.put(e.request, networkResponse.clone());
+          }
+          return networkResponse;
+        }).catch(() => {
+          // Fallback silencioso si no hay red
+          console.log('Modo offline: usando caché');
+        });
+
+        // 3. Devolvemos la respuesta cacheada INMEDIATAMENTE (o la de red si no hay caché)
+        return cachedResponse || fetchedResponse;
       });
     })
   );
