@@ -1,13 +1,16 @@
 // AUTHENTICATION MODULE
-// Separado del HTML para evitar lectura directa en View Source.
-
-const _0x5a1 = "VHhpbmd1cnJp"; // Base64 encoded hash
+// Hash: password -> Base64
+const _0x5a1 = "VHhpbmd1cnJp"; 
 
 window.checkPassword = function(input) {
     try {
-        // Simple encoding check to avoid plain text comparison in memory
-        return btoa(input) === _0x5a1;
+        if (!input) return false;
+        // Limpiamos espacios en blanco accidentales al inicio o final
+        const cleanInput = input.trim();
+        // Comparamos el hash Base64
+        return btoa(cleanInput) === _0x5a1;
     } catch (e) {
+        console.error("Auth Error:", e);
         return false;
     }
 };
