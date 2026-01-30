@@ -2131,6 +2131,73 @@ create table if not exists db_hardware (
         }
     </script>
 
+<!-- HamQTH Lookup - función global (fix: make callable desde onclick) -->
+<script>
+  window.hamqthLookup = async function() {
+    const callsignEl = document.getElementById('callsign');
+    if (!callsignEl) {
+      alert('No se encontró el input de indicativo (callsign).');
+      return;
+    }
+    const callsign = (callsignEl.value || '').trim().toUpperCase();
+    if (!callsign) {
+      alert('Ingrese un indicativo para buscar en HamQTH.');
+      return;
+    }
+
+    // Credenciales desde localStorage (prueba) o pedirlas
+    let user = localStorage.getItem('hamqth_user');
+    let pass = localStorage.getItem('hamqth_pass');
+    if (!user || !pass) {
+      user = prompt('HamQTH - Usuario:');
+      if (user === null) return;
+      pass = prompt('HamQTH - Password:');
+      if (pass === null) return;
+      localStorage.setItem('hamqth_user', user);
+      localStorage.setItem('hamqth_pass', pass);
+    }
+
+    const url = `https://hamqth.com/xml.php?callsign=${encodeURIComponent(callsign)}&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`;
+
+    try {
+      // Nota: puede fallar por CORS si HamQTH no permite cross-origin
+      const res = await fetch(url, { mode: 'cors' });
+      const text = await res.text();
+
+      const parser = new DOMParser();
+      const xml = parser.parseFromString(text, 'application/xml');
+      const err = xml.querySelector('session > error');
+      if (err) {
+        alert('HamQTH: ' + (err.textContent || 'error'));
+        return;
+      }
+
+      const name = xml.querySelector('name')?.textContent?.trim() ?? '';
+      const locator = xml.querySelector('locator')?.textContent?.trim() ?? '';
+
+      const noteEl = document.getElementById('comment');
+      const current = noteEl?.value ?? '';
+      const parts = [];
+      if (name) parts.push(`Nombre: ${name}`);
+      if (locator) parts.push(`Locator: ${locator}`);
+
+      if (parts.length) {
+        const addition = parts.join(' | ');
+        noteEl.value = current ? current + '\\n' + addition : addition;
+        if (typeof sysLog === 'function') {
+          sysLog(`HamQTH autofill: ${name} ${locator}`, 'text-green-600');
+        }
+      } else {
+        alert('HamQTH no devolvió nombre/locator.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Error al consultar HamQTH. Revisa la consola para más detalles.');
+    }
+  };
+</script>
+
+    
 </body>
 
 </html>
