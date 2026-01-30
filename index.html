@@ -65,7 +65,7 @@
             position: relative;
             overflow: hidden;
         }
-
+        
         /* Subtle shine effect on logo area */
         .logo-area::after {
             content: '';
@@ -192,7 +192,7 @@
             overflow: hidden;
             position: relative;
         }
-
+        
         /* Decorative screw heads for tactical look */
         .card-tactical-dark::before, .card-tactical-dark::after {
             content: '+';
@@ -352,11 +352,11 @@
             white-space: nowrap;
             font-weight: 500;
         }
-
+        
         .table-tactical tr:hover td {
             background-color: #f8fafc;
         }
-
+        
         /* Modal Styles */
         .modal-overlay {
             background: rgba(15, 23, 42, 0.6);
@@ -364,7 +364,7 @@
         }
 
         /* --- ANIMATIONS & GRAPHICS --- */
-
+        
         /* Spectrum Analyzer Bars (Old) -> Replaced by SVG widget but kept for legacy just in case */
         .spectrum-container {
             display: flex;
@@ -373,19 +373,19 @@
             height: 20px;
             opacity: 0.8;
         }
-
+        
         .spectrum-bar {
             width: 4px;
             background-color: #0ea5e9;
             border-radius: 2px 2px 0 0;
             animation: spectrum-bounce 1s infinite ease-in-out;
         }
-
+        
         @keyframes spectrum-bounce {
             0%, 100% { height: 20%; opacity: 0.5; }
             50% { height: 100%; opacity: 1; }
         }
-
+        
         /* Oscilloscope Line in Logo Area */
         .scope-line {
             width: 100%;
@@ -425,32 +425,32 @@
             overflow: hidden;
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        /* MOBILE READABILITY OPTIMIZATIONS */
+        @media (max-width: 768px) {
+            .table-tactical {
+                font-size: 1rem;
+            }
+            .table-tactical td {
+                padding: 16px 12px;
+                font-size: 0.95rem;
+            }
+            /* First column (Name/Location) BOLD and Larger */
+            .table-tactical td:first-child {
+                font-weight: 900;
+                font-size: 1.05rem;
+                color: #0f172a;
+            }
+            /* Second column (Frequency) Slightly larger */
+            .table-tactical td:nth-child(2) {
+                font-weight: 700;
+                font-size: 1rem;
+            }
+            /* Make action buttons bigger touch targets */
+            .btn-action {
+                padding: 10px;
+                font-size: 1rem;
+            }
+        }
 
     </style>
     <script type="importmap">
@@ -555,7 +555,7 @@
             <h1 class="text-xl font-black tracking-tighter italic uppercase text-slate-900">RADIOLOG <span
                     class="text-sky-500">PRO</span> <span class="text-xl font-black 100 text-slate-400">v2.4</span></h1>
             <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">by Kepa iNKuBo</p>
-
+            
             <!-- Oscilloscope Line -->
             <div class="scope-line">
                 <div class="scope-dot"></div>
@@ -637,6 +637,9 @@
                     <div class="md:col-span-4">
                         <label class="text-[10px] font-extrabold uppercase mb-2 block tracking-wide"><i class="fas fa-id-card mr-1"></i> Indicativo (Callsign)</label>
                         <input type="text" id="callsign" placeholder="EA2XXX" class="uppercase mono text-lg" required>
+
+                      
+                      
                     </div>
                     <div class="grid grid-cols-2 gap-5 md:col-span-2">
                         <div>
@@ -765,7 +768,7 @@
                     </table>
                 </div>
             </div>
-
+            
             <div class="card-tactical border-0">
                 <div class="card-header bg-slate-700 shadow-md">
                      <div class="flex items-center gap-3"><i class="fas fa-plane text-slate-300"></i> Banda Aérea</div>
@@ -982,7 +985,7 @@
         function doLogin() {
             const passField = document.getElementById('login-pass');
             const pass = passField.value.trim(); // Trim added
-
+            
             // Check if auth system loaded
             if (typeof window.checkPassword !== 'function') {
                 document.getElementById('login-msg').innerText = "ERROR: auth.js no cargado";
@@ -1001,7 +1004,7 @@
 
         function checkAuthSync(action) {
             if (window.isSessionActive && window.isSessionActive()) return true;
-
+            
             const p = prompt(`SEGURIDAD: Contraseña para ${action}:`);
             if (window.checkPassword && window.checkPassword(p)) {
                  if(window.setSessionActive) window.setSessionActive();
@@ -1125,7 +1128,7 @@
             {id: uuid(), s: 'Protección Civil Bilbao', f: '152.225', m: 'FM', n: 'Coordinación municipal Bilbao', tx: 'RX ONLY', type: 'EMERG' },
             {id: uuid(), s: 'Protección Civil Barakaldo', f: '152.425', m: 'FM', n: 'Coordinación municipal Barakaldo', tx: 'RX ONLY', type: 'EMERG' },
             {id: uuid(), s: 'Protección Civil Portugalete', f: '152.525', m: 'FM', n: 'Coordinación municipal Portugalete', tx: 'RX ONLY', type: 'EMERG' },
-
+            
             { id: uuid(), s: 'LEBB Loiu APP', f: '120.700', m: 'AM', n: 'Aproximación', tx: 'RX ONLY', type: 'AIR' },
             { id: uuid(), s: 'LEBB Loiu Torre', f: '118.500', m: 'AM', n: 'Torre Control', tx: 'RX ONLY', type: 'AIR' },
             { id: uuid(), s: 'LEBB Loiu Tierra', f: '121.700', m: 'AM', n: 'Rodadura', tx: 'RX ONLY', type: 'AIR' }
@@ -1249,7 +1252,7 @@ create table if not exists db_hardware (
             db.emerg = JSON.parse(localStorage.getItem('db_emerg')) || [];
             db.fm = JSON.parse(localStorage.getItem('db_fm')) || [];
             db.hardware = JSON.parse(localStorage.getItem('db_hardware')) || [];
-
+            
             // SANITY CHECK: Ensure all items have ID
             ['repeaters', 'pmr', 'emerg', 'fm', 'hardware'].forEach(k => {
                 if(db[k]) {
@@ -1258,7 +1261,7 @@ create table if not exists db_hardware (
                     });
                 }
             });
-
+            
             // Fallback seed if local is totally empty
             if(db.repeaters.length === 0) db.repeaters = SEED_DATA.repeaters;
             if(db.pmr.length === 0) db.pmr = SEED_DATA.pmr;
@@ -1279,7 +1282,7 @@ create table if not exists db_hardware (
             if (!supabaseClient) return false;
             try {
                 let { data, error } = await supabaseClient.from(tableName).select('*');
-
+                
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
@@ -1287,7 +1290,7 @@ create table if not exists db_hardware (
                     sysLog(`Table ${tableName} is empty. Seeding...`, 'text-blue-400');
                     const seed = SEED_DATA[seedKey];
                     const { error: insertError } = await supabaseClient.from(tableName).insert(seed);
-
+                    
                     if (!insertError) {
                          sysLog(`Seeding OK: ${tableName}`, 'text-emerald-400');
                          db[stateKey] = seed;
@@ -1315,7 +1318,7 @@ create table if not exists db_hardware (
             if (!checkAuthSync('fusionar datos')) return;
 
             sysLog("Iniciando fusión inteligente...", "text-indigo-400");
-
+            
             const configs = [
                 { table: 'db_repeaters', key: 'repeaters', match: ['loc', 'rx'] },
                 { table: 'db_pmr', key: 'pmr', match: ['c', 'f'] },
@@ -1366,10 +1369,10 @@ create table if not exists db_hardware (
 
         async function fetchLogs() {
             if (!supabaseClient) initSupabase();
-
+            
             // Load local first for speed
             loadLocalData();
-
+            
             if (supabaseClient) {
                 sysLog("Syncing DB Tables...");
                 // Normal sync
@@ -1400,7 +1403,7 @@ create table if not exists db_hardware (
                logs = JSON.parse(localStorage.getItem('basauri_logs_backup')) || [];
                if(supabaseClient) updateStatus("Offline Mode", "text-amber-400");
             }
-
+            
             renderAll();
         }
 
@@ -1420,10 +1423,10 @@ create table if not exists db_hardware (
             const formData = new FormData(form);
             const obj = {};
             formData.forEach((value, key) => obj[key] = value);
-
+            
             // Logic to preserve or create ID
             let updateMode = false;
-
+            
             if (id) {
                 updateMode = true;
                 // Update Local Memory
@@ -1442,12 +1445,12 @@ create table if not exists db_hardware (
             saveAllLocal();
             closeResourceModal();
             renderAll(); // Immediate UI Update
-
+            
             // Cloud Sync
             if (supabaseClient) {
                 const tableName = 'db_' + type;
                 let error = null;
-
+                
                 if (updateMode) {
                     // Important: Send all object keys to ensure full update
                      const result = await supabaseClient.from(tableName).update(obj).eq('id', id);
@@ -1456,7 +1459,7 @@ create table if not exists db_hardware (
                      const result = await supabaseClient.from(tableName).insert([obj]);
                      error = result.error;
                 }
-
+                
                 if (error) {
                     console.error(error);
                     sysLog(`Cloud Sync Error: ${error.message}`, "text-rose-500");
@@ -1470,10 +1473,10 @@ create table if not exists db_hardware (
         // EXPOSED GLOBALLY FOR ONCLICK EVENTS
         window.deleteResource = async function(type, id) {
             console.log("Intento borrar:", type, id);
-
+            
             // Native confirm doesn't block UI efficiently in all contexts but is simplest here.
             if (!confirm("¿Borrar recurso permanentemente?")) return;
-
+            
             if (!checkAuthSync('borrar')) return;
 
             db[type] = db[type].filter(x => x.id !== id);
@@ -1528,7 +1531,7 @@ create table if not exists db_hardware (
                 {k: 'tx', l: 'TX Status', type: 'select', options: ['TX OK', 'RX', 'UNLOCKED']}
             ]
         };
-
+        
         // Helper to mask frequency input
         function formatFreqInput(input) {
             // Remove non-numeric/non-dot
@@ -1546,12 +1549,12 @@ create table if not exists db_hardware (
             document.getElementById('res-type').value = type;
             document.getElementById('res-id').value = '';
             document.getElementById('modal-title').innerText = `AÑADIR A ${type.toUpperCase()}`;
-
+            
             const fields = CONFIG_FIELDS[type];
             const container = document.getElementById('modal-fields');
             container.innerHTML = fields.map(f => {
                 const val = subType && f.k === 'type' ? subType : '';
-
+                
                 // Hidden field handling
                 if (f.hidden) {
                      return `<input type="hidden" name="${f.k}" value="${val}">`;
@@ -1587,7 +1590,7 @@ create table if not exists db_hardware (
             openResourceModal(type);
             document.getElementById('res-id').value = id;
             document.getElementById('modal-title').innerText = `EDITAR ${type.toUpperCase()}`;
-
+            
             // Fill inputs (text, freq, hidden) AND selects
             const inputs = document.querySelectorAll('#resource-form input, #resource-form select');
             inputs.forEach(inp => {
@@ -1599,7 +1602,7 @@ create table if not exists db_hardware (
             document.getElementById('resource-modal').classList.add('hidden');
             document.getElementById('resource-form').reset();
         }
-
+        
         document.getElementById('resource-form').onsubmit = saveResource;
 
         // --- QSO HANDLERS ---
@@ -1684,7 +1687,7 @@ create table if not exists db_hardware (
 
             document.getElementById('cancel-edit-btn').classList.remove('hidden');
             // Form card style is now fixed to dark, so we don't swap border colors anymore, just scroll
-
+            
             // Scroll to form
             document.getElementById('tab-logbook').scrollIntoView({ behavior: 'smooth' });
         }
@@ -1722,7 +1725,7 @@ create table if not exists db_hardware (
                 }
             }
         }
-
+        
         // --- SYNC HELPERS FOR LOGS ---
         async function saveToCloud(qso) {
             if (!supabaseClient) return false;
@@ -2101,11 +2104,11 @@ create table if not exists db_hardware (
         }
 
         window.onload = () => {
-
-
-
-
-
+             // AUTH CHECK - Skip overlay if already logged in via LocalStorage
+            if (window.isSessionActive && window.isSessionActive()) {
+                const overlay = document.getElementById('login-overlay');
+                if(overlay) overlay.classList.add('opacity-0', 'pointer-events-none');
+            }
 
             initSupabase();
             fetchLogs();
