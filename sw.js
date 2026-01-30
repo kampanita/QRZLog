@@ -32,24 +32,34 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.match(e.request).then((cachedResponse) => {
-        // 1. Disparamos la petición a la red
-        const fetchedResponse = fetch(e.request).then((networkResponse) => {
-          // 2. Si la red responde bien, guardamos la copia fresca en la caché
-          if (networkResponse.status === 200) {
-            cache.put(e.request, networkResponse.clone());
-          }
-          return networkResponse;
-        }).catch(() => {
-          // Fallback silencioso si no hay red
-          console.log('Modo offline: usando caché');
-        });
+  const req = e.request;
 
-        // 3. Devolvemos la respuesta cacheada INMEDIATAMENTE (o la de red si no hay caché)
-        return cachedResponse || fetchedResponse;
-      });
-    })
+  // 1) Evitar caches para URLs de extensiones del navegador
+  if (req.url.startsWith('chrome-extension://')) {
+    // Deja que la petición vaya a la red directamente
+    return;
+  }
+
+  // 2) Estrategia: cache-first con fallback a red
+  e.respondWith(
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      const cachedResponse = await cache.match(req);
+
+      try {
+        // Disparo a la red
+        const networkResponse = await fetch(req);
+        if (networkResponse && networkResponse.status === 200) {
+          // Actualizamos la caché con la respuesta fresca
+          await cache.put(req, networkResponse.clone());
+        }
+        return networkResponse;
+      } catch {
+        // Si la red falla, usar caché si existe
+        if (cachedResponse) return cachedResponse;
+        // Si no hay caché, fall back a un mini fallback
+        return new Response('Offline', { status: 503, statusText: 'Offline' });
+      }
+    })()
   );
 });
