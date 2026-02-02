@@ -1,0 +1,42 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Project specific ignores (files not in commit d27fa57)
+AGENTS.md
+*.csv
+QRZLog__old/
+*.zip
+components/
+index.tsx
+jkuriarte.code-workspace
+kk.json
+log.adi
+logbook.json
+metadata.json
+package.json
+qrzlog_backup_2026-01-20.json
+supabase-bridge.js
+tsconfig.json
+vite.config.ts
