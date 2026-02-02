@@ -1,6 +1,6 @@
 // AUTHENTICATION MODULE
-// Hash: Txingurri -> Base64
-const _0x5a1 = "VHhpbmd1cnJpQDE5NzM="; 
+// Hash: password -> Base64
+const _0x5a1 = "VHhpbmd1cnJp"; 
 
 window.checkPassword = function(input) {
     try {
@@ -16,9 +16,9 @@ window.checkPassword = function(input) {
 };
 
 window.isSessionActive = function() {
-    return sessionStorage.getItem('radiolog_auth_token') === _0x5a1;
+    return localStorage.getItem('radiolog_auth_token') === _0x5a1;
 };
 
 window.setSessionActive = function() {
-    sessionStorage.setItem('radiolog_auth_token', _0x5a1);
+    localStorage.setItem('radiolog_auth_token', _0x5a1);
 };
