@@ -1990,6 +1990,20 @@ create table if not exists db_hardware (
                 comment: document.getElementById('comment').value
             };
 
+            if (!editingId) {
+                const today = new Date().toISOString().slice(0, 10);
+                const isDup = logs.find(l =>
+                    l.callsign === formValues.callsign &&
+                    l.band === formValues.band &&
+                    (l.created_at || '').includes(today)
+                );
+                if (isDup && !confirm("¡OJO! Ya tienes este contacto hoy en esta banda. ¿Registrar duplicado?")) {
+                    btn.disabled = false;
+                    btn.innerText = "Registrar QSO";
+                    return;
+                }
+            }
+
             if (editingId) {
                 // UPDATE LOGIC
                 const index = logs.findIndex(l => l.id == editingId);
