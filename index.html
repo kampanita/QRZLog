@@ -2639,114 +2639,96 @@ create table if not exists contest_logs (
                 <defs>
                     <linearGradient id="fallGrad" x1="0" x2="0" y1="0" y2="1">
                         <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.9" />
-                        <stop offset="20%" stop-color="#f59e0b" stop-opacity="0.6" />
-                        <stop offset="50%" stop-color="#0ea5e9" stop-opacity="0.3" />
+                        <stop offset="40%" stop-color="#3b82f6" stop-opacity="0.2" />
                         <stop offset="100%" stop-color="#0f172a" stop-opacity="0" />
                     </linearGradient>
                     <linearGradient id="peakGrad" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stop-color="#ff4545" />
-                        <stop offset="30%" stop-color="#fbbf24" />
-                        <stop offset="100%" stop-color="#0ea5e9" stroke-opacity="0.2" />
+                        <stop offset="0%" stop-color="#ef4444" />
+                        <stop offset="50%" stop-color="#fbbf24" />
+                        <stop offset="100%" stop-color="#3b82f6" />
                     </linearGradient>
                     <filter id="glow">
-                        <feGaussianBlur stdDeviation="0.8" result="blur" />
+                        <feGaussianBlur stdDeviation="0.6" result="blur" />
                         <feComposite in="SourceGraphic" in2="blur" operator="over" />
                     </filter>
                 </defs>
 
-                <!-- Background -->
+                <!-- Screen Base -->
                 <rect width="200" height="64" fill="#020617" />
                 
-                <!-- Advanced Grid -->
+                <!-- Technical Grid Layer -->
                 <g stroke="#1e293b" stroke-width="0.3">
-                    <!-- Vertical Frequency Lines -->
-                    <line x1="20" y1="0" x2="20" y2="64" />
+                    <line x1="0" y1="10" x2="200" y2="10" />
+                    <line x1="0" y1="20" x2="200" y2="20" />
+                    <line x1="0" y1="30" x2="200" y2="30" />
                     <line x1="40" y1="0" x2="40" y2="64" stroke-width="0.6" />
-                    <line x1="60" y1="0" x2="60" y2="64" />
                     <line x1="80" y1="0" x2="80" y2="64" stroke-width="0.6" />
-                    <line x1="100" y1="0" x2="100" y2="64" stroke="#334155" stroke-width="1" />
                     <line x1="120" y1="0" x2="120" y2="64" stroke-width="0.6" />
-                    <line x1="140" y1="0" x2="140" y2="64" />
                     <line x1="160" y1="0" x2="160" y2="64" stroke-width="0.6" />
-                    <line x1="180" y1="0" x2="180" y2="64" />
-
-                    <!-- Horizontal dB Lines -->
-                    <line x1="0" y1="12" x2="200" y2="12" />
-                    <line x1="0" y1="24" x2="200" y2="24" />
-                    <line x1="0" y1="36" x2="200" y2="36" />
                 </g>
 
-                <!-- Numerical Markers (Tiny) -->
-                <g fill="#475569" font-family="monospace" font-size="4" font-weight="bold">
-                    <text x="2" y="10">-20</text>
-                    <text x="2" y="22">-50</text>
-                    <text x="2" y="34">-80</text>
-                    <text x="185" y="42">dBm</text>
+                <!-- Scales & Labels -->
+                <g fill="#475569" font-family="monospace" font-size="3.5" font-weight="bold">
+                    <text x="2" y="9">-20</text>
+                    <text x="2" y="19">-40</text>
+                    <text x="2" y="29">-60</text>
+                    <text x="35" y="62">144.50</text>
+                    <text x="75" y="62">145.00</text>
+                    <text x="115" y="62">145.50</text>
+                    <text x="155" y="62">146.00</text>
                 </g>
 
-                <!-- PRO Waterfall (Granular) -->
-                <g opacity="0.8">
-                    <!-- Signal 1 Waterfall Cluster -->
-                    <rect x="26" y="42" width="10" height="22" fill="url(#fallGrad)">
-                        <animate attributeName="opacity" values="0.9;0.4;0.9" dur="1s" repeatCount="indefinite" />
-                    </rect>
-                    <rect x="29" y="42" width="4" height="22" fill="#fff" opacity="0.1">
-                        <animate attributeName="x" values="28;31;28" dur="0.5s" repeatCount="indefinite" />
-                    </rect>
+                <!-- High-Density Waterfall (Granular Segments) -->
+                <g opacity="0.9">
+                    <rect x="25" y="40" width="12" height="24" fill="url(#fallGrad)" opacity="0.6" />
+                    <rect x="145" y="40" width="8" height="24" fill="url(#fallGrad)" opacity="0.4" />
                     
-                    <!-- Signal 2 Waterfall Cluster -->
-                    <rect x="146" y="42" width="7" height="22" fill="url(#fallGrad)">
-                        <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2s" repeatCount="indefinite" />
+                    <!-- Scrolling waterfall 'bits' -->
+                    <rect x="26" y="40" width="10" height="1" fill="#fbbf24">
+                        <animate attributeName="y" values="40;64" dur="1.2s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="1;0" dur="1.2s" repeatCount="indefinite" />
                     </rect>
-
-                    <!-- Falling 'Rain' Segments -->
-                    <rect x="27" y="42" width="8" height="2" fill="#fbbf24">
-                        <animate attributeName="y" values="42;64" dur="0.8s" repeatCount="indefinite" />
+                    <rect x="146" y="40" width="6" height="1" fill="#fff">
+                        <animate attributeName="y" values="40;64" dur="2s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.8;0" dur="2s" repeatCount="indefinite" />
                     </rect>
-                    <rect x="30" y="48" width="2" height="4" fill="#fff" opacity="0.5">
-                        <animate attributeName="y" values="42;64" dur="0.6s" repeatCount="indefinite" />
-                    </rect>
-                    <rect x="148" y="42" width="4" height="2" fill="#fbbf24">
-                        <animate attributeName="y" values="42;64" dur="1.2s" repeatCount="indefinite" />
+                    <rect x="28" y="45" width="4" height="1" fill="#fbbf24">
+                        <animate attributeName="y" values="40;64" dur="0.8s" begin="0.2s" repeatCount="indefinite" />
                     </rect>
                 </g>
 
-                <!-- High-Density Noise Floor (Grass) -->
-                <path fill="none" stroke="#334155" stroke-width="0.8" opacity="0.4">
-                    <animate attributeName="d" dur="0.08s" repeatCount="indefinite"
-                        values="M0,40 L2,38 L4,41 L6,39 L8,42 L10,38 L12,41 L14,39 L16,42 L18,38 L20,41 L22,39 L24,42 L26,38 L28,41 L30,39 L32,42 L34,38 L36,41 L38,39 L40,42 L42,38 L44,41 L46,39 L48,42 L50,38 L52,41 L54,39 L56,42 L58,38 L60,41 L62,39 L64,42 L66,38 L68,41 L70,39 L72,42 L74,38 L76,41 L78,39 L80,42 L82,38 L84,41 L86,39 L88,42 L90,38 L92,41 L94,39 L96,42 L98,38 L100,41 L102,39 L104,42 L106,38 L108,41 L110,39 L112,42 L114,38 L116,41 L118,39 L120,42 L122,38 L124,41 L126,39 L128,42 L130,38 L132,41 L134,39 L136,42 L138,38 L140,41 L142,39 L144,42 L146,38 L148,41 L150,39 L152,42 L154,38 L156,41 L158,39 L160,42 L162,38 L164,41 L166,39 L168,42 L170,38 L172,41 L174,39 L176,42 L178,38 L180,41 L182,39 L184,42 L186,38 L188,41 L190,39 L192,42 L194,38 L196,41 L198,39 L200,42;
-                                M0,41 L2,39 L4,42 L6,38 L8,41 L10,39 L12,42 L14,38 L16,41 L18,39 L20,42 L22,38 L24,41 L26,39 L28,42 L30,38 L32,41 L34,39 L36,42 L38,38 L40,41 L42,39 L44,42 L46,38 L48,41 L50,39 L52,42 L54,38 L56,41 L58,39 L60,42 L62,38 L64,41 L66,39 L68,42 L70,38 L72,41 L74,39 L76,42 L78,38 L80,41 L82,39 L84,42 L86,38 L88,41 L90,39 L92,42 L94,38 L96,41 L98,39 L100,42 L102,38 L104,41 L106,39 L108,42 L110,38 L112,41 L114,39 L116,42 L118,38 L120,41 L122,39 L124,42 L126,38 L128,41 L130,39 L132,42 L134,38 L136,41 L138,39 L140,42 L142,38 L144,41 L146,39 L148,42 L150,38 L152,41 L154,39 L156,42 L158,38 L160,41 L162,39 L164,42 L166,38 L168,41 L170,39 L172,42 L174,38 L176,41 L178,39 L180,42 L182,38 L184,41 L186,39 L188,42 L190,38 L192,41 L194,39 L196,42 L198,38 L200,41" />
+                <!-- Double Jitter Noise Floor (The 'Grass') -->
+                <path fill="none" stroke="#1e293b" stroke-width="0.5" opacity="0.5">
+                    <animate attributeName="d" dur="0.07s" repeatCount="indefinite"
+                        values="M0,40 L3,37 L6,41 L9,38 L12,42 L15,37 L18,41 L21,38 L24,42 L27,37 L30,41 L33,38 L36,42 L39,37 L42,41 L45,38 L48,42 L51,37 L54,41 L57,38 L60,42 L63,37 L66,41 L69,38 L72,42 L75,37 L78,41 L81,38 L84,42 L87,37 L90,41 L93,38 L96,42 L99,37 L102,41 L105,38 L108,42 L111,37 L114,41 L117,38 L120,42 L123,37 L126,41 L129,38 L132,42 L135,37 L138,41 L141,38 L144,42 L147,37 L150,41 L153,38 L156,42 L159,37 L162,41 L165,38 L168,42 L171,37 L174,41 L177,38 L180,42 L183,37 L186,41 L189,38 L192,42 L195,37 L198,41 L200,42;
+                                M0,41 L3,38 L6,42 L9,37 L12,41 L15,38 L18,42 L21,37 L24,41 L27,38 L30,42 L33,37 L36,41 L39,38 L42,42 L45,37 L48,41 L51,38 L54,42 L57,37 L60,41 L63,38 L66,42 L69,37 L72,41 L75,38 L78,42 L81,37 L84,41 L87,38 L90,42 L93,37 L96,41 L99,38 L102,42 L105,37 L108,41 L111,38 L114,42 L117,37 L120,41 L123,38 L126,42 L129,37 L132,41 L135,38 L138,42 L141,37 L144,41 L147,38 L150,42 L153,37 L156,41 L159,38 L162,42 L165,37 L168,41 L171,38 L174,42 L177,37 L180,41 L183,38 L186,42 L189,37 L192,41 L195,38 L198,42 L200,41" />
                 </path>
 
-                <!-- PRO SPECTRAL LINE (The Active Pulse) -->
-                <path fill="none" stroke="#0ea5e9" stroke-width="1.2" filter="url(#glow)">
-                    <animate attributeName="d" dur="0.12s" repeatCount="indefinite"
-                        values="M0,40 L15,40 Q25,38 31,5 Q37,38 45,40 L80,41 L85,25 L90,41 L130,40 Q142,39 149,15 Q156,39 165,40 L200,40;
-                                M0,41 L15,41 Q25,39 31,8 Q37,39 45,41 L80,42 L85,30 L90,42 L130,41 Q142,40 149,18 Q156,40 165,41 L200,41" />
+                <!-- High-Detail Active Spectral Line -->
+                <path fill="none" stroke="#60a5fa" stroke-width="1" filter="url(#glow)">
+                    <animate attributeName="d" dur="0.1s" repeatCount="indefinite"
+                        values="M0,38 L10,38 Q20,38 31,5 Q42,38 60,39 L78,40 L85,20 L92,40 L120,39 Q135,39 149,15 Q163,39 180,38 L200,38;
+                                M0,38 L10,38 Q20,38 31,8 Q42,38 60,39 L78,40 L85,25 L92,40 L120,39 Q135,39 149,18 Q163,39 180,38 L200,38" />
                 </path>
 
-                <!-- Signal Fill (Gradient) -->
-                <path fill="url(#peakGrad)" opacity="0.4">
-                    <animate attributeName="d" dur="0.12s" repeatCount="indefinite"
-                        values="M15,40 Q25,38 31,5 Q37,38 45,40 Z; M15,40 Q25,39 31,8 Q37,39 45,40 Z" />
-                </path>
-
-                <!-- Harmonic Sidelobes -->
-                <g fill="#38bdf8" opacity="0.3">
-                    <circle cx="25" cy="40" r="1.5"><animate attributeName="cy" values="40;35;40" dur="0.4s" repeatCount="indefinite" /></circle>
-                    <circle cx="37" cy="40" r="1.5"><animate attributeName="cy" values="40;37;40" dur="0.3s" repeatCount="indefinite" /></circle>
+                <!-- Signal Area Fills -->
+                <g opacity="0.3">
+                    <path fill="url(#peakGrad)" d="M15,38 Q25,38 31,5 Q37,38 47,38 Z">
+                        <animate attributeName="d" dur="0.1s" repeatCount="indefinite" values="M15,38 Q25,38 31,5 Q37,38 47,38 Z; M15,38 Q25,38 31,8 Q37,38 47,38 Z" />
+                    </path>
+                    <path fill="#3b82f6" d="M135,38 Q145,38 149,15 Q153,38 163,38 Z">
+                        <animate attributeName="d" dur="0.1s" repeatCount="indefinite" values="M135,38 Q145,38 149,15 Q153,38 163,38 Z; M135,38 Q145,38 149,18 Q153,38 163,38 Z" />
+                    </path>
                 </g>
 
-                <!-- Center Needle / Tuning Info -->
-                <g class="cursor">
-                    <line x1="100" y1="0" x2="100" y2="42" stroke="#f43f5e" stroke-width="1" stroke-dasharray="1 1" />
-                    <rect x="97" y="0" width="6" height="3" fill="#f43f5e" rx="1" />
-                    <text x="102" y="6" fill="#f43f5e" font-size="4" font-family="monospace" font-weight="bold">SQL</text>
+                <!-- Tuning Fork / Needle Tool -->
+                <g>
+                    <line x1="100" y1="0" x2="100" y2="40" stroke="#f43f5e" stroke-width="1" stroke-dasharray="1 1" />
+                    <rect x="98" y="0" width="4" height="2" fill="#f43f5e" />
+                    <text x="103" y="6" fill="#f43f5e" font-family="monospace" font-size="3.5" font-weight="extrabold">145.500</text>
+                    <circle cx="100" cy="40" r="1.5" fill="#f43f5e" />
                 </g>
             </svg>
-            `;
-            svgs.forEach(el => el.innerHTML = svgContent);
-        }
             `;
             svgs.forEach(el => el.innerHTML = svgContent);
         }
