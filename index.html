@@ -5,7 +5,7 @@
     <link rel="manifest" href="./manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RadioLog Pro v2.7 | Secure Auth Fix</title>
+    <title>RadioLog Pro v2.8 | Terminal System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./auth.js"></script> <!-- EXTERNAL AUTH -->
@@ -22,17 +22,21 @@
         }
 
         body {
-            background-color: #f0f4f8;
-            /* Technical Grid Pattern Background */
+            background-color: #94a3b8;
+            /* Slate 400 - Professional Technical Gray */
+            /* Advanced Schematic Grid Pattern */
             background-image:
-                linear-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(148, 163, 184, 0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
+                linear-gradient(rgba(14, 165, 233, 0.2) 1.5px, transparent 1.5px),
+                linear-gradient(90deg, rgba(14, 165, 233, 0.2) 1.5px, transparent 1.5px),
+                linear-gradient(rgba(30, 41, 59, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30, 41, 59, 0.1) 1px, transparent 1px);
+            background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
             font-family: 'Inter', sans-serif;
             display: flex;
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
+            color: #0f172a;
         }
 
         @media (min-width: 768px) {
@@ -49,6 +53,8 @@
         .sidebar {
             transition: transform 0.3s ease-in-out;
             z-index: 50;
+            background: linear-gradient(160deg, #1e293b, #0f172a);
+            border-right: 1px solid #334155;
         }
 
         /* Mobile Overlay */
@@ -60,8 +66,8 @@
 
         .logo-area {
             padding: 30px;
-            background: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
+            background: transparent;
+            border-bottom: 1px solid #334155;
             position: relative;
             overflow: hidden;
         }
@@ -103,13 +109,13 @@
         }
 
         .nav-link {
-            color: #475569;
-            /* Slate 600 - Darker text for light bg */
+            color: #94a3b8;
+            /* Slate 400 */
             padding: 15px 30px;
             font-weight: 800;
             font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             cursor: pointer;
             transition: 0.2s;
             border: none;
@@ -123,15 +129,14 @@
         }
 
         .nav-link:hover {
-            color: var(--accent);
-            background: #f0f9ff;
-            /* Sky 50 */
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .nav-link.active {
-            color: var(--accent);
-            background: #e0f2fe;
-            /* Sky 100 */
+            color: white;
+            background: rgba(14, 165, 233, 0.2);
+            /* Transparent Sky */
             border-right-color: var(--accent);
         }
 
@@ -177,12 +182,42 @@
         }
 
         .card-tactical {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            /* Clean Blueprint Card */
+            backdrop-filter: blur(10px);
             border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 2px solid rgba(30, 41, 59, 0.3);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
             overflow: hidden;
+        }
+
+        .table-tactical td {
+            padding: 14px 24px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            color: #0f172a;
+            /* Back to Dark Text */
+            white-space: nowrap;
+            font-weight: 600;
+        }
+
+        .table-tactical thead th {
+            background: #f1f5f9;
+            padding: 14px 24px;
+            color: #475569;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            border-bottom: 2px solid #cbd5e1;
+            white-space: nowrap;
+            letter-spacing: 0.05em;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .table-tactical tr:hover td {
+            background-color: rgba(14, 165, 233, 0.03);
         }
 
         /* --- NEW DARK TACTICAL CARD (For QSO Form) --- */
@@ -556,13 +591,14 @@
 
     <!-- MOBILE HEADER -->
     <div
-        class="md:hidden flex justify-between items-center p-4 bg-white text-slate-800 z-40 shadow-sm border-b border-slate-200">
+        class="md:hidden flex justify-between items-center p-4 bg-[#0f172a] text-white z-40 shadow-sm border-b border-slate-800">
         <div class="flex items-center gap-2">
             <i class="fas fa-broadcast-tower text-sky-500 text-xl"></i>
-            <span class="font-black italic tracking-tighter text-lg">RADIOLOG <span
-                    class="text-sky-500">PRO</span></span>
+            <span class="font-black italic tracking-tighter text-lg text-white">RADIOLOG <span
+                    class="text-sky-500">PRO</span> <span
+                    class="text-[10px] text-slate-400 not-italic ml-1">v2.8</span></span>
         </div>
-        <button onclick="toggleMenu()" class="text-slate-600 hover:text-sky-500 focus:outline-none transition-colors">
+        <button onclick="toggleMenu()" class="text-slate-400 hover:text-sky-500 focus:outline-none transition-colors">
             <i class="fas fa-bars text-xl"></i>
         </button>
     </div>
@@ -572,7 +608,7 @@
 
     <!-- SIDEBAR -->
     <aside id="sidebar"
-        class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 md:static md:flex flex-col w-72 bg-white text-slate-800 border-r border-slate-200 shadow-xl shadow-slate-200/50 overflow-y-auto z-50">
+        class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 md:static md:flex flex-col w-72 text-white shadow-2xl overflow-y-auto z-50">
 
         <div class="logo-area flex flex-col items-start relative">
             <!-- Mobile Close Button -->
@@ -590,20 +626,23 @@
                     <circle cx="50" cy="30" r="8" class="radio-wave wave-3" fill="none" stroke="currentColor"
                         stroke-width="1" />
                     <!-- Changed stroke from white to slate-800 (#1e293b) -->
-                    <path d="M50 30 L50 85" stroke="#1e293b" stroke-width="4" stroke-linecap="round" />
-                    <path d="M35 50 L50 45 L65 50" fill="none" stroke="#1e293b" stroke-width="2"
-                        stroke-linecap="round" />
-                    <path d="M40 65 L50 60 L60 65" fill="none" stroke="#1e293b" stroke-width="2"
-                        stroke-linecap="round" />
+                    <path d="M50 30 L50 85" stroke="white" stroke-width="4" stroke-linecap="round" />
+                    <path d="M35 50 L50 45 L65 50" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" />
+                    <path d="M40 65 L50 60 L60 65" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" />
                     <rect x="30" y="80" width="40" height="12" rx="2" fill="currentColor" />
-                    <!-- Changed circle fill from white to slate-800 -->
-                    <circle cx="50" cy="30" r="4" fill="#1e293b" />
+                    <circle cx="50" cy="30" r="4" fill="white" />
                 </svg>
 
             </div>
-            <h1 class="text-xl font-black tracking-tighter italic uppercase text-slate-900">RADIOLOG <span
-                    class="text-sky-500">PRO</span> <span class="text-xl font-black 100 text-slate-400">v2.4</span></h1>
-            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">by Kepa iNKuBo</p>
+            <div class="mt-2">
+                <h1 class="text-xl font-black italic tracking-tighter text-white leading-none">RADIOLOG <span
+                        class="text-sky-500">PRO</span></h1>
+                <div class="flex items-center gap-2 mt-1">
+                    <span
+                        class="bg-sky-500 text-[8px] font-black px-1.5 py-0.5 rounded text-white uppercase tracking-tighter">v2.8</span>
+                    <p class="text-[9px] font-black tracking-widest text-slate-400 uppercase">Terminal System</p>
+                </div>
+            </div>
 
             <!-- Oscilloscope Line -->
             <div class="scope-line">
@@ -651,21 +690,11 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
                 <div>
                     <h2
-                        class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter relative z-10 flex items-center gap-3 flex-wrap">
-                        <span><span class="text-sky-500">Terminal</span> Logbook</span>
+                        class="text-3xl md:text-4xl font-black italic uppercase text-slate-900 tracking-tighter relative z-10 flex items-center gap-3 flex-wrap">
+                        <span><span class="text-sky-600">Terminal</span> Logbook</span>
                         <div class="sdr-placeholder"></div>
                         <span class="absolute -bottom-2 left-0 w-12 h-1.5 bg-sky-500 rounded-full"></span>
                     </h2>
-                    <div class="flex gap-2 mt-4">
-                        <label
-                            class="text-[10px] bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-black px-4 py-2 rounded-lg uppercase transition-all cursor-pointer inline-flex items-center shadow-sm">
-                            <i class="fas fa-file-import mr-2 text-sky-500"></i> Importar
-                            <input type="file" id="import-json" class="hidden" accept=".json">
-                        </label>
-                        <button onclick="exportJSON()"
-                            class="text-[10px] bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-black px-4 py-2 rounded-lg uppercase transition-all shadow-sm"><i
-                                class="fas fa-file-export mr-2 text-emerald-500"></i> Exportar</button>
-                    </div>
                 </div>
                 <div class="flex flex-col items-end">
                     <!-- SPECTRUM ANIMATION -->
@@ -726,6 +755,18 @@
                             placeholder="Notas adicionales: Ubicación, Operador, Clima..."></textarea>
                     </div>
                 </form>
+            </div>
+
+            <!-- LOG MANAGEMENT ACTIONS -->
+            <div class="flex justify-end gap-2 mb-6">
+                <label
+                    class="text-[9px] bg-white border border-slate-300 hover:bg-slate-50 text-slate-500 font-black px-3 py-1.5 rounded-lg uppercase transition-all cursor-pointer inline-flex items-center shadow-sm">
+                    <i class="fas fa-file-import mr-2 text-sky-500"></i> Importar
+                    <input type="file" id="import-json" class="hidden" accept=".json">
+                </label>
+                <button onclick="exportJSON()"
+                    class="text-[9px] bg-white border border-slate-300 hover:bg-slate-50 text-slate-500 font-black px-3 py-1.5 rounded-lg uppercase transition-all shadow-sm"><i
+                        class="fas fa-file-export mr-2 text-emerald-500"></i> Exportar</button>
             </div>
 
             <!-- SEARCH BAR -->
@@ -808,7 +849,6 @@
             </div>
         </div>
 
-        <!-- TAB: EMERG & AIRE -->
         <div id="tab-emerg" class="tab-content">
             <h2
                 class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter mb-8 flex items-center gap-3 flex-wrap">
@@ -867,22 +907,39 @@
         <!-- TAB: CONTEST -->
         <div id="tab-contest" class="tab-content">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
-                <div>
+                <div class="w-full md:w-auto">
                     <h2
-                        class="text-3xl md:text-4xl font-black italic uppercase text-slate-800 tracking-tighter relative z-10 flex items-center gap-3">
+                        class="text-3xl md:text-4xl font-black italic uppercase text-slate-900 tracking-tighter relative z-10 flex items-center gap-3">
                         <span><span class="text-amber-500">Modo</span> Concurso</span>
                         <div class="sdr-placeholder"></div>
                         <span class="absolute -bottom-2 left-0 w-12 h-1.5 bg-amber-500 rounded-full"></span>
                     </h2>
-                    <div class="flex gap-2 mt-4">
-                        <button onclick="exportEDI()"
-                            class="text-[10px] bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-black px-4 py-2 rounded-lg uppercase transition-all shadow-sm">
-                            <i class="fas fa-file-export mr-2 text-amber-500"></i> Exportar EDI (REG1TEST)
-                        </button>
-                        <button onclick="resetContestSerial()"
-                            class="text-[10px] bg-white border border-slate-200 hover:bg-rose-50 text-rose-600 font-black px-4 py-2 rounded-lg uppercase transition-all shadow-sm">
-                            <i class="fas fa-undo mr-2"></i> Reset Serial
-                        </button>
+
+                    <!-- CONTEST SELECTOR -->
+                    <div class="flex flex-wrap gap-2 mt-6 p-4 bg-slate-100 rounded-xl border border-slate-200">
+                        <div class="flex-1 min-w-[200px]">
+                            <label
+                                class="text-[9px] font-black uppercase text-slate-500 block mb-1 tracking-widest">Identificador
+                                de Concurso</label>
+                            <div class="flex gap-2">
+                                <select id="current-contest-select" onchange="setContest(this.value)"
+                                    class="flex-1 bg-white border-slate-300 text-xs font-bold h-[38px] rounded-lg">
+                                    <option value="">-- Seleccionar --</option>
+                                </select>
+                                <button onclick="promptNewContest()"
+                                    class="bg-amber-500 text-white px-3 rounded-lg text-xs font-black uppercase hover:bg-amber-600 transition-all shadow-sm">Nuevo</button>
+                            </div>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button onclick="exportEDI()"
+                                class="text-[9px] bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-black px-3 py-2 rounded-lg uppercase transition-all shadow-sm h-[38px]">
+                                <i class="fas fa-file-export mr-1 text-amber-500"></i> EDI
+                            </button>
+                            <button onclick="resetContestSerial()"
+                                class="text-[9px] bg-white border border-slate-200 hover:bg-rose-50 text-rose-600 font-black px-3 py-2 rounded-lg uppercase transition-all shadow-sm h-[38px]">
+                                <i class="fas fa-undo mr-1"></i> Reset
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="flex flex-col items-end">
@@ -1441,7 +1498,9 @@
             hardware: []
         };
         let logs = JSON.parse(localStorage.getItem('basauri_logs_backup')) || [];
-        let contestLogs = JSON.parse(localStorage.getItem('basauri_contest_logs')) || [];
+        let contestLogs = []; // Now loaded from Cloud/Local based on ID
+        let currentContestId = localStorage.getItem('basauri_current_contest_id') || '';
+        let availableContests = [];
         let editingId = null;
 
         // --- SQL INSTALL GENERATOR ---
@@ -1475,6 +1534,17 @@ create table if not exists db_fm (
 create table if not exists db_hardware (
   id text primary key,
   r text, s text, u text, m text, tx text
+);
+
+-- TABLA CONTEST LOGS
+create table if not exists contest_logs (
+  id uuid primary key default gen_random_uuid(),
+  contest_id text not null,
+  date text, time text, callsign text not null,
+  band text, s_rst text, s_nr text,
+  r_rst text, r_nr text, r_loc text,
+  my_call text, my_loc text,
+  created_at timestamptz default now()
 );
             `.trim();
             const area = document.getElementById('sql-area');
@@ -1604,11 +1674,67 @@ create table if not exists db_hardware (
             setTimeout(fetchLogs, 1000);
         }
 
+        function updateContestSelector() {
+            const select = document.getElementById('current-contest-select');
+            if (!select) return;
+            select.innerHTML = '<option value="">-- Seleccionar --</option>';
+            availableContests.forEach(id => {
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.innerText = id;
+                if (id === currentContestId) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        function promptNewContest() {
+            const id = prompt("Escribe el Identificador Único del Concurso (ej: V-UHF-FEBRERO-24):");
+            if (id && id.trim()) {
+                setContest(id.trim());
+            }
+        }
+
+        function setContest(id) {
+            currentContestId = id;
+            localStorage.setItem('basauri_current_contest_id', id);
+
+            // Filter logs for this contest
+            const allLogs = JSON.parse(localStorage.getItem('basauri_contest_all_backup')) || [];
+            contestLogs = allLogs.filter(q => q.contest_id === id);
+
+            if (!availableContests.includes(id) && id) {
+                availableContests.push(id);
+                updateContestSelector();
+            }
+
+            renderAll();
+            updateContestSerial();
+            sysLog(`Cambiado a concurso: ${id}`, "text-amber-500");
+        }
+
+        async function saveContestQSO(qso) {
+            if (!supabaseClient) return false;
+            try {
+                const { error } = await supabaseClient.from('contest_logs').insert([qso]);
+                if (error) throw error;
+                return true;
+            } catch (e) {
+                sysLog("Error guardando concurso: " + e.message, "text-rose-500");
+                return false;
+            }
+        }
+
         async function fetchLogs() {
             if (!supabaseClient) initSupabase();
 
             // Load local first for speed
             loadLocalData();
+
+            // Restore current contest logs from local all-backup if needed
+            if (currentContestId) {
+                const allLogs = JSON.parse(localStorage.getItem('basauri_contest_all_backup')) || [];
+                contestLogs = allLogs.filter(q => q.contest_id === currentContestId);
+            }
 
             if (supabaseClient) {
                 sysLog("Syncing DB Tables...");
@@ -1639,6 +1765,21 @@ create table if not exists db_hardware (
             } catch (err) {
                 logs = JSON.parse(localStorage.getItem('basauri_logs_backup')) || [];
                 if (supabaseClient) updateStatus("Offline Mode", "text-amber-400");
+            }
+
+            // Fetch Contest Logs
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient.from('contest_logs').select('*').order('created_at', { ascending: false });
+                    if (!error && data) {
+                        localStorage.setItem('basauri_contest_all_backup', JSON.stringify(data));
+                        availableContests = [...new Set(data.map(q => q.contest_id))];
+                        if (currentContestId) {
+                            contestLogs = data.filter(q => q.contest_id === currentContestId);
+                        }
+                        updateContestSelector();
+                    }
+                } catch (e) { console.error("Contest sync error", e); }
             }
 
             renderAll();
@@ -1908,14 +2049,16 @@ create table if not exists db_hardware (
 
         function updateContestSerial() {
             let max = 0;
-            contestLogs.forEach(q => { const n = parseInt(q.sNr); if (!isNaN(n) && n > max) max = n; });
+            contestLogs.forEach(q => { const n = parseInt(q.s_nr); if (!isNaN(n) && n > max) max = n; });
             document.getElementById('c-s-nr').value = (max + 1).toString().padStart(3, '0');
         }
 
         function resetContestSerial() { if (confirm("¿Resetear serie a 001?")) { document.getElementById('c-s-nr').value = "001"; } }
 
-        document.getElementById('contest-qso-form').onsubmit = function (e) {
+        document.getElementById('contest-qso-form').onsubmit = async function (e) {
             e.preventDefault();
+            if (!currentContestId) return alert("Por favor, selecciona o crea un ID de Concurso primero.");
+
             const call = document.getElementById('c-callsign').value.toUpperCase();
             const band = document.getElementById('c-band').value;
             const rLoc = document.getElementById('c-r-loc').value.toUpperCase();
@@ -1928,47 +2071,88 @@ create table if not exists db_hardware (
             if (!validateLocator(rLoc)) { alert("Locator incorrecto (ej: IN83ne)"); return; }
 
             const qso = {
-                id: Date.now(),
+                contest_id: currentContestId,
                 date,
                 time: new Date().toLocaleTimeString('es-ES', { hour12: false }).replace(/:/g, '').slice(0, 4),
                 callsign: call,
                 band,
-                sRst: document.getElementById('c-s-rst').value,
-                sNr: document.getElementById('c-s-nr').value,
-                rRst: document.getElementById('c-r-rst').value,
-                rNr: document.getElementById('c-r-nr').value.padStart(3, '0'),
-                rLoc: rLoc
+                s_rst: document.getElementById('c-s-rst').value,
+                s_nr: document.getElementById('c-s-nr').value,
+                r_rst: document.getElementById('c-r-rst').value,
+                r_nr: document.getElementById('c-r-nr').value.padStart(3, '0'),
+                r_loc: rLoc,
+                my_call: document.getElementById('c-my-call').value || "EA2LXX",
+                my_loc: document.getElementById('c-my-loc').value || "IN83NE"
             };
 
+            // Local push for speed
             contestLogs.unshift(qso);
-            localStorage.setItem('basauri_contest_logs', JSON.stringify(contestLogs));
+            renderAll();
             this.reset();
             updateContestSerial();
-            renderAll();
-            sysLog("QSO Concurso Guardado.", "text-amber-500");
+
+            if (supabaseClient) {
+                const success = await saveContestQSO(qso);
+                if (success) {
+                    sysLog("QSO Concurso sincronizado.", "text-emerald-500");
+                    // Refresh all contests backup
+                    const { data } = await supabaseClient.from('contest_logs').select('*').order('created_at', { ascending: false });
+                    if (data) localStorage.setItem('basauri_contest_all_backup', JSON.stringify(data));
+                } else {
+                    sysLog("Fallo al sincronizar. Guardado local.", "text-amber-500");
+                }
+            } else {
+                // Save locally if offline
+                let allBackup = JSON.parse(localStorage.getItem('basauri_contest_all_backup')) || [];
+                allBackup.unshift({ ...qso, id: 'local_' + Date.now() });
+                localStorage.setItem('basauri_contest_all_backup', JSON.stringify(allBackup));
+            }
         };
 
-        function deleteContestLog(id) {
+        window.deleteContestLog = async function (id) {
             if (!confirm("¿Borrar este QSO del concurso?")) return;
+
+            const backup = [...contestLogs];
             contestLogs = contestLogs.filter(q => q.id !== id);
-            localStorage.setItem('basauri_contest_logs', JSON.stringify(contestLogs));
             renderAll();
+
+            if (supabaseClient && !id.toString().startsWith('local_')) {
+                try {
+                    const { error } = await supabaseClient.from('contest_logs').delete().eq('id', id);
+                    if (error) throw error;
+                    // Refresh backup
+                    const { data } = await supabaseClient.from('contest_logs').select('*').order('created_at', { ascending: false });
+                    if (data) localStorage.setItem('basauri_contest_all_backup', JSON.stringify(data));
+                } catch (e) {
+                    alert("Error en nube. Revertiendo.");
+                    contestLogs = backup;
+                    renderAll();
+                }
+            } else {
+                // Local delete
+                let allBackup = JSON.parse(localStorage.getItem('basauri_contest_all_backup')) || [];
+                allBackup = allBackup.filter(q => q.id !== id);
+                localStorage.setItem('basauri_contest_all_backup', JSON.stringify(allBackup));
+            }
             updateContestSerial();
         }
 
         function exportEDI() {
-            if (contestLogs.length === 0) return alert("Nada que exportar.");
+            if (contestLogs.length === 0) return alert("Nada que exportar en este concurso.");
             const myCall = document.getElementById('c-my-call').value || "EA2LXX";
             const myLoc = document.getElementById('c-my-loc').value || "IN83NE";
             const band = document.getElementById('c-band').value;
             const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-            let h = `[REG1TEST;1]\nTName=BASAURI V-UHF\nTDate=${dateStr};${dateStr}\nPCall=${myCall}\nPWWLo=${myLoc}\nPSect=SINGLE-PORTABLE\nPBand=${band}\n[Remarks]\nGenerated by QRZLog\n[QSORecords;${contestLogs.length}]\n`;
-            let r = contestLogs.map(q => `${q.date};${q.time};${q.callsign};1;${q.sRst};${q.sNr};${q.rRst};${q.rNr};${q.rLoc};`).join('\n');
+            const contestName = currentContestId || "CONTEST";
+
+            let h = `[REG1TEST;1]\nTName=${contestName}\nTDate=${dateStr};${dateStr}\nPCall=${myCall}\nPWWLo=${myLoc}\nPSect=SINGLE-PORTABLE\nPBand=${band}\n[Remarks]\nGenerated by RadioLog Pro\n[QSORecords;${contestLogs.length}]\n`;
+            let r = contestLogs.map(q => `${q.date};${q.time};${q.callsign};1;${q.s_rst};${q.s_nr};${q.r_rst};${q.r_nr};${q.r_loc};`).join('\n');
+
             const blob = new Blob([h + r], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `CONTEST_${dateStr}_${band.replace(' ', '')}.edi`;
+            a.download = `${contestName}_${dateStr}_${band.replace(' ', '')}.edi`;
             a.click();
         }
 
@@ -2216,34 +2400,37 @@ create table if not exists db_hardware (
                 const el = document.getElementById(id);
                 if (el) el.innerHTML = tables[id];
             });
-        }
+            // CONTEST LOGS RENDER
+            const contestStatus = document.getElementById('contest-status');
+            if (contestStatus) contestStatus.innerText = `${contestLogs.length} QSOs CONCURSO`;
 
-        // CONTEST LOGS RENDER
-        const contestStatus = document.getElementById('contest-status');
-        if (contestStatus) contestStatus.innerText = `${contestLogs.length} QSOs CONCURSO`;
-
-        const contestContainer = document.getElementById('contest-logs-container');
-        if (contestContainer) {
-            contestContainer.innerHTML = contestLogs.length > 0 ? contestLogs.map(q => `
-                    <div class="card-tactical-dark p-4 border-l-4 border-l-amber-500 flex justify-between items-center group">
-                        <div>
-                            <div class="flex items-center gap-3">
-                                <span class="text-xl font-black text-white mono">${q.callsign}</span>
-                                <span class="text-[9px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded font-black">${q.band}</span>
+            const contestContainer = document.getElementById('contest-logs-container');
+            if (contestContainer) {
+                if (!currentContestId) {
+                    contestContainer.innerHTML = '<div class="p-8 text-center text-slate-500 font-bold uppercase italic text-xs border border-dashed border-slate-300 rounded-xl bg-slate-50">Crea o selecciona un concurso arriba para empezar</div>';
+                } else {
+                    contestContainer.innerHTML = contestLogs.length > 0 ? contestLogs.map(q => `
+                        <div class="card-tactical-dark p-4 border-l-4 border-l-amber-500 flex justify-between items-center group">
+                            <div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xl font-black text-white mono">${q.callsign}</span>
+                                    <span class="text-[9px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded font-black">${q.band}</span>
+                                </div>
+                                <div class="text-[9px] font-bold text-slate-500 uppercase mt-1">
+                                    <i class="far fa-clock"></i> ${q.date} ${q.time} | LOC: <span class="text-amber-200">${q.r_loc}</span>
+                                </div>
                             </div>
-                            <div class="text-[9px] font-bold text-slate-500 uppercase mt-1">
-                                <i class="far fa-clock"></i> ${q.date} ${q.time} | LOC: <span class="text-amber-200">${q.rLoc}</span>
+                            <div class="flex items-center gap-4">
+                                <div class="text-right">
+                                    <div class="text-[8px] font-black text-slate-500 uppercase">Serie S/R</div>
+                                    <div class="text-xs font-black text-amber-500 mono">${q.s_nr} / ${q.r_nr}</div>
+                                </div>
+                                <button onclick="deleteContestLog('${q.id}')" class="text-slate-600 hover:text-rose-500 p-2 transition-colors"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
-                        <div class="flex items-center gap-4">
-                            <div class="text-right">
-                                <div class="text-[8px] font-black text-slate-500 uppercase">Serie S/R</div>
-                                <div class="text-xs font-black text-amber-500 mono">${q.sNr} / ${q.rNr}</div>
-                            </div>
-                            <button onclick="deleteContestLog(${q.id})" class="text-slate-600 hover:text-rose-500 p-2 transition-colors"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                `).join('') : '<div class="p-8 text-center text-slate-500 font-bold uppercase italic text-xs border border-dashed border-slate-700 rounded-xl">Empieza el concurso registrando tu primer QSO</div>';
+                    `).join('') : '<div class="p-8 text-center text-slate-500 font-bold uppercase italic text-xs border border-dashed border-slate-700 rounded-xl">Empieza el concurso registrando tu primer QSO</div>';
+                }
+            }
         }
 
 
@@ -2448,69 +2635,118 @@ create table if not exists db_hardware (
         function renderSDRWidgets() {
             const svgs = document.querySelectorAll('.sdr-placeholder');
             const svgContent = `
-            <svg viewBox="0 0 200 50" class="w-full h-full drop-shadow-lg" preserveAspectRatio="none">
-                <!-- Bg -->
-                <rect width="200" height="50" fill="#0f172a" rx="4" />
-                
-                <!-- Grid -->
-                <path d="M0 25 L200 25" stroke="#1e293b" stroke-width="1" />
-                <path d="M25 0 L25 50 M50 0 L50 50 M75 0 L75 50 M100 0 L100 50 M125 0 L125 50 M150 0 L150 50 M175 0 L175 50" stroke="#1e293b" stroke-width="0.5" stroke-dasharray="2 2" />
-
-                <!-- Waterfall (Bottom) -->
+            <svg viewBox="0 0 200 64" class="w-full h-full" preserveAspectRatio="none">
                 <defs>
                     <linearGradient id="fallGrad" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stop-color="#0ea5e9" stop-opacity="1" />
+                        <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.9" />
+                        <stop offset="20%" stop-color="#f59e0b" stop-opacity="0.6" />
+                        <stop offset="50%" stop-color="#0ea5e9" stop-opacity="0.3" />
                         <stop offset="100%" stop-color="#0f172a" stop-opacity="0" />
                     </linearGradient>
+                    <linearGradient id="peakGrad" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stop-color="#ff4545" />
+                        <stop offset="30%" stop-color="#fbbf24" />
+                        <stop offset="100%" stop-color="#0ea5e9" stroke-opacity="0.2" />
+                    </linearGradient>
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="0.8" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
                 </defs>
+
+                <!-- Background -->
+                <rect width="200" height="64" fill="#020617" />
                 
-                <!-- Signal 1 Waterfall (Left) -->
-                <rect x="30" y="25" width="6" height="25" fill="url(#fallGrad)" opacity="0.8">
-                    <animate attributeName="y" values="25;50" dur="1.5s" repeatCount="indefinite" />
-                    <animate attributeName="height" values="0;25" dur="1.5s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.8;0" dur="1.5s" repeatCount="indefinite" />
-                </rect>
-                
-                <!-- Signal 2 Waterfall (Center-Right) -->
-                <rect x="110" y="25" width="4" height="25" fill="url(#fallGrad)" opacity="0.6">
-                    <animate attributeName="y" values="25;50" dur="2s" begin="0.5s" repeatCount="indefinite" />
-                    <animate attributeName="height" values="0;25" dur="2s" begin="0.5s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.6;0" dur="2s" begin="0.5s" repeatCount="indefinite" />
-                </rect>
+                <!-- Advanced Grid -->
+                <g stroke="#1e293b" stroke-width="0.3">
+                    <!-- Vertical Frequency Lines -->
+                    <line x1="20" y1="0" x2="20" y2="64" />
+                    <line x1="40" y1="0" x2="40" y2="64" stroke-width="0.6" />
+                    <line x1="60" y1="0" x2="60" y2="64" />
+                    <line x1="80" y1="0" x2="80" y2="64" stroke-width="0.6" />
+                    <line x1="100" y1="0" x2="100" y2="64" stroke="#334155" stroke-width="1" />
+                    <line x1="120" y1="0" x2="120" y2="64" stroke-width="0.6" />
+                    <line x1="140" y1="0" x2="140" y2="64" />
+                    <line x1="160" y1="0" x2="160" y2="64" stroke-width="0.6" />
+                    <line x1="180" y1="0" x2="180" y2="64" />
 
-                <!-- Signal 3 Waterfall (Right) -->
-                <rect x="160" y="25" width="8" height="25" fill="url(#fallGrad)" opacity="0.9">
-                    <animate attributeName="y" values="25;50" dur="1.2s" begin="0.2s" repeatCount="indefinite" />
-                    <animate attributeName="height" values="0;25" dur="1.2s" begin="0.2s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.9;0" dur="1.2s" begin="0.2s" repeatCount="indefinite" />
-                </rect>
+                    <!-- Horizontal dB Lines -->
+                    <line x1="0" y1="12" x2="200" y2="12" />
+                    <line x1="0" y1="24" x2="200" y2="24" />
+                    <line x1="0" y1="36" x2="200" y2="36" />
+                </g>
 
-                <!-- Spectrum (Top) -->
-                <!-- Base Noise Floor -->
-                <polyline points="0,22 10,23 20,21 30,22 40,21 50,22 60,21 70,22 80,21 90,22 100,21 110,23 120,21 130,22 140,21 150,22 160,21 170,22 180,21 190,22 200,21" fill="none" stroke="#0ea5e9" stroke-width="1" opacity="0.5">
-                     <animate attributeName="points" dur="0.2s" repeatCount="indefinite"
-                        values="0,22 10,23 20,21 30,22 40,21 50,22 60,21 70,22 80,21 90,22 100,21 110,23 120,21 130,22 140,21 150,22 160,21 170,22 180,21 190,22 200,21;
-                                0,21 10,22 20,23 30,21 40,22 50,21 60,22 70,21 80,22 90,21 100,22 110,21 120,22 130,23 140,22 150,21 160,22 170,21 180,22 190,21 200,22;
-                                0,22 10,21 20,22 30,23 40,21 50,23 60,21 70,23 80,21 90,22 100,21 110,22 120,21 130,22 140,23 150,22 160,23 170,22 180,21 190,22 200,21" />
-                </polyline>
+                <!-- Numerical Markers (Tiny) -->
+                <g fill="#475569" font-family="monospace" font-size="4" font-weight="bold">
+                    <text x="2" y="10">-20</text>
+                    <text x="2" y="22">-50</text>
+                    <text x="2" y="34">-80</text>
+                    <text x="185" y="42">dBm</text>
+                </g>
 
-                <!-- Active Signals Peaks -->
-                <!-- Peak 1 at x=30 -->
-                <path d="M25 22 L33 5 L41 22" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                     <animate attributeName="d" dur="0.1s" repeatCount="indefinite"
-                        values="M25 22 L33 5 L41 22; M25 22 L33 8 L41 22; M25 22 L33 4 L41 22" />
+                <!-- PRO Waterfall (Granular) -->
+                <g opacity="0.8">
+                    <!-- Signal 1 Waterfall Cluster -->
+                    <rect x="26" y="42" width="10" height="22" fill="url(#fallGrad)">
+                        <animate attributeName="opacity" values="0.9;0.4;0.9" dur="1s" repeatCount="indefinite" />
+                    </rect>
+                    <rect x="29" y="42" width="4" height="22" fill="#fff" opacity="0.1">
+                        <animate attributeName="x" values="28;31;28" dur="0.5s" repeatCount="indefinite" />
+                    </rect>
+                    
+                    <!-- Signal 2 Waterfall Cluster -->
+                    <rect x="146" y="42" width="7" height="22" fill="url(#fallGrad)">
+                        <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2s" repeatCount="indefinite" />
+                    </rect>
+
+                    <!-- Falling 'Rain' Segments -->
+                    <rect x="27" y="42" width="8" height="2" fill="#fbbf24">
+                        <animate attributeName="y" values="42;64" dur="0.8s" repeatCount="indefinite" />
+                    </rect>
+                    <rect x="30" y="48" width="2" height="4" fill="#fff" opacity="0.5">
+                        <animate attributeName="y" values="42;64" dur="0.6s" repeatCount="indefinite" />
+                    </rect>
+                    <rect x="148" y="42" width="4" height="2" fill="#fbbf24">
+                        <animate attributeName="y" values="42;64" dur="1.2s" repeatCount="indefinite" />
+                    </rect>
+                </g>
+
+                <!-- High-Density Noise Floor (Grass) -->
+                <path fill="none" stroke="#334155" stroke-width="0.8" opacity="0.4">
+                    <animate attributeName="d" dur="0.08s" repeatCount="indefinite"
+                        values="M0,40 L2,38 L4,41 L6,39 L8,42 L10,38 L12,41 L14,39 L16,42 L18,38 L20,41 L22,39 L24,42 L26,38 L28,41 L30,39 L32,42 L34,38 L36,41 L38,39 L40,42 L42,38 L44,41 L46,39 L48,42 L50,38 L52,41 L54,39 L56,42 L58,38 L60,41 L62,39 L64,42 L66,38 L68,41 L70,39 L72,42 L74,38 L76,41 L78,39 L80,42 L82,38 L84,41 L86,39 L88,42 L90,38 L92,41 L94,39 L96,42 L98,38 L100,41 L102,39 L104,42 L106,38 L108,41 L110,39 L112,42 L114,38 L116,41 L118,39 L120,42 L122,38 L124,41 L126,39 L128,42 L130,38 L132,41 L134,39 L136,42 L138,38 L140,41 L142,39 L144,42 L146,38 L148,41 L150,39 L152,42 L154,38 L156,41 L158,39 L160,42 L162,38 L164,41 L166,39 L168,42 L170,38 L172,41 L174,39 L176,42 L178,38 L180,41 L182,39 L184,42 L186,38 L188,41 L190,39 L192,42 L194,38 L196,41 L198,39 L200,42;
+                                M0,41 L2,39 L4,42 L6,38 L8,41 L10,39 L12,42 L14,38 L16,41 L18,39 L20,42 L22,38 L24,41 L26,39 L28,42 L30,38 L32,41 L34,39 L36,42 L38,38 L40,41 L42,39 L44,42 L46,38 L48,41 L50,39 L52,42 L54,38 L56,41 L58,39 L60,42 L62,38 L64,41 L66,39 L68,42 L70,38 L72,41 L74,39 L76,42 L78,38 L80,41 L82,39 L84,42 L86,38 L88,41 L90,39 L92,42 L94,38 L96,41 L98,39 L100,42 L102,38 L104,41 L106,39 L108,42 L110,38 L112,41 L114,39 L116,42 L118,38 L120,41 L122,39 L124,42 L126,38 L128,41 L130,39 L132,42 L134,38 L136,41 L138,39 L140,42 L142,38 L144,41 L146,39 L148,42 L150,38 L152,41 L154,39 L156,42 L158,38 L160,41 L162,39 L164,42 L166,38 L168,41 L170,39 L172,42 L174,38 L176,41 L178,39 L180,42 L182,38 L184,41 L186,39 L188,42 L190,38 L192,41 L194,39 L196,42 L198,38 L200,41" />
                 </path>
-                <!-- Peak 2 at x=110 -->
-                <path d="M105 22 L112 12 L119 22" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                     <animate attributeName="d" dur="0.15s" repeatCount="indefinite"
-                        values="M105 22 L112 12 L119 22; M105 22 L112 15 L119 22; M105 22 L112 10 L119 22" />
+
+                <!-- PRO SPECTRAL LINE (The Active Pulse) -->
+                <path fill="none" stroke="#0ea5e9" stroke-width="1.2" filter="url(#glow)">
+                    <animate attributeName="d" dur="0.12s" repeatCount="indefinite"
+                        values="M0,40 L15,40 Q25,38 31,5 Q37,38 45,40 L80,41 L85,25 L90,41 L130,40 Q142,39 149,15 Q156,39 165,40 L200,40;
+                                M0,41 L15,41 Q25,39 31,8 Q37,39 45,41 L80,42 L85,30 L90,42 L130,41 Q142,40 149,18 Q156,40 165,41 L200,41" />
                 </path>
-                <!-- Peak 3 at x=160 -->
-                <path d="M152 22 L164 2 L176 22" fill="none" stroke="#e0f2fe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                     <animate attributeName="d" dur="0.12s" repeatCount="indefinite"
-                        values="M152 22 L164 2 L176 22; M152 22 L164 6 L176 22; M152 22 L164 3 L176 22" />
+
+                <!-- Signal Fill (Gradient) -->
+                <path fill="url(#peakGrad)" opacity="0.4">
+                    <animate attributeName="d" dur="0.12s" repeatCount="indefinite"
+                        values="M15,40 Q25,38 31,5 Q37,38 45,40 Z; M15,40 Q25,39 31,8 Q37,39 45,40 Z" />
                 </path>
+
+                <!-- Harmonic Sidelobes -->
+                <g fill="#38bdf8" opacity="0.3">
+                    <circle cx="25" cy="40" r="1.5"><animate attributeName="cy" values="40;35;40" dur="0.4s" repeatCount="indefinite" /></circle>
+                    <circle cx="37" cy="40" r="1.5"><animate attributeName="cy" values="40;37;40" dur="0.3s" repeatCount="indefinite" /></circle>
+                </g>
+
+                <!-- Center Needle / Tuning Info -->
+                <g class="cursor">
+                    <line x1="100" y1="0" x2="100" y2="42" stroke="#f43f5e" stroke-width="1" stroke-dasharray="1 1" />
+                    <rect x="97" y="0" width="6" height="3" fill="#f43f5e" rx="1" />
+                    <text x="102" y="6" fill="#f43f5e" font-size="4" font-family="monospace" font-weight="bold">SQL</text>
+                </g>
             </svg>
+            `;
+            svgs.forEach(el => el.innerHTML = svgContent);
+        }
             `;
             svgs.forEach(el => el.innerHTML = svgContent);
         }
