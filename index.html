@@ -5,7 +5,7 @@
     <link rel="manifest" href="./manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RadioLog Pro v2.4 | Secure & Merge</title>
+    <title>RadioLog Pro v2.7 | Secure Auth Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./auth.js"></script> <!-- EXTERNAL AUTH -->
@@ -1263,8 +1263,7 @@
         let supabaseClient = null;
 
         // --- GLOBAL STATE ---
-        let logs = [];
-        let editingId = null;
+        // logs and editingId are declared further down with initialization logic
 
         // --- HELPER FUNCTIONS ---
         function updateStatus(msg, color) {
@@ -2213,7 +2212,11 @@ create table if not exists db_hardware (
                 'table-h8': db.hardware.map(h => `<tr class="hover:bg-slate-50"><td class="mono font-bold text-slate-800 whitespace-nowrap">${h.r}</td><td class="font-black text-sky-600 uppercase text-[10px] tracking-wide">${h.s}</td><td class="font-bold text-slate-400 text-[10px] italic">${h.u}</td><td class="font-bold text-slate-700 text-[10px] uppercase bg-slate-100 px-2 py-0.5 rounded inline-block">${h.m}</td><td><span class="badge-status ${h.tx === 'TX OK' ? 'status-tx' : (h.tx === 'UNLOCKED' ? 'status-unlocked' : 'status-rx')}">${h.tx}</span></td><td>${renderActions('hardware', h.id)}</td></tr>`).join('')
             };
 
-        });
+            Object.keys(tables).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = tables[id];
+            });
+        }
 
         // CONTEST LOGS RENDER
         const contestStatus = document.getElementById('contest-status');
@@ -2242,7 +2245,7 @@ create table if not exists db_hardware (
                     </div>
                 `).join('') : '<div class="p-8 text-center text-slate-500 font-bold uppercase italic text-xs border border-dashed border-slate-700 rounded-xl">Empieza el concurso registrando tu primer QSO</div>';
         }
-        }
+
 
         document.getElementById('import-json').addEventListener('change', function (event) {
             const file = event.target.files[0];
