@@ -928,6 +928,9 @@
                                 </select>
                                 <button onclick="promptNewContest()"
                                     class="bg-amber-500 text-white px-3 rounded-lg text-xs font-black uppercase hover:bg-amber-600 transition-all shadow-sm">Nuevo</button>
+                                <button onclick="deleteCurrentContest()"
+                                    class="bg-rose-500 text-white px-3 rounded-lg text-xs font-black uppercase hover:bg-rose-600 transition-all shadow-sm"><i
+                                        class="fas fa-trash"></i></button>
                             </div>
                         </div>
                         <div class="flex items-end gap-2">
@@ -1710,6 +1713,44 @@ create table if not exists contest_logs (
             renderAll();
             updateContestSerial();
             sysLog(`Cambiado a concurso: ${id}`, "text-amber-500");
+        }
+
+        async function deleteCurrentContest() {
+            if (!currentContestId) return alert("Selecciona un concurso para eliminar.");
+            if (!confirm(`¿Eliminar permanentemente el concurso "${currentContestId}" y todos sus QSOs?`)) return;
+            if (!checkAuthSync('eliminar concurso')) return;
+
+            const contestIdToDelete = currentContestId;
+
+            // 1. Delete from Cloud
+            if (supabaseClient) {
+                try {
+                    const { error } = await supabaseClient.from('contest_logs').delete().eq('contest_id', contestIdToDelete);
+                    if (error) throw error;
+                    sysLog(`Concurso ${contestIdToDelete} eliminado de la nube.`, "text-rose-500");
+                } catch (e) {
+                    sysLog("Error eliminando concurso en nube: " + e.message, "text-rose-500");
+                    alert("Error al eliminar en la nube.");
+                    return;
+                }
+            }
+
+            // 2. Delete from Local Storage (all backup)
+            let allLogs = JSON.parse(localStorage.getItem('basauri_contest_all_backup')) || [];
+            allLogs = allLogs.filter(q => q.contest_id !== contestIdToDelete);
+            localStorage.setItem('basauri_contest_all_backup', JSON.stringify(allLogs));
+
+            // 3. Update State
+            availableContests = availableContests.filter(id => id !== contestIdToDelete);
+            currentContestId = '';
+            localStorage.removeItem('basauri_current_contest_id');
+            contestLogs = [];
+
+            // 4. UI Update
+            updateContestSelector();
+            renderAll();
+            updateContestSerial();
+            sysLog(`Concurso ${contestIdToDelete} eliminado.`, "text-amber-500");
         }
 
         async function saveContestQSO(qso) {
